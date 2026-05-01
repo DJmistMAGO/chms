@@ -209,21 +209,21 @@
             <img src="{{ asset('assets/images/chlogo.png') }}" alt="Caree Hotel Logo" width="100">
         </div>
         <div class="nav-links">
-        <a href="#">HOME</a>
-        <a href="#">ROOMS</a>
-        <a href="#">LOGIN</a>
-        {{-- <a href="#">ADMIN</a> --}}
+            <a href="#">HOME</a>
+            <a href="#">ROOMS</a>
+            <a href="#">LOGIN</a>
+            {{-- <a href="#">ADMIN</a> --}}
         </div>
     </div>
 
     <section class="hero mt-5">
         <div class="hero-content">
-        <h1>FIND YOUR <span>PEACE</span> HERE.</h1>
-        <p>Experience the perfect blend of modern comfort and serene ambiance. Our micro-pricing ensures you only pay for the views and features you love.</p>
-        <div class="buttons">
-            <button class="btn btn-primary">Start Reservation</button>
-            <button class="btn btn-outline">Explore Rooms</button>
-        </div>
+            <h1>FIND YOUR <span>PEACE</span> HERE.</h1>
+            <p>Experience the perfect blend of modern comfort and serene ambiance. Our micro-pricing ensures you only pay for the views and features you love.</p>
+            <div class="buttons">
+                <button class="btn btn-primary">Start Reservation</button>
+                <button class="btn btn-outline">Explore Rooms</button>
+            </div>
         </div>
     </section>
 
@@ -277,7 +277,6 @@
 
     {{-- <script src="{{ asset('assets/js/main.js') }}"></script> --}} {{-- to add once compiled for development --Mike --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 
 </body>
 </html>
