@@ -45,8 +45,7 @@
             });
 
             Alpine.store('sidebar', {
-                // Initialize based on screen size
-                isExpanded: window.innerWidth >= 1280, // true for desktop, false for mobile
+                isExpanded: window.innerWidth >= 1280,
                 isMobileOpen: false,
                 isHovered: false,
 
@@ -90,7 +89,7 @@
             }
         })();
     </script>
-    
+
 </head>
 
 <body
