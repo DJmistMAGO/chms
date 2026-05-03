@@ -15,16 +15,39 @@
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#ffd000',
-                        secondary: '#f9ae36',
-                        light: '#ffe1a4',
-                        dark: '#000000'
+                        primary: '#FFD000',
+                        secondary: '#F9AE36',
+                        light: '#FFE1A4',
+                        dark: '#000000',
+
+                        neutral: {
+                            50: '#FFFFFF',
+                            100: '#F5F5F5',
+                            200: '#E5E7EB',
+                            300: '#D1D5DB',
+                            400: '#9CA3AF',
+                            500: '#6B7280',
+                            600: '#4B5563',
+                            700: '#374151',
+                            800: '#1F2937',
+                            900: '#111827'
+                        },
+
+                        accent: {
+                            blue: '#2563EB',
+                            teal: '#14B8A6',
+                            navy: '#1E3A8A'
+                        },
+
+                        success: '#22C55E',
+                        warning: '#F59E0B',
+                        error: '#EF4444',
+                        info: '#3B82F6'
                     }
                 }
             }
