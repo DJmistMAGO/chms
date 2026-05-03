@@ -13,12 +13,15 @@
             Login to <span class="text-yellow-500">Caree Hotel</span>
         </h2>
 
-        <form action="/login" method="POST" class="space-y-4">
+        <form action="{{ route('login.post') }}" method="POST" class="space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium">Email</label>
                 <input type="email" name="email" required
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none">
+                    @error('email')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
             </div>
 
             <div>
@@ -39,7 +42,7 @@
             <div class="flex-grow border-t"></div>
         </div>
 
-        <a href="/auth/google"
+        <a href="{{ route('login.google') }}"
             class="flex items-center justify-center gap-3 border py-2 rounded-lg hover:bg-gray-100 transition">
 
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">

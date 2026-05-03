@@ -7,11 +7,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landingpage');
+})->name('landingpage');
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
+    })->name('dashboard');
 });
 
-Route::get('/dashboard', function () {
-    return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
-})->name('dashboard');
 
 Route::get('/calendar', function () {
     return view('pages.calender', ['title' => 'Calendar']);
@@ -96,8 +99,14 @@ Route::get('/test', function () {
 Route::controller(LoginController::class)
     ->prefix('login')
     ->group(function () {
+        Route::get('/', 'showLoginForm')->name('login');
         Route::post('/login', 'login')->name('login.post');
+        Route::get('/google', 'redirectToGoogle')->name('login.google');
+        Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+        // Route::post('/logout', 'logout')->name('logout');
 });
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // ->middleware('guest'); // Optional: Add guest middleware to prevent authenticated users from accessing the login page
 // ->middleware('auth'); // Optional: Add auth middleware to protect the dashboard route

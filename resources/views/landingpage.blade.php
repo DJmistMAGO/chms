@@ -66,7 +66,7 @@
         <div class="space-x-6 font-medium">
             <a href="#" class="hover:text-primary">HOME</a>
             <a href="#" class="hover:text-primary">ROOMS</a>
-            <a href="#" class="hover:text-primary ps-5">LOGIN</a>
+            <a href="{{ route('login') }}" class="hover:text-primary ps-5">LOGIN</a>
         </div>
     </nav>
 
@@ -78,16 +78,16 @@
                 FIND YOUR <span class="text-primary">PEACE</span> HERE.
             </h1>
 
-            <p class="mt-4 text-lg leading-relaxed">
+            <p class="mt-4 text-sm md:text-lg leading-relaxed ">
                 Experience the perfect blend of modern comfort and serene ambiance.
                 Our micro-pricing ensures you only pay for the views and features you love.
             </p>
 
-            <div class="mt-6 space-x-3">
-                <button class="bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:scale-105 hover:text-black transition">
+            <div class="mt-6 flex flex-col md:flex-row md:items-left md:justify-left gap-3">
+                <button class="w-full md:w-auto md:min-w-[180px] bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:scale-105 hover:text-black transition text-center">
                     Start Reservation
                 </button>
-                <button class="border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition">
+                <button class="w-full md:w-auto md:min-w-[180px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition text-center">
                     Explore Rooms
                 </button>
             </div>
@@ -97,7 +97,7 @@
     <section class="flex flex-col md:flex-row items-center px-6 md:px-16 py-20 gap-10">
 
         <div class="flex-1">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+            <h2 class="text-3xl md:text-4xl text-center md:text-left font-bold mb-6">
                 Why Choose <span class="text-primary">Caree Hotel?</span>
             </h2>
 
