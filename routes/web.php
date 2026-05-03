@@ -33,9 +33,9 @@ Route::get('/blank', function () {
     return view('pages.blank', ['title' => 'Blank']);
 })->name('blank');
 
-Route::get('/error-404', function () {
-    return view('pages.errors.error-404', ['title' => 'Error 404']);
-})->name('error-404');
+// Route::get('/error-404', function () {
+//     return view('pages.errors.error-404', ['title' => 'Error 404']);
+// })->name('error-404');
 
 Route::get('/line-chart', function () {
     return view('pages.chart.line-chart', ['title' => 'Line Chart']);
@@ -77,3 +77,9 @@ Route::get('/image', function () {
 Route::get('/videos', function () {
     return view('pages.ui-elements.videos', ['title' => 'Videos']);
 })->name('videos');
+
+
+
+Route::fallback(function () {
+    return response()->view('pages.errors.error-404', [], 404);
+});
