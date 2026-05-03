@@ -12,7 +12,7 @@
     <link rel="shortcut icon" href="{{ asset('assets/images/chlogo.png') }}">
 
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
 
@@ -61,10 +61,10 @@
             </p>
 
             <div class="mt-6 space-x-3">
-                <button class="bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:shadow-lg hover:text-black transition">
+                <button class="bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:scale-105 hover:text-black transition">
                     Start Reservation
                 </button>
-                <button class="border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black transition">
+                <button class="border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition">
                     Explore Rooms
                 </button>
             </div>
@@ -83,7 +83,7 @@
                     <i class="fas fa-star"></i>
                 </div>
                 <div>
-                    <h3 class="font-semibold">Micro Pricing Engine</h3>
+                    <h3 class="font-semibold text-lg">Micro Pricing Engine</h3>
                     <p class="text-gray-600">
                         Our innovative pricing model breaks down room rates by features like view, type, and ambiance.
                     </p>
@@ -95,7 +95,7 @@
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div>
-                    <h3 class="font-semibold">Secure Identity Verification</h3>
+                    <h3 class="font-semibold text-lg">Secure Identity Verification</h3>
                     <p class="text-gray-600">
                         Two-step identity verification ensures safe and legitimate bookings.
                     </p>
@@ -107,7 +107,7 @@
                     <i class="fas fa-bed"></i>
                 </div>
                 <div>
-                    <h3 class="font-semibold">Bulan's Finest Comfort</h3>
+                    <h3 class="font-semibold text-lg">Bulan's Finest Comfort</h3>
                     <p class="text-gray-600">
                         High-speed internet, premium bedding, and peaceful ambiance in Sorsogon.
                     </p>
@@ -117,7 +117,7 @@
 
         <div class="flex-1">
             <img src="{{ asset('assets/images/ch1.png') }}"
-                class="rounded-3xl w-full max-h-[80vh] object-cover">
+                class="rounded-3xl w-full max-h-[80vh] object-cover hover:scale-105 transition-transform shadow-lg">
         </div>
     </section>
 
