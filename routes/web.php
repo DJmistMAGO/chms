@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
+// use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -83,3 +84,21 @@ Route::get('/videos', function () {
 Route::fallback(function () {
     return response()->view('pages.errors.error-404', [], 404);
 });
+
+
+// test pages
+
+Route::get('/test', function () {
+    return view('test_pages.testlogin');
+})->name('test');
+
+// login route (use this format for routing to controllers)
+Route::controller(LoginController::class)
+    ->prefix('login')
+    ->group(function () {
+        Route::post('/login', 'login')->name('login.post');
+});
+
+// ->middleware('guest'); // Optional: Add guest middleware to prevent authenticated users from accessing the login page
+// ->middleware('auth'); // Optional: Add auth middleware to protect the dashboard route
+// ->middleware('verified'); // Optional: Add email verification middleware if you require email verification for users

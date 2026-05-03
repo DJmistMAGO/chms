@@ -71,7 +71,7 @@
     </nav>
 
     <section class="h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white"
-        style="background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url('{{ asset('assets/images/ch2.png') }}')">
+        style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.716)), url('{{ asset('assets/images/ch2.png') }}')">
 
         <div class="max-w-xl">
             <h1 class="text-4xl md:text-6xl font-bold mt-10">
