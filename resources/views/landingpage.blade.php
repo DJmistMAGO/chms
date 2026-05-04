@@ -175,13 +175,13 @@
                         on a budget.
                     </p>
                     <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Free Wi-Fi
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Air Conditioning
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> 1 Queen Bed
                         </li>
                     </ul>
@@ -216,19 +216,19 @@
                         on a budget.
                     </p>
                     <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Free Wi-Fi
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Air Conditioning
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Free Wi-Fi
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Air Conditioning
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> 1 Queen Bed
                         </li>
                     </ul>
@@ -263,19 +263,19 @@
                         on a budget.
                     </p>
                     <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Free Wi-Fi
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Air Conditioning
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Free Wi-Fi
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> Air Conditioning
                         </li>
-                        <li class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
                             <span class="text-yellow-500">★</span> 1 Queen Bed
                         </li>
                     </ul>
