@@ -72,6 +72,11 @@
             });
         });
     </script>
+
+    <style>
+        /* body { font-family: 'DM Sans', sans-serif; } */
+        /* h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; } */
+    </style>
 </head>
 
 <body class="bg-white text-black font-sans">

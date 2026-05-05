@@ -10,6 +10,10 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- <style>
+        body { font-family: 'DM Sans', sans-serif; }
+        h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; }
+    </style> --}}
 
     <!-- Alpine.js -->
     {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
