@@ -16,6 +16,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 });
 
 
+// to clean
+
 Route::get('/calendar', function () {
     return view('pages.calender', ['title' => 'Calendar']);
 })->name('calendar');
@@ -50,13 +52,13 @@ Route::get('/bar-chart', function () {
 })->name('bar-chart');
 
 
-Route::get('/signin', function () {
-    return view('pages.auth.signin', ['title' => 'Sign In']);
-})->name('signin');
+// Route::get('/signin', function () {
+//     return view('pages.auth.signin', ['title' => 'Sign In']);
+// })->name('signin');
 
-Route::get('/signup', function () {
-    return view('pages.auth.signup', ['title' => 'Sign Up']);
-})->name('signup');
+// Route::get('/signup', function () {
+//     return view('pages.auth.signup', ['title' => 'Sign Up']);
+// })->name('signup');
 
 Route::get('/alerts', function () {
     return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
@@ -83,13 +85,15 @@ Route::get('/videos', function () {
 })->name('videos');
 
 
+////////////////// end
+
+
+
+// test pages
 
 Route::fallback(function () {
     return response()->view('pages.errors.error-404', [], 404);
 });
-
-
-// test pages
 
 Route::get('/test', function () {
     return view('test_pages.testlogin');
