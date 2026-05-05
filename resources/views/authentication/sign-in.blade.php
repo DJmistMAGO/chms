@@ -65,7 +65,7 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center bg-cover bg-center relative"
-      style="background-image: url('{{ asset('assets/images/ch2.png') }}')">
+        style="background-image: url('{{ asset('assets/images/ch2.png') }}')">
 
     <div class="overlay absolute inset-0"></div>
 
@@ -83,7 +83,6 @@
             <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
                 @csrf
 
-                {{-- Email --}}
                 <div class="space-y-1">
                     <label class="block text-xs font-medium text-stone-500 tracking-widest uppercase">Email</label>
                     <input
@@ -102,7 +101,6 @@
                     @enderror
                 </div>
 
-                {{-- Password --}}
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
                         <label class="block text-xs font-medium text-stone-500 tracking-widest uppercase">Password</label>
@@ -137,14 +135,12 @@
                 </button>
             </form>
 
-            {{-- Divider --}}
             <div class="flex items-center my-5">
                 <div class="flex-grow border-t border-stone-200"></div>
                 <span class="mx-3 text-stone-400 text-xs tracking-widest uppercase">or</span>
                 <div class="flex-grow border-t border-stone-200"></div>
             </div>
 
-            {{-- Google --}}
             <a href="{{ route('login.google') }}"
                 class="btn-google flex items-center justify-center gap-3 border border-stone-200 bg-white py-3 rounded-xl text-stone-700 text-sm font-medium shadow-sm">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
@@ -158,6 +154,7 @@
         </div>
     </div>
 
+    {{-- Password Toggle Script --}}
     <script>
         function togglePassword(id, btn) {
             const input = document.getElementById(id);
