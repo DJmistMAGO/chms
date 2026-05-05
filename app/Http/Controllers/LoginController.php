@@ -23,7 +23,6 @@ class LoginController extends Controller
 
     public function signup(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -35,6 +34,8 @@ class LoginController extends Controller
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
         ]);
+
+        $user->assignRole('client');
 
         Auth::login($user);
         return redirect()->route('dashboard');
@@ -83,11 +84,16 @@ class LoginController extends Controller
             ]
         );
 
+        // Assign 'client' role if the user was just created
+        if ($user->wasRecentlyCreated) {
+            $user->assignRole('client');
+        }
+
+
         Auth::login($user, true);
         $request->session()->regenerate();
-        // $request->session()->put('auth_user_id', $user->id);
 
-        return redirect('/dashboard');
+        return redirect()->intended('dashboard');
     }
 
     public function logout(Request $request)
