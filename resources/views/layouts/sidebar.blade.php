@@ -65,12 +65,12 @@
         'justify-start'">
         <a href="/">
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" width="150" height="40" />
+                class="dark:hidden" src="{{ asset('assets/images/chlogo.png') }}" alt="Logo" width="120" height="40" />
             <img x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width="150"
+                class="hidden dark:block" src="{{ asset('assets/images/chlogo.png') }}" alt="Logo" width="120"
                 height="40" />
             <img x-show="!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen"
-                src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+                src="{{ asset('assets/images/clogo.svg') }}" alt="Logo" width="32" height="32" />
 
         </a>
     </div>
@@ -218,9 +218,9 @@
         </nav>
 
         <!-- Sidebar Widget -->
-        <div x-data x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen" x-transition class="mt-auto">
+        {{-- <div x-data x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen" x-transition class="mt-auto">
             @include('layouts.sidebar-widget')
-        </div>
+        </div> --}}
 
     </div>
 </aside>

@@ -33,6 +33,7 @@ class AuthenticationController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' =>  Hash::make($request->password),
+            'is_google_user' => false,
         ]);
 
         $user->assignRole('client');
@@ -81,6 +82,7 @@ class AuthenticationController extends Controller
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
                 'password' => Hash::make(Str::random(24)),
+                'is_google_user' => true,
             ]
         );
 
@@ -100,7 +102,7 @@ class AuthenticationController extends Controller
         return redirect()->intended('dashboard');
     }
 
-    // 
+    //
 
 
 
