@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
@@ -21,6 +23,7 @@ class LoginController extends Controller
 
     public function signup(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -30,7 +33,7 @@ class LoginController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' =>  Hash::make($request->password),
         ]);
 
         Auth::login($user);
@@ -60,22 +63,29 @@ class LoginController extends Controller
         return Socialite::driver('google')->redirect();
     }
 
+
     public function handleGoogleCallback(Request $request)
     {
-        $googleUser = Socialite::driver('google')->stateless()->user();
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (\Exception $e) {
+            return redirect()->route('login')->withErrors([
+                'google' => 'Unable to login with Google. Please try again.',
+            ]);
+        }
 
         $user = User::updateOrCreate(
             ['email' => $googleUser->getEmail()],
             [
                 'name' => $googleUser->getName(),
                 'google_id' => $googleUser->getId(),
-                'password' => bcrypt('randompassword')
+                'password' => Hash::make(Str::random(24)),
             ]
         );
 
         Auth::login($user, true);
         $request->session()->regenerate();
-        $request->session()->put('auth_user_id', $user->id);
+        // $request->session()->put('auth_user_id', $user->id);
 
         return redirect('/dashboard');
     }

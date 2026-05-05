@@ -6,6 +6,7 @@
     <title>Login - Caree Hotel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ asset('assets/images/chlogo.png') }}" type="image/x-icon">
     <style>
         body { font-family: 'DM Sans', sans-serif; }
         h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; }

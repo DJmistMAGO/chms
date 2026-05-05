@@ -107,6 +107,7 @@ Route::controller(LoginController::class)
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/signup', [LoginController::class, 'showSignupForm'])->name('signup');
+Route::post('/signup', [LoginController::class, 'signup'])->name('signup.post')->middleware('web');
 
 // ->middleware('guest'); // Optional: Add guest middleware to prevent authenticated users from accessing the login page
 // ->middleware('auth'); // Optional: Add auth middleware to protect the dashboard route
