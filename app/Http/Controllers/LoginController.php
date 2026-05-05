@@ -75,7 +75,7 @@ class LoginController extends Controller
             ]);
         }
 
-        $user = User::updateOrCreate(
+        $user = User::firstOrCreate(
             ['email' => $googleUser->getEmail()],
             [
                 'name' => $googleUser->getName(),
@@ -84,11 +84,15 @@ class LoginController extends Controller
             ]
         );
 
-        // Assign 'client' role if the user was just created
+        // Only update non-sensitive fields
+        $user->update([
+            'name' => $googleUser->getName(),
+            'google_id' => $googleUser->getId(),
+        ]);
+
         if ($user->wasRecentlyCreated) {
             $user->assignRole('client');
         }
-
 
         Auth::login($user, true);
         $request->session()->regenerate();
