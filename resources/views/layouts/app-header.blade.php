@@ -50,8 +50,8 @@
 
             <!-- Logo (mobile only) -->
             <a href="/" class="xl:hidden">
-                <img class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" />
-                <img class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" />
+                <img class="dark:hidden" src="{{ asset('assets/images/chlogo.png') }}" alt="Logo" height="30" width="120"/>
+                <img class="hidden dark:block" src="{{ asset('assets/images/chlogo.png') }}" alt="Logo" height="30" width="120"/>
             </a>
 
             <!-- Application Menu Toggle (mobile only) -->
