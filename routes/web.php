@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AuthenticationController;
 use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\DashboardController;
 
@@ -39,10 +39,6 @@ Route::get('/blank', function () {
     return view('pages.blank', ['title' => 'Blank']);
 })->name('blank');
 
-// Route::get('/error-404', function () {
-//     return view('pages.errors.error-404', ['title' => 'Error 404']);
-// })->name('error-404');
-
 Route::get('/line-chart', function () {
     return view('pages.chart.line-chart', ['title' => 'Line Chart']);
 })->name('line-chart');
@@ -50,15 +46,6 @@ Route::get('/line-chart', function () {
 Route::get('/bar-chart', function () {
     return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
 })->name('bar-chart');
-
-
-// Route::get('/signin', function () {
-//     return view('pages.auth.signin', ['title' => 'Sign In']);
-// })->name('signin');
-
-// Route::get('/signup', function () {
-//     return view('pages.auth.signup', ['title' => 'Sign Up']);
-// })->name('signup');
 
 Route::get('/alerts', function () {
     return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
@@ -85,7 +72,7 @@ Route::get('/videos', function () {
 })->name('videos');
 
 
-////////////////// end
+// end of to clean
 
 
 
@@ -100,7 +87,7 @@ Route::get('/test', function () {
 })->name('test');
 
 // login route (use this format for routing to controllers)
-Route::controller(LoginController::class)
+Route::controller(AuthenticationController::class)
     ->prefix('login')
     ->group(function () {
         Route::get('/', 'showLoginForm')->name('login');
@@ -109,10 +96,6 @@ Route::controller(LoginController::class)
         Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-Route::get('/signup', [LoginController::class, 'showSignupForm'])->name('signup');
-Route::post('/signup', [LoginController::class, 'signup'])->name('signup.post')->middleware('web');
-
-// ->middleware('guest'); // Optional: Add guest middleware to prevent authenticated users from accessing the login page
-// ->middleware('auth'); // Optional: Add auth middleware to protect the dashboard route
-// ->middleware('verified'); // Optional: Add email verification middleware if you require email verification for users
+Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
+Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
+Route::post('/signup', [AuthenticationController::class, 'signup'])->name('signup.post')->middleware('web');

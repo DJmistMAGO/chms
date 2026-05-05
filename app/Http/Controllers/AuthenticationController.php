@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
-class LoginController extends Controller
+class AuthenticationController extends Controller
 {
     public function showLoginForm()
     {
@@ -100,6 +100,13 @@ class LoginController extends Controller
         return redirect()->intended('dashboard');
     }
 
+    // 
+
+
+
+
+
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -107,5 +114,4 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
         return redirect('/');
     }
-
 }
