@@ -9,19 +9,19 @@
                 </div>
                 <div class="order-3 xl:order-2">
                     <h4 class="mb-2 text-center text-lg font-semibold text-gray-800 xl:text-left dark:text-white/90">
-                        Musharof Chowdhury
+                        {{ auth()->user()?->name ?? '' }}
                     </h4>
                     <div class="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Team Manager
+                            {{ ucfirst(auth()->user()->roles->first()->name) }}
                         </p>
                         <div class="hidden h-3.5 w-px bg-gray-300 xl:block dark:bg-gray-700"></div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Arizona, United States.
+                            Address here to be edited in the near future
                         </p>
                     </div>
                 </div>
-                <div class="order-2 flex grow items-center gap-2 xl:order-3 xl:justify-end">
+                {{-- <div class="order-2 flex grow items-center gap-2 xl:order-3 xl:justify-end">
                     <button
                         class="shadow-theme-xs flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
                         <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -61,7 +61,7 @@
                                 fill="" />
                         </svg>
                     </button>
-                </div>
+                </div> --}}
             </div>
 
             <button @click="$dispatch('open-profile-info-modal')"
