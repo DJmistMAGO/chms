@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('google_id')->nullable();
             $table->boolean('is_google_user')->default(false);
+            $table->boolean('has_changed_password')->default(false);
+            $table->timestamp('first_google_login_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

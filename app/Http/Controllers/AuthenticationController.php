@@ -76,23 +76,37 @@ class AuthenticationController extends Controller
             ]);
         }
 
-        $user = User::firstOrCreate(
-            ['email' => $googleUser->getEmail()],
-            [
+        $isNewUser = false;
+
+        $user = User::where('email', $googleUser->getEmail())->first();
+
+        if (!$user) {
+            $isNewUser = true;
+
+            $user = User::create([
                 'name' => $googleUser->getName(),
+                'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
                 'password' => Hash::make(Str::random(24)),
                 'is_google_user' => true,
-            ]
-        );
+                'has_changed_password' => false,
+                'first_google_login_at' => now(),
+            ]);
+        } else {
+            $updateData = [
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
+                'is_google_user' => true,
+            ];
 
-        // Only update non-sensitive fields
-        $user->update([
-            'name' => $googleUser->getName(),
-            'google_id' => $googleUser->getId(),
-        ]);
+            if (!$user->first_google_login_at) {
+                $updateData['first_google_login_at'] = now();
+            }
 
-        if ($user->wasRecentlyCreated) {
+            $user->update($updateData);
+        }
+
+        if ($isNewUser) {
             $user->assignRole('client');
         }
 
@@ -102,11 +116,27 @@ class AuthenticationController extends Controller
         return redirect()->intended('dashboard');
     }
 
-    //
 
+    public function setPassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
 
+        /** @var User $user */
+        $user = Auth::user();
 
+        // Prevent abuse (optional but recommended)
+        if (!$user || !$user->is_google_user) {
+            return redirect()->route('dashboard');
+        }
 
+        $user->password = Hash::make($request->password);
+        $user->has_changed_password = true;
+        $user->save();
+
+        return redirect()->route('dashboard')->with('success', 'Password updated successfully!');
+    }
 
 
     public function logout(Request $request)

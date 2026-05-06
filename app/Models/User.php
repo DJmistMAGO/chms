@@ -18,6 +18,9 @@ class User extends Authenticatable
         'email',
         'google_id',
         'password',
+        'is_google_user',
+        'has_changed_password',
+        'first_google_login_at',
     ];
 
 
@@ -25,6 +28,10 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'google_id',
+    ];
+
+    protected $casts = [
+        'first_google_login_at' => 'datetime',
     ];
 
 

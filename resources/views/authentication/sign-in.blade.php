@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="{{ asset('assets/images/chlogo.png') }}" type="image/x-icon">
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; }
+        /* h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; } */
 
         .card-enter {
             animation: cardSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -90,7 +90,7 @@
                         name="email"
                         placeholder="you@example.com"
                         value="{{ old('email') }}"
-                        required
+                        required autofocus autocomplete="off"
                         class="input-field w-full px-4 py-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-800 placeholder-stone-300 text-sm"
                     >
                     @error('email')
