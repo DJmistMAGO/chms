@@ -10,7 +10,7 @@
 
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; }
+        /* h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; } */
 
         .card-enter {
             animation: cardSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
