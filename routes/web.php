@@ -2,18 +2,41 @@
 
 use App\Http\Controllers\AuthenticationController;
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\DashboardController;
 
 
-Route::get('/', function () {
-    return view('landingpage');
-})->name('landingpage');
+// Routes accessible only to guests (not authenticated users)
+Route::middleware('guest')->group(function () {
 
+    Route::get('/', function () {
+        return view('landingpage');
+    })->name('landingpage');
+
+    Route::controller(AuthenticationController::class)
+        ->prefix('login')
+        ->group(function () {
+            Route::get('/', 'showLoginForm')->name('login');
+            Route::post('/', 'login')->name('login.post');
+            Route::get('/google', 'redirectToGoogle')->name('login.google');
+            Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+    });
+
+
+    Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
+    Route::post('/signup', [AuthenticationController::class, 'signup'])->name('signup.post')->middleware('web');
+
+});
+
+
+// Routes accessible only to authenticated users
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', function () {
-        return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
+        return view('pages.dashboard.ecommerce', ['title' => 'Caree Hotel']);
     })->name('dashboard');
+
+    Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
+
 });
+
 
 
 // to clean
@@ -81,21 +104,3 @@ Route::get('/videos', function () {
 Route::fallback(function () {
     return response()->view('pages.errors.error-404', [], 404);
 });
-
-Route::get('/test', function () {
-    return view('test_pages.testlogin');
-})->name('test');
-
-// login route (use this format for routing to controllers)
-Route::controller(AuthenticationController::class)
-    ->prefix('login')
-    ->group(function () {
-        Route::get('/', 'showLoginForm')->name('login');
-        Route::post('/login', 'login')->name('login.post');
-        Route::get('/google', 'redirectToGoogle')->name('login.google');
-        Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
-});
-
-Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
-Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
-Route::post('/signup', [AuthenticationController::class, 'signup'])->name('signup.post')->middleware('web');
