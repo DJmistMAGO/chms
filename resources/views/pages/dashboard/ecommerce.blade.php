@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.authenticated.app')
 
 @section('content')
 
@@ -10,12 +10,16 @@
     @endphp
 
     @if($showWarning)
-        <div class="bg-blue-100 border border-blue-400 text-black px-4 py-3 rounded relative mb-4" role="alert">
+        <div class="bg-blue-100 dark:bg-blue-900 border border-blue-400 dark:border-blue-600 text-black dark:text-black px-4 py-3 rounded relative mb-4" role="alert">
             <strong class="font-bold">Welcome!</strong>
-            <span class="block sm:inline">It looks like you signed in with Google. For security reasons, please update your password by <a href="{{--  --}}" class="underline">clicking here</a>.</span>
+            <span class="block sm:inline">It looks like you signed in with Google. For security reasons, please update your password by <a href="{{--  --}}" class="underline text-blue-400 dark:text-blue-400">clicking here</a>.</span>
         </div>
     @endif
 
+
+    @role('admin')
+        {{-- Insert here admin content or we can use a separate dashboard (suggestion only) --}}
+    @endrole
 
     <div class="grid grid-cols-12 gap-4 md:gap-6">
         <div class="col-span-12 space-y-6 xl:col-span-7">

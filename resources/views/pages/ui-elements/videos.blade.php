@@ -1,5 +1,5 @@
 
-@extends('layouts.app')
+@extends('layouts.authenticated.app')
 
 @section('content')
     {{-- Page Breadcrumb --}}

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.authenticated.app')
 
 @php
     $images = [
