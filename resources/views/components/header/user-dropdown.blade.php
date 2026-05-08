@@ -13,11 +13,29 @@
         @click.prevent="toggleDropdown()"
         type="button"
     >
-        <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
-            <img src="/images/user/owner.png" alt="User" />
+        @php
+            $user = auth()->user();
+            $initials = '';
+
+            if ($user?->name) {
+                $parts = preg_split('/\s+/', trim($user->name));
+                $initials = strtoupper(collect($parts)
+                    ->filter()
+                    ->map(fn ($part) => substr($part, 0, 1))
+                    ->take(2)
+                    ->join(''));
+            }
+        @endphp
+
+        <span class="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-200 text-gray-700 flex items-center justify-center text-sm font-semibold dark:bg-gray-700 dark:text-gray-100">
+            @if ($user?->avatar)
+                <img class="h-full w-full object-cover" src="{{ $user->avatar }}" alt="{{ $user->name }}" />
+            @else
+                {{ $initials }}
+            @endif
         </span>
 
-        <span class="block mr-1 font-medium text-theme-sm">{{ auth()->user()?->name }}</span>
+        <span class="block mr-1 font-medium text-theme-sm">{{ $user?->name }}</span>
 
         <!-- Chevron Icon -->
         <svg

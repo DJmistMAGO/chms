@@ -49,13 +49,24 @@ class User extends Authenticatable
         ];
     }
 
-    // Relationships
     public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
 
+    public function getInitialsAttribute()
+    {
+        $names = explode(' ', $this->name);
+        $initials = '';
+        foreach ($names as $name) {
+            $initials .= strtoupper(substr($name, 0, 1));
+        }
+        return $initials;
+    }
 
-
+        // Check if user has a valid ID
+    public function hasValidID(){
+        return !is_null($this->valid_id);
+    }
 
 }
