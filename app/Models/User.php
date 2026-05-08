@@ -21,6 +21,10 @@ class User extends Authenticatable
         'is_google_user',
         'has_changed_password',
         'first_google_login_at',
+        'phone',
+        'address',
+        'avatar',
+        'valid_id',
     ];
 
 
@@ -28,10 +32,12 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'google_id',
+        'valid_id',
     ];
 
     protected $casts = [
         'first_google_login_at' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
 
@@ -42,4 +48,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // Relationships
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+
+
+
 }

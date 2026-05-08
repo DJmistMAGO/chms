@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.authenticated.app')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Badges" />

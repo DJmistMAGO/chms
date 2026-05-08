@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.authenticated.app')
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="Avatars" />
-    
+
     @php
         $avatarSrc = asset('images/user/user-01.jpg');
         $sizes = ['xsmall', 'small', 'medium', 'large', 'xlarge', 'xxlarge'];
@@ -13,7 +13,7 @@
         <x-common.component-card title="Default Avatar">
             <div class="flex flex-col items-center justify-center gap-5 sm:flex-row">
                 @foreach($sizes as $size)
-                    <x-ui.avatar 
+                    <x-ui.avatar
                         :src="$avatarSrc"
                         :size="$size"
                     />
@@ -25,7 +25,7 @@
         <x-common.component-card title="Avatar with online indicator">
             <div class="flex flex-col items-center justify-center gap-5 sm:flex-row">
                 @foreach($sizes as $size)
-                    <x-ui.avatar 
+                    <x-ui.avatar
                         :src="$avatarSrc"
                         :size="$size"
                         status="online"
@@ -38,7 +38,7 @@
         <x-common.component-card title="Avatar with Offline indicator">
             <div class="flex flex-col items-center justify-center gap-5 sm:flex-row">
                 @foreach($sizes as $size)
-                    <x-ui.avatar 
+                    <x-ui.avatar
                         :src="$avatarSrc"
                         :size="$size"
                         status="offline"
@@ -51,7 +51,7 @@
         <x-common.component-card title="Avatar with busy indicator">
             <div class="flex flex-col items-center justify-center gap-5 sm:flex-row">
                 @foreach($sizes as $size)
-                    <x-ui.avatar 
+                    <x-ui.avatar
                         :src="$avatarSrc"
                         :size="$size"
                         status="busy"
