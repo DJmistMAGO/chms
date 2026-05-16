@@ -14,6 +14,11 @@ Route::middleware('guest')->group(function () {
         return view('landingpage');
     })->name('landingpage');
 
+    Route::get('/customized', function () {
+        return view('micro-pricing');
+    })->name('customized');
+
+
     Route::controller(AuthenticationController::class)
         ->prefix('login')
         ->group(function () {
