@@ -354,7 +354,7 @@
     </section>
 
     <section class="min-h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white"
-        style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('{{ asset('assets/images/about-bg.jpg') }}')">
+        style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('{{ asset('assets/images/ch1.png') }}')">
 
         <div class="max-w-3xl">
             <p class="uppercase tracking-[0.3em] text-primary font-semibold mb-3">
@@ -396,7 +396,7 @@
                 </div>
             </div>
 
-            <div class="mt-8 flex flex-col md:flex-row gap-4">
+            {{-- <div class="mt-8 flex flex-col md:flex-row gap-4">
                 <button
                     class="w-full md:w-auto md:min-w-[190px] bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:text-black hover:scale-105 transition duration-300">
                     Read More About Us
@@ -406,7 +406,7 @@
                     class="w-full md:w-auto md:min-w-[190px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition duration-300">
                     Contact Us
                 </button>
-            </div>
+            </div> --}}
         </div>
     </section>
 
