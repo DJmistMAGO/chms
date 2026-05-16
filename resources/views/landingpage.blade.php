@@ -353,6 +353,63 @@
         </div>
     </section>
 
+    <section class="min-h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white"
+        style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('{{ asset('assets/images/about-bg.jpg') }}')">
+
+        <div class="max-w-3xl">
+            <p class="uppercase tracking-[0.3em] text-primary font-semibold mb-3">
+                Our Story
+            </p>
+
+            <h1 class="text-4xl md:text-6xl font-bold leading-tight">
+                A Sanctuary of Serenity in
+                <span class="text-primary">Bulan, Sorsogon</span>
+            </h1>
+
+            <p class="mt-6 text-sm md:text-lg leading-relaxed text-gray-200">
+                Founded in 2016, Caree Hotel was established with a singular vision:
+                to bring international standards of hospitality to the heart of Bulan.
+                We provide a peaceful and comfortable environment where every guest
+                can experience rest, relaxation, and peace of mind.
+            </p>
+
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
+                    <h3 class="text-xl font-bold text-primary">2016</h3>
+                    <p class="text-sm text-gray-200 mt-2">
+                        Established to deliver quality hospitality and comfort.
+                    </p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
+                    <h3 class="text-xl font-bold text-primary">Mission</h3>
+                    <p class="text-sm text-gray-200 mt-2">
+                        Promoting excellence in the local hospitality industry.
+                    </p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
+                    <h3 class="text-xl font-bold text-primary">Innovation</h3>
+                    <p class="text-sm text-gray-200 mt-2">
+                        Micro Pricing lets guests customize their stay experience.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-col md:flex-row gap-4">
+                <button
+                    class="w-full md:w-auto md:min-w-[190px] bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:text-black hover:scale-105 transition duration-300">
+                    Read More About Us
+                </button>
+
+                <button
+                    class="w-full md:w-auto md:min-w-[190px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition duration-300">
+                    Contact Us
+                </button>
+            </div>
+        </div>
+    </section>
+
     <footer class="bg-black text-white px-6 md:px-16 py-6">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
             <a href="/">
