@@ -145,14 +145,14 @@
 
                     {{-- Room type badge --}}
                     <span class="absolute top-4 right-4 bg-charcoal text-cream text-xs font-medium px-4 py-1.5 rounded-full tracking-widest uppercase">
-                        {{ $room->type ?? 'Premium' }}
+                        {{ $roomType }}
                     </span>
 
                     {{-- Price per night floating --}}
                     <div class="absolute bottom-4 left-4">
                         <p class="text-white/60 text-xs tracking-wide uppercase mb-0.5">Starting from</p>
                         <p class="font-display text-3xl font-semibold text-white">
-                            ₱{{ number_format($room->base_price ?? 1500) }}
+                            ₱{{ number_format($price) }}
                             <span class="text-white/50 text-sm font-body font-light">/night</span>
                         </p>
                     </div>
@@ -160,7 +160,7 @@
 
                 {{-- Room Name & Details --}}
                 <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal leading-tight mb-4">
-                    {{ $room->name ?? 'Premium Deluxe Room' }}
+                    {{ $roomType }}
                 </h1>
 
                 {{-- Quick stats --}}
@@ -211,6 +211,24 @@
 
                     <div class="px-6 py-6 space-y-7">
 
+                        {{-- Dates --}}
+                                <div class="grid grid-cols-2 gap-3" >
+                                    <div>
+                                        <label class="block text-xs tracking-widest uppercase text-muted mb-1.5">Check-in</label>
+                                        <input type="date" name="check_in" id="checkin"
+                                            class="w-full rounded-xl px-4 py-3 text-sm text-warm transition-colors"
+                                            style="border:1px solid #FFE566; background:#FFF8D6;"
+                                            required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs tracking-widest uppercase text-muted mb-1.5">Check-out</label>
+                                        <input type="date" name="check_out" id="checkout"
+                                            class="w-full rounded-xl px-4 py-3 text-sm text-warm transition-colors"
+                                            style="border:1px solid #FFE566; background:#FFF8D6;"
+                                            required>
+                                    </div>
+                                </div>
+
                         {{-- ---- FLOOR LEVEL ---- --}}
                         <div>
                             <div class="section-label mb-3">
@@ -235,7 +253,7 @@
                                     data-group="floor" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
-                                        <span class="text-sm text-warm">Floor 4</span>
+                                        <span class="text-sm text-warm">Floor 3</span>
                                     </div>
                                 </div>
                             </div>
@@ -393,24 +411,6 @@
                                         required>
                                 </div>
 
-                                {{-- Dates --}}
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-xs tracking-widest uppercase text-muted mb-1.5">Check-in</label>
-                                        <input type="date" name="check_in" id="checkin"
-                                            class="w-full rounded-xl px-4 py-3 text-sm text-warm transition-colors"
-                                            style="border:1px solid #FFE566; background:#FFF8D6;"
-                                            required>
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs tracking-widest uppercase text-muted mb-1.5">Check-out</label>
-                                        <input type="date" name="check_out" id="checkout"
-                                            class="w-full rounded-xl px-4 py-3 text-sm text-warm transition-colors"
-                                            style="border:1px solid #FFE566; background:#FFF8D6;"
-                                            required>
-                                    </div>
-                                </div>
-
                                 {{-- Guests --}}
                                 <div>
                                     <label class="block text-xs tracking-widest uppercase text-muted mb-1.5">Number of Guests</label>
@@ -428,7 +428,7 @@
                                 <div class="hidden lg:block rounded-2xl p-4 space-y-2" style="background:#FFF8D6; border:1px solid #FFE566;">
                                     <div class="flex justify-between text-sm">
                                         <span class="text-muted">Base Rate</span>
-                                        <span class="font-medium text-charcoal">₱{{ number_format($room->base_price ?? 1500) }}</span>
+                                        <span class="font-medium text-charcoal">₱{{ number_format($price) }}</span>
                                     </div>
                                     <div class="flex justify-between text-sm" id="addon-row">
                                         <span class="text-muted">Add-ons</span>
@@ -437,7 +437,7 @@
                                     <div class="pt-2 flex justify-between items-center" style="border-top:1px solid #FFE566;">
                                         <span class="text-xs tracking-widest uppercase text-muted">Total / Night</span>
                                         <span class="font-display text-2xl font-semibold" style="color:#B89200;" id="total-price">
-                                            ₱{{ number_format($room->base_price ?? 1500) }}
+                                            ₱{{ number_format($price) }}
                                         </span>
                                     </div>
                                 </div>
@@ -467,7 +467,7 @@
             <div>
                 <p class="text-xs text-muted">Total / Night</p>
                 <p class="font-display text-2xl font-semibold" style="color:#B89200;" id="total-price-mobile">
-                    ₱{{ number_format($room->base_price ?? 1500) }}
+                    ₱{{ number_format($price) }}
                 </p>
             </div>
             <button onclick="document.querySelector('[type=submit]').click()"
@@ -482,7 +482,7 @@
 
     <script>
         // ---- Base price & add-on state ----
-        const BASE_PRICE = {{ $room->base_price ?? 1500 }};
+        const BASE_PRICE = {{ $price}};
         const groupAddons = { floor: 0, room: 0, ambiance: 0 };
 
         // Extras state: key = data-extra value, value = quantity

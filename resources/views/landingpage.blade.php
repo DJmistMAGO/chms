@@ -195,7 +195,7 @@
                             <span class="text-2xl font-bold text-gray-900">₱1,500</span>
                             <span class="text-gray-400 text-sm"> / night</span>
                         </div>
-                        <a href=""
+                        <a href="{{ route('customize.booking', ['roomType' => 'standard']) }}"
                             class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
                             Book Now
                         </a>
@@ -242,7 +242,7 @@
                             <span class="text-2xl font-bold text-gray-900">₱1,500</span>
                             <span class="text-gray-400 text-sm"> / night</span>
                         </div>
-                        <a href=""
+                        <a href="{{ route('customize.booking', ['roomType' => 'standard-premium']) }}"
                             class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
                             Book Now
                         </a>
@@ -289,7 +289,7 @@
                             <span class="text-2xl font-bold text-gray-900">₱1,500</span>
                             <span class="text-gray-400 text-sm"> / night</span>
                         </div>
-                        <a href=""
+                        <a href="{{ route('customize.booking', ['roomType' => 'family']) }}"
                             class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
                             Book Now
                         </a>

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MicroPricingController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,10 +15,15 @@ Route::middleware('guest')->group(function () {
         return view('landingpage');
     })->name('landingpage');
 
-    Route::get('/customized', function () {
-        return view('micro-pricing');
-    })->name('customized');
+    // Route::get('/customized', function () {
+    //     return view('micro-pricing');
+    // })->name('customized');
 
+    Route::controller(MicroPricingController::class)
+        ->prefix('customize')
+        ->group(function () {
+            Route::get('/{roomType}', 'booking')->name('customize.booking');
+    });
 
     Route::controller(AuthenticationController::class)
         ->prefix('login')
@@ -34,14 +40,12 @@ Route::middleware('guest')->group(function () {
 
 });
 
-
 // Routes accessible only to authenticated users
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
 
 });
-
 
 Route::middleware('guest')->group(function () {
     Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
