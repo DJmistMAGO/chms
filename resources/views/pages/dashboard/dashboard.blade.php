@@ -27,11 +27,11 @@
 
         {{-- Welcome Card --}}
         <div class="col-span-12">
-            <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm backdrop-blur-sm">
+            <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-lg">
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
                     <div class="flex items-center gap-4">
-                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/30">
+                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/30">
                             @if (auth()->user()->avatar)
                                 <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="h-full w-full rounded-2xl object-cover">
                             @else
@@ -76,7 +76,7 @@
 
         {{-- Upcoming Bookings --}}
         <div class="col-span-12 md:col-span-6">
-            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20 hover:shadow-md">
+            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-white/20 hover:shadow-xl">
 
                 <div class="flex items-start justify-between">
                     <div>
@@ -116,7 +116,7 @@
 
         {{-- Booking History --}}
         <div class="col-span-12 md:col-span-6">
-            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20 hover:shadow-md">
+            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-white/20 hover:shadow-xl">
 
                 <div class="flex items-start justify-between">
                     <div>
@@ -239,45 +239,45 @@
 
             </div>
         </div>
-    
+
         <div class="col-span-12">
             <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm">
-        
+
                 <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
                     <div>
                         <h3 class="font-semibold text-gray-600 dark:text-white">
                             Room Overview
                         </h3>
-        
+
                         <p class="mt-1 text-sm text-gray-500">
                             Live status of all rooms.
                         </p>
                     </div>
-        
+
                     <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                         <span class="flex items-center gap-1.5">
                             <span class="h-2 w-2 rounded-full bg-green-400"></span>
                             Available
                         </span>
-        
+
                         <span class="flex items-center gap-1.5">
                             <span class="h-2 w-2 rounded-full bg-red-400"></span>
                             Occupied
                         </span>
-        
+
                         <span class="flex items-center gap-1.5">
                             <span class="h-2 w-2 rounded-full bg-yellow-400"></span>
                             Maintenance
                         </span>
                     </div>
-        
+
                 </div>
-        
+
                 {{-- Table --}}
                 <div class="overflow-x-auto">
                     <table class="w-full min-w-[800px] text-sm">
-        
+
                         <thead>
                             <tr
                                 class="border-b border-white/[0.06] text-left text-xs font-semibold uppercase tracking-widest text-gray-500">
@@ -289,9 +289,9 @@
                                 <th class="pb-3">Check-out</th>
                             </tr>
                         </thead>
-        
+
                         <tbody class="divide-y divide-white/[0.04]">
-        
+
                             {{-- Available --}}
                             <tr class="group transition hover:bg-white/[0.02]">
                                 <td class="py-4 pr-4 font-semibold text-gray-800 dark:text-white">Room 101</td>
@@ -307,7 +307,7 @@
                                 <td class="py-4 pr-4 text-gray-500">—</td>
                                 <td class="py-4 text-gray-500">—</td>
                             </tr>
-        
+
                             {{-- Occupied --}}
                             <tr class="group transition hover:bg-white/[0.02]">
                                 <td class="py-4 pr-4 font-semibold text-gray-800 dark:text-white">Suite 204</td>
@@ -323,7 +323,7 @@
                                 <td class="py-4 pr-4 text-gray-400">May 8 &bull; 2:00 PM</td>
                                 <td class="py-4 text-gray-400">May 10 &bull; 12:00 PM</td>
                             </tr>
-        
+
                             {{-- Maintenance --}}
                             <tr class="group transition hover:bg-white/[0.02]">
                                 <td class="py-4 pr-4 font-semibold text-gray-800 dark:text-white">Room 305</td>
@@ -339,7 +339,7 @@
                                 <td class="py-4 pr-4 text-gray-500">—</td>
                                 <td class="py-4 text-gray-500">—</td>
                             </tr>
-        
+
                             {{-- Occupied --}}
                             <tr class="group transition hover:bg-white/[0.02]">
                                 <td class="py-4 pr-4 font-semibold text-gray-800 dark:text-white">Room 112</td>
@@ -355,7 +355,7 @@
                                 <td class="py-4 pr-4 text-gray-400">May 7 &bull; 3:00 PM</td>
                                 <td class="py-4 text-gray-400">May 9 &bull; 11:00 AM</td>
                             </tr>
-        
+
                             {{-- Available --}}
                             <tr class="group transition hover:bg-white/[0.02]">
                                 <td class="py-4 pr-4 font-semibold text-gray-800 dark:text-white">Conference A</td>
@@ -371,14 +371,14 @@
                                 <td class="py-4 pr-4 text-gray-500">—</td>
                                 <td class="py-4 text-gray-500">—</td>
                             </tr>
-        
+
                         </tbody>
                     </table>
                 </div>
-        
+
                 {{-- Pagination --}}
                 <div class="mt-6 flex flex-col gap-4 border-t border-white/[0.06] pt-4 sm:flex-row sm:items-center sm:justify-between">
-        
+
                     <p class="text-sm text-gray-500">
                         Showing
                         <span class="font-medium text-black dark:text-white">1</span>
@@ -388,46 +388,46 @@
                         <span class="font-medium text-black font-black italic dark:text-white">24</span>
                         rooms
                     </p>
-        
+
                     <div class="flex items-center gap-2">
-        
+
                         {{-- Previous --}}
                         <button
                             class="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-gray-400 transition hover:bg-white/[0.06] hover:text-white">
                             Previous
                         </button>
-        
+
                         {{-- Pages --}}
                         <button
                             class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20">
                             1
                         </button>
-        
+
                         <button
                             class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-sm text-gray-400 transition hover:bg-white/[0.06] hover:text-white">
                             2
                         </button>
-        
+
                         <button
                             class="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-sm text-gray-400 transition hover:bg-white/[0.06] hover:text-white">
                             3
                         </button>
-        
+
                         {{-- Next --}}
                         <button
                             class="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-gray-400 transition hover:bg-white/[0.06] hover:text-white">
                             Next
                         </button>
-        
+
                     </div>
                 </div>
-        
+
             </div>
         </div>
-    
+
         <div class="col-span-12 md:col-span-6">
             <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20">
-    
+
                 <div class="mb-5 flex items-start justify-between">
                     <div>
                         <h3 class="font-semibold text-gray-600 dark:text-white">Pending Approvals</h3>
@@ -439,9 +439,9 @@
                         </svg>
                     </div>
                 </div>
-    
+
                 <div class="flex flex-col gap-3">
-    
+
                     <div class="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -455,7 +455,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <div class="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -469,7 +469,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <div class="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -483,15 +483,15 @@
                             </div>
                         </div>
                     </div>
-    
+
                 </div>
             </div>
         </div>
-    
+
         {{-- Recent Bookings + Quick Actions --}}
         <div class="col-span-12 md:col-span-6">
             <div class="flex h-full flex-col gap-6">
-    
+
                 {{-- Quick Actions --}}
                 <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20">
                     <h3 class="mb-4 font-semibold text-gray-600 dark:text-white">Quick Actions</h3>
@@ -530,7 +530,7 @@
                         </button>
                     </div>
                 </div>
-    
+
                 {{-- Recent Bookings --}}
                 <div class="flex-1 rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20">
                     <div class="mb-4 flex items-start justify-between">
@@ -544,9 +544,9 @@
                             </svg>
                         </div>
                     </div>
-    
+
                     <div class="flex flex-col gap-3">
-    
+
                         <div class="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.04] px-4 py-3">
                             <div>
                                 <p class="text-sm font-semibold text-gray-600 dark:text-white">Room 101 — Ben Cruz</p>
@@ -554,7 +554,7 @@
                             </div>
                             <span class="rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-semibold text-green-400">Confirmed</span>
                         </div>
-    
+
                         <div class="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.04] px-4 py-3">
                             <div>
                                 <p class="text-sm font-semibold text-gray-600 dark:text-white">Suite 204 — Maria Santos</p>
@@ -562,7 +562,7 @@
                             </div>
                             <span class="rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-semibold text-blue-400">Checked-in</span>
                         </div>
-    
+
                         <div class="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.04] px-4 py-3">
                             <div>
                                 <p class="text-sm font-semibold text-gray-600 dark:text-white">Conference A — IT Dept.</p>
@@ -570,13 +570,13 @@
                             </div>
                             <span class="rounded-full bg-gray-500/10 px-2.5 py-1 text-xs font-semibold text-gray-400">Completed</span>
                         </div>
-    
+
                     </div>
                 </div>
-    
+
             </div>
         </div>
-    
+
     </div>
     @endrole
 
@@ -595,11 +595,11 @@
             </div>
 
             <div class="col-span-12 xl:col-span-5">
-            <x-ecommerce.customer-demographic />
+            {{-- <x-ecommerce.customer-demographic /> --}}
             </div>
 
             <div class="col-span-12 xl:col-span-7">
-            <x-ecommerce.recent-orders />
+            {{-- <x-ecommerce.recent-orders /> --}}
             </div>
         </div>
     @endrole

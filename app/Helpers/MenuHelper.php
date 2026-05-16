@@ -2,84 +2,133 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Auth;
+
 class MenuHelper
 {
     public static function getMainNavItems()
     {
-        return [
+        $menu = [
             [
                 'icon' => 'dashboard',
                 'name' => 'Dashboard',
-                'subItems' => [
-                    ['name' => 'Ecommerce', 'path' => '/'],
-                ],
+                'path' => '/dashboard',
             ],
             [
                 'icon' => 'calendar',
                 'name' => 'Calendar',
                 'path' => '/calendar',
             ],
-            [
-                'icon' => 'user-profile',
-                'name' => 'User Profile',
-                'path' => '/profile',
-            ],
-            [
-                'name' => 'Forms',
-                'icon' => 'forms',
-                'subItems' => [
-                    ['name' => 'Form Elements', 'path' => '/form-elements', 'pro' => false],
-                ],
-            ],
-            [
-                'name' => 'Tables',
-                'icon' => 'tables',
-                'subItems' => [
-                    ['name' => 'Basic Tables', 'path' => '/basic-tables', 'pro' => false]
-                ],
-            ],
-            [
-                'name' => 'Pages',
-                'icon' => 'pages',
-                'subItems' => [
-                    ['name' => 'Blank Page', 'path' => '/blank', 'pro' => false],
-                    ['name' => '404 Error', 'path' => '/error-404', 'pro' => false]
-                ],
-            ],
         ];
+
+        if (Auth::check() && Auth::user()->hasRole('admin')) {
+            $menu[] = [
+                'icon' => 'user-profile',
+                'name' => 'User Management',
+                'subItems' => [
+                    [
+                        'name' => 'Users',
+                        'path' => '/users',
+                        'pro' => false,
+                    ],
+                    [
+                        'name' => 'Roles',
+                        'path' => '/roles',
+                        'pro' => false,
+                    ],
+                ],
+            ];
+        }
+
+        if (Auth::check() && Auth::user()->hasRole('staff')) {
+            $menu = array_merge($menu, [
+                [
+                    'icon' => 'ecommerce',
+                    'name' => 'Reservations',
+                    'subItems' => [
+                        ['name' => 'Create Reservation', 'path' => '/reservations/create', 'pro' => false],
+                        ['name' => 'Pending Reservations', 'path' => '/reservations/pending', 'pro' => false],
+                        ['name' => 'Confirmed Reservations', 'path' => '/reservations/confirmed', 'pro' => false],
+                        ['name' => 'Cancelled Reservations', 'path' => '/reservations/cancelled', 'pro' => false],
+                    ],
+                ],
+                [
+                    'icon' => 'task',
+                    'name' => 'Room Management',
+                    'path' => '/rooms',
+                ],
+                [
+                    'icon' => 'forms',
+                    'name' => 'Guest Management',
+                    'path' => '/guests',
+                ],
+                [
+                    'icon' =>'charts',
+                    'name' => 'Reports',
+                    'path' => '/reports',
+                ]
+            ]);
+        }
+
+        if (Auth::check() && Auth::user()->hasRole('client')) {
+            $menu = array_merge($menu, [
+                [
+                    'icon' => 'ecommerce',
+                    'name' => 'My Reservations',
+                    'path' => '/reservations',
+                ],
+                [
+                    'icon' => 'tables',
+                    'name' => 'Booking History',
+                    'path' => '/booking-history',
+                ],
+                [
+                    'icon' =>'charts',
+                    'name' => 'Reports',
+                    'path' => '/reports',
+                ]
+            ]);
+        }
+
+        return $menu;
     }
 
     public static function getOthersItems()
     {
         return [
             [
-                'icon' => 'charts',
-                'name' => 'Charts',
-                'subItems' => [
-                    ['name' => 'Line Chart', 'path' => '/line-chart', 'pro' => false],
-                    ['name' => 'Bar Chart', 'path' => '/bar-chart', 'pro' => false]
-                ],
+                'icon' => 'user-profile',
+                'name' => 'User Profile',
+                'path' => '/profile',
             ],
-            [
-                'icon' => 'ui-elements',
-                'name' => 'UI Elements',
-                'subItems' => [
-                    ['name' => 'Alerts', 'path' => '/alerts', 'pro' => false],
-                    ['name' => 'Avatar', 'path' => '/avatars', 'pro' => false],
-                    ['name' => 'Badge', 'path' => '/badge', 'pro' => false],
-                    ['name' => 'Buttons', 'path' => '/buttons', 'pro' => false],
-                    ['name' => 'Images', 'path' => '/image', 'pro' => false],
-                    ['name' => 'Videos', 'path' => '/videos', 'pro' => false],
-                ],
-            ],
-            [
-                'icon' => 'authentication',
-                'name' => 'Authentication',
-                'subItems' => [
-                    ['name' => 'Sign In', 'path' => '/signin', 'pro' => false],
-                    ['name' => 'Sign Up', 'path' => '/signup', 'pro' => false],
-                ],
-            ],
+            // [
+            //     'icon' => 'charts',
+            //     'name' => 'Charts',
+            //     'subItems' => [
+            //         ['name' => 'Line Chart', 'path' => '/line-chart', 'pro' => false],
+            //         ['name' => 'Bar Chart', 'path' => '/bar-chart', 'pro' => false]
+            //     ],
+            // ],
+            // [
+            //     'icon' => 'ui-elements',
+            //     'name' => 'UI Elements',
+            //     'subItems' => [
+            //         ['name' => 'Alerts', 'path' => '/alerts', 'pro' => false],
+            //         ['name' => 'Avatar', 'path' => '/avatars', 'pro' => false],
+            //         ['name' => 'Badge', 'path' => '/badge', 'pro' => false],
+            //         ['name' => 'Buttons', 'path' => '/buttons', 'pro' => false],
+            //         ['name' => 'Images', 'path' => '/image', 'pro' => false],
+            //         ['name' => 'Videos', 'path' => '/videos', 'pro' => false],
+            //     ],
+            // ],
+            // [
+            //     'icon' => 'authentication',
+            //     'name' => 'Authentication',
+            //     'subItems' => [
+            //         ['name' => 'Sign In', 'path' => '/signin', 'pro' => false],
+            //         ['name' => 'Sign Up', 'path' => '/signup', 'pro' => false],
+            //     ],
+            // ],
         ];
     }
 
