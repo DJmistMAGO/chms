@@ -31,7 +31,7 @@
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
                     <div class="flex items-center gap-4">
-                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-sm shadow-indigo-500/30">
+                        <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-300 shadow-sm shadow-amber-500/30">
                             @if (auth()->user()->avatar)
                                 <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="h-full w-full rounded-2xl object-cover">
                             @else
