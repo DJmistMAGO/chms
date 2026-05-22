@@ -25,18 +25,7 @@ class MenuHelper
             $menu[] = [
                 'icon' => 'user-profile',
                 'name' => 'User Management',
-                'subItems' => [
-                    [
-                        'name' => 'Users',
-                        'path' => '/users',
-                        'pro' => false,
-                    ],
-                    [
-                        'name' => 'Roles',
-                        'path' => '/roles',
-                        'pro' => false,
-                    ],
-                ],
+                'path' => '/user-management',
             ];
         }
 
