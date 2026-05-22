@@ -1,4 +1,4 @@
-@extends('layouts.fullscreen-layout')
+@extends('layouts.authenticated.fullscreen-layout')
 
 @section('content')
 @php
