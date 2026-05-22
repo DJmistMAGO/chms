@@ -74,7 +74,9 @@
 
             {{-- Logo --}}
             <div class="flex justify-center mb-2">
-                <img src="{{ asset('assets/images/chlogo.png') }}" alt="Caree Hotel" class="h-14 object-contain drop-shadow">
+                <a href="{{ route('landingpage') }}">
+                    <img src="{{ asset('assets/images/chlogo.png') }}" alt="Caree Hotel" class="h-14 object-contain drop-shadow hover:opacity-80 transition">
+                </a>
             </div>
 
             <h2 class="font-display text-3xl font-semibold text-center text-stone-800 tracking-wide mb-1">Welcome Back</h2>
