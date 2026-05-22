@@ -45,22 +45,25 @@ class UserManagementController extends Controller
 
     public function addStaff(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
         ]);
 
+        // dd($validated);
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' =>  Hash::make($request->password),
-            'is_google_user' => false,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
         $user->assignRole('staff');
 
-        return redirect()->route('user-management')->with('success', 'Staff added successfully.');
+        return redirect()
+            ->route('user-management.index')
+            ->with('success', 'Staff user created successfully.');
     }
 
     public function deactivateStatus(Request $request, $id)
@@ -69,7 +72,7 @@ class UserManagementController extends Controller
         $user->status = 'inactive';
         $user->save();
 
-        return redirect()->route('user-management')->with('success', 'User status updated successfully.');
+        return redirect()->route('user-management.index')->with('success', 'User status updated successfully.');
     }
 
     public function activateStatus(Request $request, $id)
@@ -78,7 +81,7 @@ class UserManagementController extends Controller
         $user->status = 'active';
         $user->save();
 
-        return redirect()->route('user-management')->with('success', 'User status updated successfully.');
+        return redirect()->route('user-management.index')->with('success', 'User status updated successfully.');
     }
 
     public function resetPassword(Request $request, $id)
@@ -87,7 +90,7 @@ class UserManagementController extends Controller
         $user->password = Hash::make('defaultpassword');
         $user->save();
 
-        return redirect()->route('user-management')->with('success', 'User password reset successfully.');
+        return redirect()->route('user-management.index')->with('success', 'User password reset successfully.');
     }
 
 }
