@@ -50,6 +50,11 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management');
+    Route::post('/user-management/{id}', [UserManagementController::class, 'update'])->name('user-management.update');
+    Route::post('/user-management/add-staff', [UserManagementController::class, 'addStaff'])->name('user-management.add-staff');
+    Route::post('/user-management/{id}/reset-password', [UserManagementController::class, 'resetPassword'])->name('user-management.reset-password');
+    Route::post('/user-management/{id}/activate', [UserManagementController::class, 'activateStatus'])->name('user-management.activate');
+    Route::post('/user-management/{id}/deactivate', [UserManagementController::class, 'deactivateStatus'])->name('user-management.deactivate');
 });
 
 Route::middleware('guest')->group(function () {
