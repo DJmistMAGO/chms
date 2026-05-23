@@ -4,25 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Room extends Model
+class PricingRule extends Model
 {
     protected $fillable = [
         'room_type_id',
-        'room_number',
-        'status',
-        'floor',
-        'description',
+        'pricing_type',
+        'adjustment_type',
+        'adjustment_value',
+        'start_date',
+        'end_date',
+        'is_active',
     ];
 
     // Relationships
-    public function bookings()
-    {
-        return $this->hasMany(Booking::class, 'room_id');
-    }
-
     public function roomType()
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');
     }
-
 }
