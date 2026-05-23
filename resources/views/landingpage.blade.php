@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full" class="scroll-smooth">
 
 <head>
     <meta charset="utf-8">
@@ -73,10 +73,6 @@
         });
     </script>
 
-    <style>
-        /* body { font-family: 'DM Sans', sans-serif; } */
-        /* h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; } */
-    </style>
 </head>
 
 <body class="bg-white text-black font-sans">
@@ -89,8 +85,9 @@
 
             {{-- Desktop Menu --}}
             <div class="hidden md:flex space-x-6 font-medium items-center">
-                <a href="#" class="hover:text-primary">HOME</a>
-                <a href="#" class="hover:text-primary">ROOMS</a>
+                <a href="#home" class="hover:text-primary">HOME</a>
+                <a href="#rooms" class="hover:text-primary">ROOMS</a>
+                <a href="#about-us" class="hover:text-primary">ABOUT US</a>
                 <a href="{{ route('login') }}" class="hover:text-primary ps-5">LOGIN</a>
             </div>
 
@@ -107,16 +104,16 @@
         {{-- Mobile Menu --}}
         <div id="mobile-menu"
             class="md:hidden hidden flex-col space-y-4 pt-4 pb-2 font-medium border-t border-gray-100 mt-3">
-            <a href="#" class="block hover:text-primary">HOME</a>
-            <a href="#" class="block hover:text-primary">ROOMS</a>
+            <a href="#home" class="block hover:text-primary">HOME</a>
+            <a href="#rooms" class="block hover:text-primary">ROOMS</a>
+            <a href="#about-us" class="block hover:text-primary">ABOUT US</a>
             <a href="{{ route('login') }}" class="block hover:text-primary">LOGIN</a>
         </div>
     </nav>
 
 
 
-
-    <section class="h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white"
+    <section class="h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white" id="home"
         style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.716)), url('{{ asset('assets/images/ch2.png') }}')">
 
         <div class="max-w-xl">
@@ -135,7 +132,7 @@
                     Start Reservation
                 </button>
                 <button
-                    class="w-full md:w-auto md:min-w-[180px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition text-center">
+                    class="w-full md:w-auto md:min-w-[180px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition text-center" onclick="document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })">
                     Explore Rooms
                 </button>
             </div>
@@ -143,7 +140,7 @@
     </section>
 
     {{-- Explore & Book Rooms Section --}}
-    <section class="py-20 px-6 md:px-16 bg-white">
+    <section class="py-20 px-6 md:px-16 bg-white" id="rooms">
 
         {{-- Section Header --}}
         <div class="text-center mb-14">
@@ -300,7 +297,7 @@
         </div>
     </section>
 
-    <section class="flex flex-col md:flex-row items-center px-6 md:px-16 py-20 gap-10">
+    <section class="flex flex-col md:flex-row items-center px-6 md:px-16 py-20 gap-10" id="about-us">
 
         <div class="flex-1">
             <h2 class="text-3xl md:text-4xl text-center md:text-left font-bold mb-6">
@@ -426,5 +423,40 @@
     </footer>
 
 </body>
+
+<script>
+    function smoothScrollTo(targetY, duration = 800) {
+    const startY = window.scrollY;
+    const diff = targetY - startY;
+    let start;
+
+    function step(timestamp) {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        // Ease in-out cubic
+        const ease = progress < 0.5
+        ? 4 * progress ** 3
+        : 1 - (-2 * progress + 2) ** 3 / 2;
+
+        window.scrollTo(0, startY + diff * ease);
+        if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (!target) return;
+
+        const navHeight = document.querySelector('nav').offsetHeight;
+        const top = target.getBoundingClientRect().top + window.scrollY - navHeight;
+
+        smoothScrollTo(top, 800); // 800ms duration
+    });
+    });
+</script>
 
 </html>

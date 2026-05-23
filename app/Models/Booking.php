@@ -8,14 +8,37 @@ class Booking extends Model
 {
     protected $fillable = [
         'user_id',
+        'room_id',
         'check_in_date',
         'check_out_date',
         'number_of_guests',
-        'room_id',
+        'room_price',
+        'micro_pricing_amount',
         'total_price',
+        'reference_number',
+        'valid_id_path',
         'status',
+        'expires_at',
+        'verified_by',
+        'verified_at',
         'special_requests',
     ];
+
+    protected $dates = [
+        'check_in_date',
+        'check_out_date',
+        'expires_at',
+        'verified_at',
+    ];
+
+    protected $casts = [
+        'number_of_guests' => 'integer',
+        'room_price' => 'decimal:2',
+        'micro_pricing_amount' => 'decimal:2',
+        'total_price' => 'decimal:2',
+    ];
+
+
 
     // Relationships
     public function user()
@@ -26,5 +49,10 @@ class Booking extends Model
     public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
+    }
+
+    public function verifier()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }
