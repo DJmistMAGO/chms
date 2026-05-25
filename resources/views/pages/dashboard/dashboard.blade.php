@@ -15,7 +15,7 @@
     @endphp
 
     @if($showWarning)
-        <div class="bg-blue-100 dark:bg-blue-900 border border-blue-400 dark:border-blue-600 text-black dark:text-black px-4 py-3 rounded relative mb-4" role="alert">
+        <div class="bg-blue-100 dark:bg-gradient-to-br from-amber-300 to-yellow-200 border border-blue-400 dark:border-amber-600 text-black dark:text-black px-4 py-3 rounded relative mb-4" role="alert" id="google-login-warning">
             <strong class="font-bold">Welcome!</strong>
             <span class="block sm:inline">It looks like you signed in with Google. For security reasons, please update your password by <a href="{{--  --}}" class="underline text-blue-400 dark:text-blue-400">clicking here</a>.</span>
         </div>
@@ -43,7 +43,7 @@
 
                         <div>
                             <p class="text-sm text-black dark:text-gray-400">
-                                Welcome back, <span class="font-medium">{{ auth()->user()->name }}</span>
+                                Welcome back, <span class="font-medium">{{ auth()->user()->name }} !</span>
                             </p>
                             <h2 class="mt-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                                 Your Booking Dashboard
