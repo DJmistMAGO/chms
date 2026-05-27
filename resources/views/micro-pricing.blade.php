@@ -262,7 +262,7 @@
                         {{-- ---- ROOM TYPE ---- --}}
                         <div>
                             <div class="section-label mb-3">
-                                <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Room Type</span>
+                                <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Ambiance</span>
                             </div>
                             <div class="space-y-2" id="room-group">
                                 <div class="option-row selected flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:#D4A800;"
@@ -277,9 +277,17 @@
                                     data-group="room" data-price="500">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
-                                        <span class="text-sm text-warm">Cozy Room</span>
+                                        <span class="text-sm text-warm">Cozy Ambiance</span>
                                     </div>
                                     <span class="text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">+ ₱500</span>
+                                </div>
+                                <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:#FFE566;"
+                                    data-group="room" data-price="1000">
+                                    <div class="flex items-center gap-3">
+                                        <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+                                        <span class="text-sm text-warm">Romantic Ambiance</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">+ ₱1,000</span>
                                 </div>
                             </div>
                         </div>
