@@ -51,6 +51,9 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->prefix('booking')
         ->group(function () {
             Route::get('/create', 'create')->name('booking.create');
+            Route::get('/pending', 'pending')->name('booking.pending');
+            Route::get('/confirmed', 'confirmed')->name('booking.confirmed');
+            Route::get('/cancelled', 'cancelled')->name('booking.cancelled');
         });
 
 });
