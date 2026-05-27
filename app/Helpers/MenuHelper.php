@@ -45,7 +45,7 @@ class MenuHelper
                 [
                     'icon' => 'task',
                     'name' => 'Room Management',
-                    'path' => '/rooms',
+                    'path' => '/room-management/index',
                 ],
                 [
                     'icon' => 'forms',

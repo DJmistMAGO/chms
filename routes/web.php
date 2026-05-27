@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MicroPricingController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -54,6 +55,12 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('/pending', 'pending')->name('booking.pending');
             Route::get('/confirmed', 'confirmed')->name('booking.confirmed');
             Route::get('/cancelled', 'cancelled')->name('booking.cancelled');
+        });
+
+    Route::controller(RoomController::class)
+        ->prefix('room-management')
+        ->group(function () {
+            Route::get('/index', 'index')->name('room.index');
         });
 
 });
