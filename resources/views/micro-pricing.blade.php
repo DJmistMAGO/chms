@@ -198,8 +198,8 @@
             </div>
 
             {{-- ==============================
-                 RIGHT COLUMN — Customize
-                 ============================== --}}
+                RIGHT COLUMN — Customize
+                ============================== --}}
             <div class="fade-up-2">
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border: 1px solid #FFE566;">
 
