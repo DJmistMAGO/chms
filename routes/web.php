@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MicroPricingController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\BookingController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -45,6 +46,12 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
+
+    Route::controller(BookingController::class)
+        ->prefix('booking')
+        ->group(function () {
+            Route::get('/create', 'create')->name('booking.create');
+        });
 
 });
 

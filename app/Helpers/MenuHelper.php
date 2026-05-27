@@ -13,12 +13,13 @@ class MenuHelper
                 'icon' => 'dashboard',
                 'name' => 'Dashboard',
                 'path' => '/dashboard',
-            ],
-            [
-                'icon' => 'calendar',
-                'name' => 'Calendar',
-                'path' => '/calendar',
-            ],
+            ]
+            // ,
+            // [
+            //     'icon' => 'calendar',
+            //     'name' => 'Calendar',
+            //     'path' => '/calendar',
+            // ],
         ];
 
         if (Auth::check() && Auth::user()->hasRole('admin')) {
@@ -33,12 +34,12 @@ class MenuHelper
             $menu = array_merge($menu, [
                 [
                     'icon' => 'ecommerce',
-                    'name' => 'Reservations',
+                    'name' => 'Booking Management',
                     'subItems' => [
-                        ['name' => 'Create Reservation', 'path' => '/reservations/create', 'pro' => false],
-                        ['name' => 'Pending Reservations', 'path' => '/reservations/pending', 'pro' => false],
-                        ['name' => 'Confirmed Reservations', 'path' => '/reservations/confirmed', 'pro' => false],
-                        ['name' => 'Cancelled Reservations', 'path' => '/reservations/cancelled', 'pro' => false],
+                        ['name' => 'Create Booking', 'path' => '/booking/create', 'pro' => false],
+                        ['name' => 'Pending Bookings', 'path' => '/reservations/pending', 'pro' => false],
+                        ['name' => 'Confirmed Bookings', 'path' => '/reservations/confirmed', 'pro' => false],
+                        ['name' => 'Cancelled Bookings', 'path' => '/reservations/cancelled', 'pro' => false],
                     ],
                 ],
                 [
