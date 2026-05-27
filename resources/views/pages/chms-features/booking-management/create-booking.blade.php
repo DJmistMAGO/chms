@@ -1,4 +1,7 @@
 @extends('layouts.authenticated.app')
+
+@section('title', 'Create Walk-in Booking')
+
 @section('content')
     <x-common.page-breadcrumb pageTitle="Create Booking" />
     <div

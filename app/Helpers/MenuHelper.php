@@ -36,10 +36,10 @@ class MenuHelper
                     'icon' => 'ecommerce',
                     'name' => 'Booking Management',
                     'subItems' => [
-                        ['name' => 'Create Booking', 'path' => '/booking/create', 'pro' => false],
-                        ['name' => 'Pending Bookings', 'path' => '/reservations/pending', 'pro' => false],
-                        ['name' => 'Confirmed Bookings', 'path' => '/reservations/confirmed', 'pro' => false],
-                        ['name' => 'Cancelled Bookings', 'path' => '/reservations/cancelled', 'pro' => false],
+                        ['name' => 'Create Walk-in Booking', 'path' => '/booking/create', 'pro' => false],
+                        ['name' => 'Pending Bookings', 'path' => '/booking/pending', 'pro' => false],
+                        ['name' => 'Confirmed Bookings', 'path' => '/booking/confirmed', 'pro' => false],
+                        ['name' => 'Cancelled Bookings', 'path' => '/booking/cancelled', 'pro' => false],
                     ],
                 ],
                 [
