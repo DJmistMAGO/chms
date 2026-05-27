@@ -253,13 +253,13 @@
                                     data-group="floor" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
-                                        <span class="text-sm text-warm">Floor 3</span>
+                                        <span class="text-sm text-warm">Floor 4</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- ---- ROOM TYPE ---- --}}
+                        {{-- ---- Ambiance ---- --}}
                         <div>
                             <div class="section-label mb-3">
                                 <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Ambiance</span>
@@ -292,14 +292,47 @@
                             </div>
                         </div>
 
-                        {{-- ---- EXTRA ---- --}}
+                        {{-- ---- FOOD PACKAGE ---- --}}
                         <div>
+                            <div class="section-label mb-3">
+                                <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Food Package</span>
+                            </div>
+                            <div class="space-y-2" id="food-group">
+                                <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:#FFE566;"
+                                    data-group="food" data-price="0">
+                                    <div class="flex items-center gap-3">
+                                        <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+                                        <span class="text-sm text-warm">No Food</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">Free</span>
+                                </div>
+                                <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:#FFE566;"
+                                    data-group="food" data-price="1500">
+                                    <div class="flex items-center gap-3">
+                                        <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+                                        <span class="text-sm text-warm">Cozy Dinner for Family</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">+ ₱1,500</span>
+                                </div>
+                                <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:#FFE566;"
+                                    data-group="food" data-price="1500">
+                                    <div class="flex items-center gap-3">
+                                        <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+                                        <span class="text-sm text-warm">Romantic Dinner</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">+ ₱1,500</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- ---- EXTRA ---- --}}
+                        {{-- <div>
                             <div class="section-label mb-3">
                                 <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Extra</span>
                             </div>
                             <div class="space-y-2" id="extra-group">
 
-                                {{-- Bed Foam --}}
+                                -- Bed Foam --
                                 <div class="flex items-center justify-between border rounded-xl px-4 py-3"
                                     style="border-color:#FFE566; background:#FFFDF0;"
                                     data-extra="bed-foam" data-unit-price="200">
@@ -326,7 +359,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Extra Pillow --}}
+                                - Extra Pillow
                                 <div class="flex items-center justify-between border rounded-xl px-4 py-3"
                                     style="border-color:#FFE566; background:#FFFDF0;"
                                     data-extra="extra-pillow" data-unit-price="100">
@@ -353,7 +386,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Towel Set --}}
+                                 Towel Set
                                 <div class="flex items-center justify-between border rounded-xl px-4 py-3"
                                     style="border-color:#FFE566; background:#FFFDF0;"
                                     data-extra="towel-set" data-unit-price="150">
@@ -381,7 +414,7 @@
                                 </div>
 
                             </div>
-                        </div>
+                        </div> --}}
 
                         {{-- DIVIDER --}}
                         <div class="pt-6" style="border-top:1px solid #FFE566;">
