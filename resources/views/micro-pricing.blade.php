@@ -153,8 +153,7 @@
 
             {{-- ===== RIGHT: Customize Panel ===== --}}
             <div class="fade-up-2">
-                <form method="POST" action="" enctype="multipart/form-data">
-                @csrf
+
 
                 {{-- Hidden fields — names match migration columns exactly --}}
                 <input type="hidden" name="room_type"             value="{{ $roomType ?? '' }}">
@@ -351,7 +350,7 @@
                                 placeholder="Any special requests or notes for your stay…"
                                 class="w-full rounded-xl px-4 py-3 text-sm text-warm placeholder-muted/50 resize-none transition-colors"
                                 style="border:1px solid #FFE566; background:#FFF8D6;"></textarea>
-                        </div> --}}
+                        </div>  --}}
 
                         {{-- PRICE BREAKDOWN + SUBMIT --}}
                         <div class="pt-5" style="border-top:1px solid #FFE566;">
@@ -389,7 +388,6 @@
 
                     </div>
                 </div>
-                </form>
             </div>
 
         </div>
@@ -403,8 +401,8 @@
         <div id="signin-modal"
             class="w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
             style="background:#FFFDF0; border:1px solid #FFE566;
-                   transform:translateY(24px); opacity:0;
-                   transition:transform 0.32s ease, opacity 0.32s ease;">
+                transform:translateY(24px); opacity:0;
+                transition:transform 0.32s ease, opacity 0.32s ease;">
 
             {{-- Modal header --}}
             <div class="px-7 pt-7 pb-5 flex items-start justify-between" style="background:#FFD000;">
@@ -437,11 +435,21 @@
 
             {{-- Sign-in form --}}
             <div class="px-7 py-6">
-                <form method="POST" action="{{ route('login') }}" id="signin-form" class="space-y-4">
+                <form method="POST" action="{{ route('login.with.booking') }}" id="signin-form" class="space-y-4" enctype="multipart/form-data">
                     @csrf
 
-                    {{-- Pass booking data through so it can be resumed after login --}}
-                    <input type="hidden" name="redirect_booking" value="1">
+                    {{-- ── Booking hidden fields (mirrors the outer form) ── --}}
+                    <input type="hidden" name="room_type"            value="{{ $roomType ?? '' }}">
+                    <input type="hidden" name="check_in"             id="modal-check_in">
+                    <input type="hidden" name="check_out"            id="modal-check_out">
+                    <input type="hidden" name="number_of_guests"     id="modal-guests"    value="1">
+                    <input type="hidden" name="nights"               id="modal-nights"    value="0">
+                    <input type="hidden" name="floor"                id="modal-floor"     value="Floor 1">
+                    <input type="hidden" name="ambiance"             id="modal-ambiance"  value="Regular Room">
+                    <input type="hidden" name="food"                 id="modal-food"      value="No Food">
+                    <input type="hidden" name="room_price"           value="{{ $price }}">
+                    <input type="hidden" name="micro_pricing_amount" id="modal-addons"    value="0">
+                    <input type="hidden" name="total_price"          id="modal-total"     value="{{ $price }}">
 
                     {{-- Email --}}
                     <div>
@@ -611,8 +619,8 @@
                 const parts = document.getElementById('booking_range').value.split(' - ');
                 if (parts.length !== 2) {
                     selectedNights = 0;
-                    document.getElementById('check_in').value  = '';
-                    document.getElementById('check_out').value = '';
+                    document.getElementById('check_in').value = fecha.format(start, 'YYYY-MM-DD');
+                    document.getElementById('check_out').value =fecha.format(end, 'YYYY-MM-DD');
                     document.getElementById('nights-badge').classList.add('hidden');
                     recalcTotal();
                     return;
@@ -731,6 +739,24 @@
         function openSignInModal() {
             const overlay = document.getElementById('signin-overlay');
             const modal   = document.getElementById('signin-modal');
+
+            // ── Sync every live booking value into the modal form ──
+            const syncMap = {
+                'check_in':             'modal-check_in',
+                'check_out':            'modal-check_out',
+                'input-guests':         'modal-guests',
+                'input-nights':         'modal-nights',
+                'input-floor':          'modal-floor',
+                'input-ambiance':       'modal-ambiance',
+                'input-food':           'modal-food',
+                'input-addons':         'modal-addons',
+                'input-total':          'modal-total',
+            };
+            Object.entries(syncMap).forEach(([srcId, dstId]) => {
+                const src = document.getElementById(srcId);
+                const dst = document.getElementById(dstId);
+                if (src && dst) dst.value = src.value;
+            });
 
             // Sync live total into the summary strip
             document.getElementById('modal-summary-total').textContent =

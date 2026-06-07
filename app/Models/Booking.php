@@ -8,20 +8,20 @@ class Booking extends Model
 {
     protected $fillable = [
         'user_id',
-        'room_id',
-        'check_in_date',
-        'check_out_date',
+        'reference_number',
+        'room_type',
+        'check_in',
+        'check_out',
         'number_of_guests',
         'room_price',
         'micro_pricing_amount',
         'total_price',
-        'reference_number',
-        'valid_id_path',
+        // 'valid_id_path',
         'status',
         'expires_at',
         'verified_by',
         'verified_at',
-        'special_requests',
+        // 'special_requests',
     ];
 
     protected $dates = [

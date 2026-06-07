@@ -35,6 +35,7 @@ Route::middleware('guest')->group(function () {
             Route::post('/', 'login')->name('login.post');
             Route::get('/google', 'redirectToGoogle')->name('login.google');
             Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+            Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
     });
 
 

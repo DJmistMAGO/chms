@@ -22,8 +22,7 @@ return new class extends Migration
             $table->decimal('room_price', 10, 2);
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->string('valid_id_path');
-            $table->enum('status', [ 'pending', 'verified', 'confirmed', 'expired', 'cancelled', 'checked_in', 'checked_out' ])->default('pending');
+            $table->enum('status', [ 'pending', 'verified', 'confirmed', 'expired', 'cancelled'])->default('pending');
             $table->timestamp('expires_at');
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();
