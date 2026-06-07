@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Booking;
+use App\Models\User;
 
 use Illuminate\Http\Request;
 
@@ -14,7 +16,16 @@ class BookingController extends Controller
 
     public function myReservations()
     {
-        return view('pages.chms-features.my-reservations.reservation');
+        $user = auth()->user();
+        $pendingBookings = Booking::where('user_id', $user->id)
+        ->where('status', 'pending')
+        ->get();
+
+        $confirmedBookings = Booking::where('user_id', $user->id)
+        ->where('status', 'confirmed')
+        ->get();
+
+        return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }
 
     public function confirmed()

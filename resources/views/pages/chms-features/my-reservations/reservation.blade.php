@@ -5,9 +5,9 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="My Reservations" />
     <div
-        class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+        class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
         <div class="">
-            <div class=" grid grid-cols-1 gap-6 lg:grid-cols-2 text-left">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 text-left">
                 {{-- PENDING --}}
                 <div class="rounded-2xl border border-yellow-200 bg-white shadow-sm">
                     <div class="border-b border-yellow-100 bg-yellow-50 px-5 py-4 rounded-t-2xl">
@@ -20,49 +20,31 @@
                     </div>
 
                     <div class="p-5 space-y-4">
-                        {{-- SAMPLE CARD --}}
-                        <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-800">Room Deluxe Suite</p>
-                                    <p class="text-xs text-gray-500">Check-in: June 10, 2026</p>
-                                    <p class="text-xs text-gray-500">Check-out: June 12, 2026</p>
+                        {{-- Repeat cards here for pending bookings --}}
+                        @forelse ($pendingBookings as $booking)
+                            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">{{ $booking->room_type }}</p>
+                                        <p class="text-xs text-gray-500">Check-in: {{ $booking->check_in }}</p>
+                                        <p class="text-xs text-gray-500">Check-out: {{ $booking->check_out }}</p>
+                                    </div>
+
+                                    <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                                        Pending
+                                    </span>
                                 </div>
 
-                                <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                    Pending
-                                </span>
-                            </div>
-
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-gray-400">Ref: CH-ABC12345</span>
-                                <button class="text-xs font-medium text-yellow-600 hover:text-yellow-700">
-                                    View
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Repeat cards here --}}
-                        <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-800">Room Deluxe Suite</p>
-                                    <p class="text-xs text-gray-500">Check-in: June 10, 2026</p>
-                                    <p class="text-xs text-gray-500">Check-out: June 12, 2026</p>
+                                <div class="mt-3 flex items-center justify-between">
+                                    <span class="text-xs text-gray-400">Ref: CH-ABC12345</span>
+                                    <button class="text-xs font-medium text-yellow-600 hover:text-yellow-700">
+                                        View
+                                    </button>
                                 </div>
-
-                                <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                    Pending
-                                </span>
                             </div>
-
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-gray-400">Ref: CH-ABC12345</span>
-                                <button class="text-xs font-medium text-yellow-600 hover:text-yellow-700">
-                                    View
-                                </button>
-                            </div>
-                        </div>
+                        @empty
+                            <p class="text-sm text-gray-500">No pending reservations found.</p>
+                        @endforelse
                     </div>
                 </div>
 
@@ -78,13 +60,14 @@
                     </div>
 
                     <div class="p-5 space-y-4">
-                        {{-- SAMPLE CARD --}}
-                        <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
-                            <div class="flex items-start justify-between">
-                                <div>
-                                    <p class="text-sm font-semibold text-gray-800">Room Standard Twin</p>
-                                    <p class="text-xs text-gray-500">Check-in: June 15, 2026</p>
-                                    <p class="text-xs text-gray-500">Check-out: June 18, 2026</p>
+                        {{-- Repeat cards here for confirmed bookings --}}
+                        @forelse ($confirmedBookings as $booking)
+                            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
+                                <div class="flex items-start justify-between">
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-800">{{ $booking->room_type }}</p>
+                                    <p class="text-xs text-gray-500">Check-in: {{ $booking->check_in }}</p>
+                                    <p class="text-xs text-gray-500">Check-out: {{ $booking->check_out }}</p>
                                 </div>
 
                                 <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
@@ -93,14 +76,17 @@
                             </div>
 
                             <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-gray-400">Ref: CH-ZXY98765</span>
+                                <span class="text-xs text-gray-400">Ref: {{ $booking->reference_number }}</span>
                                 <button class="text-xs font-medium text-green-600 hover:text-green-700">
                                     View
                                 </button>
                             </div>
                         </div>
 
-                        {{-- Repeat cards here --}}
+                        @empty
+                            <p class="text-sm text-gray-500">No confirmed reservations found.</p>
+                        @endforelse
+
                     </div>
                 </div>
 
