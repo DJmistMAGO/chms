@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
-            $table->string('room_id')->constrained();
-            $table->date('check_in_date');
-            $table->date('check_out_date');
+            $table->string('reference_number')->unique();
+            $table->string('room_type');
+            $table->date('check_in');
+            $table->date('check_out');
             $table->integer('number_of_guests');
             $table->decimal('room_price', 10, 2);
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->string('reference_number')->unique();
             $table->string('valid_id_path');
             $table->enum('status', [ 'pending', 'verified', 'confirmed', 'expired', 'cancelled', 'checked_in', 'checked_out' ])->default('pending');
             $table->timestamp('expires_at');
