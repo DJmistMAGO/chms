@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\Booking;
+use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class AuthenticationController extends Controller
 {
@@ -145,5 +148,87 @@ class AuthenticationController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/');
+    }
+
+    //sign in with email and password and passing of data for bookings
+    public function loginWithBooking(Request $request)
+    {
+        // ── 1. Validate credentials + every booking field ──────────────────
+        $request->validate([
+            // Auth
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'string'],
+
+            // Booking — must match migration columns
+            'room_type'            => ['required', 'string'],
+            'check_in' => [
+                'required',
+                'date',
+                'after_or_equal:today'
+            ],
+
+            'check_out' => [
+                'required',
+                'date',
+                'after:check_in'
+            ],
+            'number_of_guests'     => ['required', 'integer', 'min:1'],
+            'room_price'           => ['required', 'numeric', 'min:0'],
+            'micro_pricing_amount' => ['required', 'numeric', 'min:0'],
+            'total_price'          => ['required', 'numeric', 'min:0'],
+        ]);
+
+        // dd($request->all());
+
+        // ── 2. Attempt login ───────────────────────────────────────────────
+        $credentials = $request->only('email', 'password');
+        $remember    = $request->boolean('remember');
+
+        if (! Auth::attempt($credentials, $remember)) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        // Regenerate session to prevent fixation
+        $request->session()->regenerate();
+
+        // // ── 3. Store the valid ID file ─────────────────────────────────────
+        // // Stored in storage/app/private/valid_ids/{user_id}/
+        // $validIdPath = $request->file('valid_id_path')
+        //     ->store('valid_ids/' . Auth::id(), 'private');
+
+        // ── 4. Create the booking ──────────────────────────────────────────
+        $booking = Booking::create([
+            'user_id'              => Auth::id(),
+            'reference_number'     => $this->generateReference(),
+            'room_type'            => $request->room_type,
+            'check_in' => Carbon::parse($request->check_in)->format('Y-m-d'),
+            'check_out' => Carbon::parse($request->check_out)->format('Y-m-d'),
+            'number_of_guests'     => $request->number_of_guests,
+            'room_price'           => $request->room_price,
+            'micro_pricing_amount' => $request->micro_pricing_amount,
+            'total_price'          => $request->total_price,
+            'special_requests'     => $request->special_requests,
+            'status'               => 'pending',
+            'expires_at'           => now()->addHours(24),
+        ]);
+
+        // ── 5. Redirect to booking confirmation page ───────────────────────
+        return redirect()
+            ->route('dashboard', $booking->reference_number)
+            ->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
+    }
+
+    private function generateReference(): string
+    {
+        do {
+            $letters = strtoupper(Str::random(4)); // letters
+            $numbers = rand(1000, 9999);          // numbers
+
+            $ref = 'CH-' . $letters . $numbers;
+        } while (Booking::where('reference_number', $ref)->exists());
+
+        return $ref;
     }
 }

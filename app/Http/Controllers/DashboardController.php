@@ -6,8 +6,9 @@ namespace App\Http\Controllers;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index($referenceNumber = null)
     {
-        return view('pages.dashboard.dashboard', ['title' => 'Caree Hotel']);
+
+        return view('pages.dashboard.dashboard', ['title' => 'Caree Hotel', 'referenceNumber' => $referenceNumber]);
     }
 }

@@ -35,6 +35,7 @@ Route::middleware('guest')->group(function () {
             Route::post('/', 'login')->name('login.post');
             Route::get('/google', 'redirectToGoogle')->name('login.google');
             Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+            Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
     });
 
 
@@ -45,7 +46,7 @@ Route::middleware('guest')->group(function () {
 
 // Routes accessible only to authenticated users
 Route::middleware(['web', 'auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/{referenceNumber?}', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
 
     Route::controller(BookingController::class)
@@ -55,6 +56,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('/pending', 'pending')->name('booking.pending');
             Route::get('/confirmed', 'confirmed')->name('booking.confirmed');
             Route::get('/cancelled', 'cancelled')->name('booking.cancelled');
+            Route::get('/my-reservations', 'myReservations')->name('booking.my-reservations');
         });
 
     Route::controller(RoomController::class)

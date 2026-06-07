@@ -65,7 +65,7 @@ class MenuHelper
                 [
                     'icon' => 'ecommerce',
                     'name' => 'My Reservations',
-                    'path' => '/reservations',
+                    'path' => '/booking/my-reservations',
                 ],
                 [
                     'icon' => 'tables',
