@@ -440,7 +440,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit"
+                                <button type="button" onclick="openSignInModal()"
                                     class="w-full py-4 rounded-2xl font-medium tracking-wide active:scale-95 transition-all flex items-center justify-center gap-2 text-sm"
                                     style="background:#FFD000; color:#1C1C1E;">
                                     <i class="fas fa-calendar-check text-xs"></i>
@@ -458,6 +458,167 @@
         </div>
     </div>
 
+    {{-- ===== SIGN-IN MODAL ===== --}}
+    <div id="signin-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4"
+        style="background:rgba(28,28,30,0.55); backdrop-filter:blur(6px);">
+
+        <div id="signin-modal" class="w-full max-w-md rounded-3xl overflow-hidden shadow-2xl"
+            style="background:#FFFDF0; border:1px solid #FFE566;
+                   transform:translateY(24px); opacity:0;
+                   transition:transform 0.32s ease, opacity 0.32s ease;">
+
+            {{-- Modal header --}}
+            <div class="px-7 pt-7 pb-5 flex items-start justify-between" style="background:#FFD000;">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <img src="{{ asset('assets/images/chlogo.png') }}" class="w-8 opacity-90">
+                        <span class="text-xs font-medium tracking-widest uppercase text-charcoal/60">Caree Hotel</span>
+                    </div>
+                    <h3 class="font-display text-2xl font-semibold text-charcoal leading-tight">
+                        Sign in to continue
+                    </h3>
+                    <p class="text-xs mt-1" style="color:rgba(28,28,30,0.5);">
+                        Confirm your identity to complete the reservation
+                    </p>
+                </div>
+                <button onclick="closeSignInModal()"
+                    class="mt-1 w-8 h-8 flex items-center justify-center rounded-full transition hover:bg-black/10 text-charcoal/60 hover:text-charcoal flex-shrink-0">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            {{-- Booking summary strip --}}
+            <div class="px-7 py-3 flex items-center gap-3 text-xs"
+                style="background:#FFF8D6; border-bottom:1px solid #FFE566;">
+                <i class="fas fa-calendar-check" style="color:#D4A800;"></i>
+                <span class="text-muted">Booking summary:</span>
+                <span class="font-semibold text-charcoal" id="modal-summary-room">{{ $roomType ?? 'Room' }}</span>
+                <span class="text-muted mx-1">·</span>
+                <span class="font-semibold" style="color:#B89200;"
+                    id="modal-summary-total">₱{{ number_format($price) }}</span>
+            </div>
+
+            {{-- Sign-in form --}}
+            <div class="px-7 py-6">
+                <form method="POST" action="{{ route('login') }}" id="signin-form" class="space-y-4">
+                    @csrf
+
+                    {{-- Pass booking data through so it can be resumed after login --}}
+                    <input type="hidden" name="redirect_booking" value="1">
+
+                    {{-- Email --}}
+                    <div>
+                        <label class="block text-xs font-medium tracking-widest uppercase mb-1.5"
+                            style="color:#7A6E68;">
+                            Email Address
+                        </label>
+                        <div class="relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5"
+                                style="color:#D4A800;">
+                                <i class="fas fa-envelope text-xs"></i>
+                            </span>
+                            <input type="email" name="email" id="modal-email" placeholder="you@email.com"
+                                required autocomplete="email"
+                                class="w-full rounded-xl pl-9 pr-4 py-3 text-sm text-warm placeholder-muted/50 transition-colors"
+                                style="border:1px solid #FFE566; background:#FFF8D6;">
+                        </div>
+                        <p class="modal-error hidden mt-1.5 text-xs text-red-500 flex items-center gap-1"
+                            id="email-error">
+                            <i class="fas fa-circle-exclamation" style="font-size:10px;"></i>
+                            <span></span>
+                        </p>
+                    </div>
+
+                    {{-- Password --}}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-medium tracking-widest uppercase" style="color:#7A6E68;">
+                                Password
+                            </label>
+                            <a href="{{ route('password.request') }}"
+                                class="text-xs hover:underline transition-colors" style="color:#B89200;">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div class="relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5"
+                                style="color:#D4A800;">
+                                <i class="fas fa-lock text-xs"></i>
+                            </span>
+                            <input type="password" name="password" id="modal-password" placeholder="••••••••"
+                                required autocomplete="current-password"
+                                class="w-full rounded-xl pl-9 pr-10 py-3 text-sm text-warm placeholder-muted/50 transition-colors"
+                                style="border:1px solid #FFE566; background:#FFF8D6;">
+                            {{-- Toggle visibility --}}
+                            <button type="button" onclick="togglePassword()"
+                                class="absolute inset-y-0 right-0 flex items-center pr-3.5 transition-colors"
+                                style="color:#D4A800;">
+                                <i id="eye-icon" class="fas fa-eye text-xs"></i>
+                            </button>
+                        </div>
+                        <p class="modal-error hidden mt-1.5 text-xs text-red-500 flex items-center gap-1"
+                            id="password-error">
+                            <i class="fas fa-circle-exclamation" style="font-size:10px;"></i>
+                            <span></span>
+                        </p>
+                    </div>
+
+                    {{-- Remember me --}}
+                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                        <input type="checkbox" name="remember" id="modal-remember"
+                            class="w-4 h-4 rounded accent-yellow-400">
+                        <span class="text-sm text-warm">Remember me</span>
+                    </label>
+
+                    {{-- Submit --}}
+                    <button type="submit" id="signin-submit"
+                        class="w-full py-3.5 rounded-2xl font-medium tracking-wide active:scale-95 transition-all flex items-center justify-center gap-2 text-sm mt-2"
+                        style="background:#FFD000; color:#1C1C1E;">
+                        <i class="fas fa-arrow-right-to-bracket text-xs"></i>
+                        Sign In & Confirm Booking
+                    </button>
+
+                    {{-- Divider --}}
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1 h-px" style="background:#FFE566;"></div>
+                        <span class="text-xs text-muted">or</span>
+                        <div class="flex-1 h-px" style="background:#FFE566;"></div>
+                    </div>
+
+                    {{-- Sign in with Google --}}
+                    <a href=""
+                        class="w-full flex items-center justify-center gap-3 py-3.5 rounded-2xl border text-sm font-medium transition-all active:scale-95 hover:shadow-md"
+                        style="border-color:#FFE566; background:#FFFFFF; color:#3D3530;">
+                        {{-- Google SVG logo --}}
+                        <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path fill="#EA4335"
+                                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                            <path fill="#4285F4"
+                                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                            <path fill="#FBBC05"
+                                d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+                            <path fill="#34A853"
+                                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+                            <path fill="none" d="M0 0h48v48H0z" />
+                        </svg>
+                        Continue with Google
+                    </a>
+
+                    {{-- Register link --}}
+                    <p class="text-center text-xs text-muted">
+                        Don't have an account?
+                        <a href="" class="font-semibold hover:underline ml-1"
+                            style="color:#B89200;">
+                            Create one
+                        </a>
+                    </p>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
     {{-- MOBILE STICKY BAR --}}
     <div class="lg:hidden sticky-bar fixed bottom-0 left-0 right-0 px-5 py-4 z-30 border-t"
         style="background:#FFFDF0; border-color:#FFE566;">
@@ -469,7 +630,7 @@
                     ₱{{ number_format($price) }}
                 </p>
             </div>
-            <button type="button" onclick="document.querySelector('form [type=submit]').click()"
+            <button type="button" onclick="openSignInModal()"
                 class="px-7 py-3.5 rounded-2xl font-medium text-sm active:scale-95 transition-all flex items-center gap-2"
                 style="background:#FFD000; color:#1C1C1E;">
                 <i class="fas fa-calendar-check text-xs"></i>
@@ -610,6 +771,97 @@
             val = Math.min(max, Math.max(1, val + delta));
             input.value = val;
         }
+
+        // ── Sign-in Modal ──────────────────────────────────
+        function openSignInModal() {
+            const overlay = document.getElementById('signin-overlay');
+            const modal = document.getElementById('signin-modal');
+
+            // Sync live total into the summary strip
+            document.getElementById('modal-summary-total').textContent =
+                document.getElementById('total-price').textContent;
+
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                modal.style.transform = 'translateY(0)';
+                modal.style.opacity = '1';
+            });
+
+            setTimeout(() => document.getElementById('modal-email').focus(), 340);
+        }
+
+        function closeSignInModal() {
+            const overlay = document.getElementById('signin-overlay');
+            const modal = document.getElementById('signin-modal');
+
+            modal.style.transform = 'translateY(24px)';
+            modal.style.opacity = '0';
+
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }, 320);
+        }
+
+        // Close on backdrop click
+        document.getElementById('signin-overlay').addEventListener('click', function(e) {
+            if (e.target === this) closeSignInModal();
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeSignInModal();
+        });
+
+        // Toggle password visibility
+        function togglePassword() {
+            const input = document.getElementById('modal-password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash text-xs';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye text-xs';
+            }
+        }
+
+        // Client-side validation + loading state on submit
+        document.getElementById('signin-form').addEventListener('submit', function(e) {
+            let valid = true;
+
+            const email = document.getElementById('modal-email');
+            const password = document.getElementById('modal-password');
+            const emailErr = document.getElementById('email-error');
+            const passErr = document.getElementById('password-error');
+
+            // Reset errors
+            [emailErr, passErr].forEach(el => el.classList.add('hidden'));
+
+            if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                emailErr.querySelector('span').textContent = 'Please enter a valid email address.';
+                emailErr.classList.remove('hidden');
+                valid = false;
+            }
+            if (!password.value) {
+                passErr.querySelector('span').textContent = 'Password is required.';
+                passErr.classList.remove('hidden');
+                valid = false;
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                return;
+            }
+
+            // Loading state
+            const btn = document.getElementById('signin-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> Signing in…';
+            btn.style.opacity = '0.75';
+        });
     </script>
 
 </body>
