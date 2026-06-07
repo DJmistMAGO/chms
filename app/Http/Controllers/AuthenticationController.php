@@ -203,14 +203,8 @@ class AuthenticationController extends Controller
             'user_id'              => Auth::id(),
             'reference_number'     => $this->generateReference(),
             'room_type'            => $request->room_type,
-            'check_in' => Carbon::parse(
-                $request->check_in
-            )->format('Y-m-d'),
-
-            'check_out' => Carbon::parse(
-                $request->check_out
-            )->format('Y-m-d'),
-
+            'check_in' => Carbon::parse($request->check_in)->format('Y-m-d'),
+            'check_out' => Carbon::parse($request->check_out)->format('Y-m-d'),
             'number_of_guests'     => $request->number_of_guests,
             'room_price'           => $request->room_price,
             'micro_pricing_amount' => $request->micro_pricing_amount,
@@ -222,20 +216,17 @@ class AuthenticationController extends Controller
 
         // ── 5. Redirect to booking confirmation page ───────────────────────
         return redirect()
-            ->route('booking.confirmation', $booking->reference_number)
+            ->route('dashboard', $booking->reference_number)
             ->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
     }
 
-    // ── Private helpers ────────────────────────────────────────────────────
-
-    /**
-     * Generate a unique, human-readable reference number.
-     * Format: CH-XXXXXXXX  (CH = Caree Hotel)
-     */
     private function generateReference(): string
     {
         do {
-            $ref = 'CH-' . strtoupper(Str::random(8));
+            $letters = strtoupper(Str::random(4)); // letters
+            $numbers = rand(1000, 9999);          // numbers
+
+            $ref = 'CH-' . $letters . $numbers;
         } while (Booking::where('reference_number', $ref)->exists());
 
         return $ref;

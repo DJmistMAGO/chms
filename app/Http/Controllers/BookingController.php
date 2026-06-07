@@ -12,9 +12,9 @@ class BookingController extends Controller
         return view('pages.chms-features.booking-management.create-booking');
     }
 
-    public function pending()
+    public function myReservations()
     {
-        return view('pages.chms-features.booking-management.pending-booking');
+        return view('pages.chms-features.my-reservations.reservation');
     }
 
     public function confirmed()
