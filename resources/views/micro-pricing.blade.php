@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $roomType ?? 'Customize Your Stay' }} | Caree Hotel</title>
+    <title>{{ $roomName ?? 'Customize Your Stay' }} | Caree Hotel</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,12 +96,12 @@
                 {{-- Image --}}
                 <div class="room-img-wrap relative rounded-2xl overflow-hidden mb-5 shadow-md" style="height:280px;">
                     <img src="{{ asset($room->image ?? 'assets/images/pRoom.png') }}"
-                        alt="{{ $roomType ?? 'Room' }}"
+                        alt="{{ $roomName ?? 'Room' }}"
                         class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                     <span class="absolute top-4 right-4 text-xs font-medium px-4 py-1.5 rounded-full tracking-widest uppercase"
                         style="background:#1C1C1E; color:#FAF7F2;">
-                        {{ $roomType ?? 'Standard' }}
+                        {{ $roomName ?? 'Standard' }}
                     </span>
                     <div class="absolute bottom-4 left-4">
                         <p class="text-white/60 text-xs tracking-wide uppercase mb-0.5">Starting from</p>
@@ -114,7 +114,7 @@
 
                 {{-- Title --}}
                 <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal leading-tight mb-4">
-                    {{ $roomType ?? 'Premium Deluxe Room' }}
+                    {{ $roomName ?? 'Premium Deluxe Room' }}
                 </h1>
 
                 {{-- Stats --}}
@@ -156,7 +156,7 @@
 
 
                 {{-- Hidden fields — names match migration columns exactly --}}
-                <input type="hidden" name="room_type"             value="{{ $roomType ?? '' }}">
+                <input type="hidden" name="room_type"             value="{{ $roomName ?? '' }}">
                 <input type="hidden" name="check_in"              id="check_in">
                 <input type="hidden" name="check_out"             id="check_out">
                 <input type="hidden" name="number_of_guests"      id="input-guests"   value="1">
@@ -428,7 +428,7 @@
             <div class="px-7 py-3 flex items-center gap-3 text-xs" style="background:#FFF8D6; border-bottom:1px solid #FFE566;">
                 <i class="fas fa-calendar-check" style="color:#D4A800;"></i>
                 <span class="text-muted">Booking summary:</span>
-                <span class="font-semibold text-charcoal" id="modal-summary-room">{{ $roomType ?? 'Room' }}</span>
+                <span class="font-semibold text-charcoal" id="modal-summary-room">{{ $roomName ?? 'Room' }}</span>
                 <span class="text-muted mx-1">·</span>
                 <span class="font-semibold" style="color:#B89200;" id="modal-summary-total">₱{{ number_format($price) }}</span>
             </div>
@@ -439,7 +439,7 @@
                     @csrf
 
                     {{-- ── Booking hidden fields (mirrors the outer form) ── --}}
-                    <input type="hidden" name="room_type"            value="{{ $roomType ?? '' }}">
+                    <input type="hidden" name="room_type"            value="{{ $roomName ?? '' }}">
                     <input type="hidden" name="check_in"             id="modal-check_in">
                     <input type="hidden" name="check_out"            id="modal-check_out">
                     <input type="hidden" name="number_of_guests"     id="modal-guests"    value="1">
@@ -589,6 +589,8 @@
         // Tracks number of selected nights
         let selectedNights = 0;
 
+        const disabledDates = @json($disabledDates);
+
         // ── Helpers ────────────────────────────────────────
         function recalcTotal() {
             const addonPerNight = groupAddons.ambiance + groupAddons.food;
@@ -610,9 +612,13 @@
         }
 
         // ── Hotel Datepicker ───────────────────────────────
+
+
+
         const datepicker = new HotelDatepicker(document.getElementById('booking_range'), {
             format:        'MMM D, YYYY',
             minNights:     1,
+            disabledDates: disabledDates,
             clearButton:   true,
             selectForward: true,
             onSelectRange() {

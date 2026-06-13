@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
+use App\Models\Booking;
 
 class MicroPricingController extends Controller
 {
@@ -12,20 +15,111 @@ class MicroPricingController extends Controller
 
     public function booking($roomType)
     {
-        if($roomType == 'standard') {
-            $roomType = 'Standard Room';
-            $price = 1500;
-        } elseif($roomType == 'standard-premium') {
-            $roomType = 'Standard Premium Room';
-            $price = 2000;
-        } elseif($roomType == 'family') {
-            $roomType = 'Family Room';
-            $price = 2500;
-        } else {
+        /*
+    ROOM CONFIGURATION
+    */
+
+        $rooms = [
+
+            'standard' => [
+                'name' => 'Standard Room',
+                'price' => 1500,
+                'total_rooms' => 14,
+            ],
+
+            'standard-premium' => [
+                'name' => 'Standard Premium Room',
+                'price' => 1900,
+                'total_rooms' => 10,
+            ],
+
+            'family' => [
+                'name' => 'Family Room',
+                'price' => 2700,
+                'total_rooms' => 4,
+            ],
+        ];
+
+        /*
+    CHECK ROOM TYPE
+    */
+
+        if (!isset($rooms[$roomType])) {
             abort(404);
         }
 
-        return view('micro-pricing', compact('roomType', 'price'));
+        /*
+    SELECTED ROOM
+    */
+
+        $selectedRoom = $rooms[$roomType];
+
+        $roomName = $selectedRoom['name'];
+
+        $price = $selectedRoom['price'];
+
+        /*
+    TOTAL AVAILABLE ROOMS
+    */
+
+        $totalRooms = $selectedRoom['total_rooms'];
+
+        /*
+    GET BOOKINGS
+    */
+
+        $bookings = Booking::where('room_type', $roomName)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->get();
+
+        /*
+    COUNT BOOKINGS PER DATE
+    */
+
+        $dateCounts = [];
+
+        foreach ($bookings as $booking) {
+
+            $start = Carbon::parse($booking->check_in)->startOfDay();
+
+            $end = Carbon::parse($booking->check_out)
+                ->startOfDay()
+                ->subDay();
+
+            $period = CarbonPeriod::create($start, $end);
+
+            foreach ($period as $date) {
+
+                $formatted = $date->format('Y-m-d');
+
+                if (!isset($dateCounts[$formatted])) {
+                    $dateCounts[$formatted] = 0;
+                }
+
+                $dateCounts[$formatted]++;
+            }
+        }
+
+        /*
+    DISABLE DATES ONLY WHEN FULLY BOOKED
+    */
+
+        $disabledDates = [];
+
+        foreach ($dateCounts as $date => $count) {
+
+            if ($count >= $totalRooms) {
+
+                $disabledDates[] = $date;
+            }
+        }
+
+
+        return view('micro-pricing', compact(
+            'roomName',
+            'price',
+            'disabledDates'
+        ));
     }
 
 
