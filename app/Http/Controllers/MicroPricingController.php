@@ -24,50 +24,19 @@ class MicroPricingController extends Controller
             'standard' => [
                 'name' => 'Standard Room',
                 'price' => 1500,
-                'room_numbers' => [
-                    'S101',
-                    'S102',
-                    'S103',
-                    'S104',
-                    'S105',
-                    'S106',
-                    'S107',
-                    'S201',
-                    'S202',
-                    'S401',
-                    'S402',
-                    'S403',
-                    'S404',
-                    'S405',
-                ],
+                'total_rooms' => 14,
             ],
 
             'standard-premium' => [
                 'name' => 'Standard Premium Room',
                 'price' => 1900,
-                'room_numbers' => [
-                    'SP101',
-                    'SP102',
-                    'SP201',
-                    'SP202',
-                    'SP401',
-                    'SP402',
-                    'SP403',
-                    'SP404',
-                    'SP405',
-                    'SP406',
-                ],
+                'total_rooms' => 10,
             ],
 
             'family' => [
                 'name' => 'Family Room',
                 'price' => 2700,
-                'room_numbers' => [
-                    'F201',
-                    'F202',
-                    'F203',
-                    'F204',
-                ],
+                'total_rooms' => 4,
             ],
         ];
 
@@ -93,7 +62,7 @@ class MicroPricingController extends Controller
     TOTAL AVAILABLE ROOMS
     */
 
-        $totalRooms = count($selectedRoom['room_numbers']);
+        $totalRooms = $selectedRoom['total_rooms'];
 
         /*
     GET BOOKINGS

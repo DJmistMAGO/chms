@@ -4,93 +4,119 @@
 
 @section('content')
     <x-common.page-breadcrumb pageTitle="My Reservations" />
-    <div
-        class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-        <div class="">
-            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 text-left">
-                {{-- PENDING --}}
-                <div class="rounded-2xl border border-yellow-200 bg-white shadow-sm">
-                    <div class="border-b border-yellow-100 bg-yellow-50 px-5 py-4 rounded-t-2xl">
-                        <h2 class="text-lg font-semibold text-yellow-700">
-                            Pending Reservations
-                        </h2>
-                        <p class="text-xs text-yellow-600">
-                            Waiting for confirmation
-                        </p>
-                    </div>
 
-                    <div class="p-5 space-y-4">
-                        {{-- Repeat cards here for pending bookings --}}
-                        @forelse ($pendingBookings as $booking)
-                            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-800">{{ $booking->room_type }}</p>
-                                        <p class="text-xs text-gray-500">Check-in: {{ $booking->check_in }}</p>
-                                        <p class="text-xs text-gray-500">Check-out: {{ $booking->check_out }}</p>
-                                    </div>
+    <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
 
-                                    <span class="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                                        Pending
-                                    </span>
-                                </div>
+        {{-- ── Page Header ── --}}
+        <div class="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">My Reservations</h2>
+                <p class="mt-0.5 text-sm text-gray-400">Track and manage all your hotel bookings.</p>
+            </div>
+            <a href=""
+                class="inline-flex w-fit items-center gap-2 rounded-xl bg-yellow-400 px-4 py-2.5 text-xs font-semibold text-gray-900 transition hover:bg-yellow-500 active:scale-95">
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                New Booking
+            </a>
+        </div>
 
-                                <div class="mt-3 flex items-center justify-between">
-                                    <span class="text-xs text-gray-400">Ref: CH-ABC12345</span>
-                                    <button class="text-xs font-medium text-yellow-600 hover:text-yellow-700">
-                                        View
-                                    </button>
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-sm text-gray-500">No pending reservations found.</p>
-                        @endforelse
-                    </div>
-                </div>
+        {{-- ── Status Tabs ── --}}
+        <div class="mb-6 flex gap-2 border-b border-gray-100 dark:border-gray-800" id="status-tabs">
 
-                {{-- CONFIRMED --}}
-                <div class="rounded-2xl border border-green-200 bg-white shadow-sm">
-                    <div class="border-b border-green-100 bg-green-50 px-5 py-4 rounded-t-2xl">
-                        <h2 class="text-lg font-semibold text-green-700">
-                            Confirmed Reservations
-                        </h2>
-                        <p class="text-xs text-green-600">
-                            Approved bookings ready for stay
-                        </p>
-                    </div>
+            <button onclick="switchTab('pending')" id="tab-pending"
+                class="tab-btn relative pb-3 px-1 text-sm font-semibold transition-colors text-yellow-500
+                       after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-yellow-400">
+                <span class="flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
+                    Pending
+                    <span class="rounded-full bg-yellow-400/20 px-1.5 py-0.5 text-xs font-bold text-yellow-600">
+                        {{ $pendingBookings->count() }}
+                    </span>
+                </span>
+            </button>
 
-                    <div class="p-5 space-y-4">
-                        {{-- Repeat cards here for confirmed bookings --}}
-                        @forelse ($confirmedBookings as $booking)
-                            <div class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-semibold text-gray-800">{{ $booking->room_type }}</p>
-                                    <p class="text-xs text-gray-500">Check-in: {{ $booking->check_in }}</p>
-                                    <p class="text-xs text-gray-500">Check-out: {{ $booking->check_out }}</p>
-                                </div>
+            <button onclick="switchTab('confirmed')" id="tab-confirmed"
+                class="tab-btn relative pb-3 px-1 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300
+                       after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-green-400 after:scale-x-0 after:transition-transform">
+                <span class="flex items-center gap-2">
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                    Confirmed
+                    <span class="rounded-full bg-green-400/15 px-1.5 py-0.5 text-xs font-bold text-green-600">
+                        {{ $confirmedBookings->count() }}
+                    </span>
+                </span>
+            </button>
 
-                                <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                                    Confirmed
-                                </span>
-                            </div>
+        </div>
 
-                            <div class="mt-3 flex items-center justify-between">
-                                <span class="text-xs text-gray-400">Ref: {{ $booking->reference_number }}</span>
-                                <button class="text-xs font-medium text-green-600 hover:text-green-700">
-                                    View
-                                </button>
-                            </div>
-                        </div>
-
-                        @empty
-                            <p class="text-sm text-gray-500">No confirmed reservations found.</p>
-                        @endforelse
-
-                    </div>
-                </div>
-
+        {{-- ── PENDING PANEL ── --}}
+        <div id="panel-pending">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                @forelse ($pendingBookings as $booking)
+                    @include('pages.chms-features.my-reservations.partials.booking-card', [
+                        'booking'      => $booking,
+                        'statusLabel'  => 'Pending',
+                        'statusColor'  => 'yellow',
+                        'pulse'        => true,
+                    ])
+                @empty
+                    @include('pages.chms-features.my-reservations.partials.booking-empty', ['label' => 'pending'])
+                @endforelse
             </div>
         </div>
+
+        {{-- ── CONFIRMED PANEL ── --}}
+        <div id="panel-confirmed" class="hidden">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                @forelse ($confirmedBookings as $booking)
+                    @include('pages.chms-features.my-reservations.partials.booking-card', [
+                        'booking'      => $booking,
+                        'statusLabel'  => 'Confirmed',
+                        'statusColor'  => 'green',
+                        'pulse'        => false,
+                    ])
+                @empty
+                    @include('pages.chms-features.my-reservations.partials.booking-empty', ['label' => 'confirmed'])
+                @endforelse
+            </div>
+        </div>
+
     </div>
+
+    <script>
+        function switchTab(tab) {
+            // Panels
+            document.getElementById('panel-pending').classList.toggle('hidden', tab !== 'pending');
+            document.getElementById('panel-confirmed').classList.toggle('hidden', tab !== 'confirmed');
+
+            // Tab styles
+            const tabs = { pending: 'yellow', confirmed: 'green' };
+
+            Object.entries(tabs).forEach(([key, color]) => {
+                const btn = document.getElementById('tab-' + key);
+                if (key === tab) {
+                    btn.classList.add('font-semibold', 'text-' + color + '-500');
+                    btn.classList.remove('font-medium', 'text-gray-400');
+                    btn.style.setProperty('--tw-scale-x', '1');
+                    btn.querySelector('span.after\\:scale-x-0')?.classList.remove('after:scale-x-0');
+                } else {
+                    btn.classList.remove('font-semibold', 'text-' + color + '-500');
+                    btn.classList.add('font-medium', 'text-gray-400');
+                }
+            });
+
+            // Active underline via direct style (simpler than Tailwind JIT)
+            document.querySelectorAll('.tab-btn').forEach(b => b.style.borderBottom = '');
+            const active = document.getElementById('tab-' + tab);
+            const colorMap = { pending: '#facc15', confirmed: '#4ade80' };
+            active.style.borderBottom = '2px solid ' + colorMap[tab];
+        }
+
+        // Init
+        document.getElementById('tab-pending').style.borderBottom  = '2px solid #facc15';
+        document.getElementById('tab-confirmed').style.borderBottom = '';
+    </script>
+
 @endsection
