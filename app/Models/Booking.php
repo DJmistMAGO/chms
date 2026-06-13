@@ -16,12 +16,10 @@ class Booking extends Model
         'room_price',
         'micro_pricing_amount',
         'total_price',
-        // 'valid_id_path',
         'status',
         'expires_at',
         'verified_by',
         'verified_at',
-        // 'special_requests',
     ];
 
     protected $dates = [
@@ -36,6 +34,10 @@ class Booking extends Model
         'room_price' => 'decimal:2',
         'micro_pricing_amount' => 'decimal:2',
         'total_price' => 'decimal:2',
+        'check_in'   => 'date',
+        'check_out'  => 'date',
+        'expires_at' => 'datetime',
+        'verified_at' => 'datetime',
     ];
 
 

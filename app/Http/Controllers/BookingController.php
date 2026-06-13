@@ -40,13 +40,28 @@ class BookingController extends Controller
     return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }
 
+    public function pending()
+    {
+        $pendingBookings = Booking::where('status', 'pending')
+        ->latest()
+        ->paginate(15);
+
+        return view('pages.chms-features.booking-management.pending-booking', compact('pendingBookings'));
+    }
+
     public function confirmed()
     {
-        return view('pages.chms-features.booking-management.confirmed-booking');
+        // Fetch all confirmed bookings for the staff
+        $confirmedBookings = Booking::where('status', 'confirmed')->get();
+
+        return view('pages.chms-features.booking-management.confirmed-booking', compact('confirmedBookings'));
     }
 
     public function cancelled()
     {
-        return view('pages.chms-features.booking-management.cancelled-booking');
+        // Fetch all cancelled bookings for the staff
+        $cancelledBookings = Booking::where('status', 'cancelled')->get();
+
+        return view('pages.chms-features.booking-management.cancelled-booking', compact('cancelledBookings'));
     }
 }
