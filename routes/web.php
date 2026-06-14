@@ -57,6 +57,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('/confirmed', 'confirmed')->name('booking.confirmed');
             Route::get('/cancelled', 'cancelled')->name('booking.cancelled');
             Route::get('/my-reservations', 'myReservations')->name('booking.my-reservations');
+            Route::put('/confirm/{referenceNumber}', 'confirmBooking')->name('booking.confirm');
         });
 
     Route::controller(RoomController::class)
