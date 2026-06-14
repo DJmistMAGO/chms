@@ -5,269 +5,219 @@
 @section('content')
     <x-common.page-breadcrumb pageTitle="Room Management" />
 
+    {{-- ── Status Update Modal ── --}}
+    <div
+        id="statusModal"
+        class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
+        <div class="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900">
+            <div class="mb-5 flex items-center justify-between">
+                <h3 id="modalTitle" class="text-lg font-semibold text-gray-900 dark:text-white">
+                    Update Room Status
+                </h3>
+                <button
+                    onclick="closeModal()"
+                    class="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                    aria-label="Close"
+                >
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="statusForm" method="POST" action="">
+                @csrf
+                @method('PATCH')
+
+                <div class="mb-4">
+                    <label class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Room
+                    </label>
+                    <p id="modalRoomNo" class="text-2xl font-bold text-gray-900 dark:text-white">—</p>
+                    <p id="modalRoomMeta" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">—</p>
+                </div>
+
+                <div class="mb-6">
+                    <label for="modalStatus" class="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        New Status
+                    </label>
+                    <select
+                        id="modalStatus"
+                        name="status"
+                        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30"
+                    >
+                        <option value="Available">Available</option>
+                        <option value="Not Available">Not Available</option>
+                        <option value="Under Maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3">
+                    <button
+                        type="button"
+                        onclick="closeModal()"
+                        class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        class="flex-1 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    >
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{-- ── End Modal ── --}}
+
     <div class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
         <div class="mx-auto w-full">
-            <h3 class="mb-6 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-                Room Management
-            </h3>
 
-            <div class="space-y-10">
+            {{-- Page Header --}}
+            <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h4 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-                        First Floor
-                    </h4>
-
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                        <div class="aspect-square rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 p-5 shadow-lg shadow-emerald-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/30 dark:from-emerald-500/20 dark:via-gray-900 dark:to-emerald-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">101</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-emerald-500/20">
-                                    <option selected>Available</option>
-                                    <option>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-100 p-5 shadow-lg shadow-rose-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-rose-500/30 dark:from-rose-500/20 dark:via-gray-900 dark:to-rose-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-rose-600 dark:text-rose-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">102</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Not Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-rose-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-200 dark:border-rose-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-rose-500/20">
-                                    <option>Available</option>
-                                    <option selected>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 p-5 shadow-lg shadow-amber-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-amber-500/30 dark:from-amber-500/20 dark:via-gray-900 dark:to-amber-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-amber-600 dark:text-amber-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">103</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Maintenance
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200 dark:border-amber-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-amber-500/20">
-                                    <option>Available</option>
-                                    <option>Not Available</option>
-                                    <option selected>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Room Management</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        {{ $rooms->count() }} rooms across {{ $rooms->pluck('floor')->unique()->count() }} floors
+                    </p>
                 </div>
 
-                <div>
-                    <h4 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-                        Second Floor
-                    </h4>
-
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                        <div class="aspect-square rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 p-5 shadow-lg shadow-emerald-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/30 dark:from-emerald-500/20 dark:via-gray-900 dark:to-emerald-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">201</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-emerald-500/20">
-                                    <option selected>Available</option>
-                                    <option>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 p-5 shadow-lg shadow-emerald-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/30 dark:from-emerald-500/20 dark:via-gray-900 dark:to-emerald-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">202</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-emerald-500/20">
-                                    <option selected>Available</option>
-                                    <option>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-100 p-5 shadow-lg shadow-rose-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-rose-500/30 dark:from-rose-500/20 dark:via-gray-900 dark:to-rose-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-rose-600 dark:text-rose-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">203</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Not Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-rose-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-200 dark:border-rose-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-rose-500/20">
-                                    <option>Available</option>
-                                    <option selected>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 p-5 shadow-lg shadow-amber-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-amber-500/30 dark:from-amber-500/20 dark:via-gray-900 dark:to-amber-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-amber-600 dark:text-amber-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">204</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Maintenance
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200 dark:border-amber-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-amber-500/20">
-                                    <option>Available</option>
-                                    <option>Not Available</option>
-                                    <option selected>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 p-5 shadow-lg shadow-emerald-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/30 dark:from-emerald-500/20 dark:via-gray-900 dark:to-emerald-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">205</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-emerald-500/20">
-                                    <option selected>Available</option>
-                                    <option>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-                        Fourth Floor
-                    </h4>
-
-                    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                        <div class="aspect-square rounded-2xl border border-rose-200 bg-gradient-to-br from-rose-50 via-white to-rose-100 p-5 shadow-lg shadow-rose-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-rose-500/30 dark:from-rose-500/20 dark:via-gray-900 dark:to-rose-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-rose-600 dark:text-rose-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">401</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Not Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-rose-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-200 dark:border-rose-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-rose-500/20">
-                                    <option>Available</option>
-                                    <option selected>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-emerald-100 p-5 shadow-lg shadow-emerald-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/30 dark:from-emerald-500/20 dark:via-gray-900 dark:to-emerald-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-emerald-600 dark:text-emerald-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">402</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Available
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-emerald-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 dark:border-emerald-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-emerald-500/20">
-                                    <option selected>Available</option>
-                                    <option>Not Available</option>
-                                    <option>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="aspect-square rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 via-white to-amber-100 p-5 shadow-lg shadow-amber-100/70 transition hover:-translate-y-1 hover:shadow-xl dark:border-amber-500/30 dark:from-amber-500/20 dark:via-gray-900 dark:to-amber-900/30 dark:shadow-none">
-                            <div class="flex h-full flex-col justify-between">
-                                <div class="flex items-start justify-between">
-                                    <div>
-                                        <p class="text-sm font-medium text-amber-600 dark:text-amber-300">Room</p>
-                                        <h5 class="mt-2 text-4xl font-bold text-gray-900 dark:text-white">403</h5>
-                                    </div>
-
-                                    <span class="rounded-full bg-amber-500 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                        Maintenance
-                                    </span>
-                                </div>
-
-                                <select class="w-full rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 shadow-sm outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-200 dark:border-amber-500/30 dark:bg-gray-950 dark:text-white dark:focus:ring-amber-500/20">
-                                    <option>Available</option>
-                                    <option>Not Available</option>
-                                    <option selected>Under Maintenance</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                {{-- Legend --}}
+                <div class="flex flex-wrap items-center gap-4 text-xs font-medium">
+                    <span class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span> Available
+                    </span>
+                    <span class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                        <span class="h-2.5 w-2.5 rounded-full bg-rose-500"></span> Not Available
+                    </span>
+                    <span class="flex items-center gap-1.5 text-gray-600 dark:text-gray-400">
+                        <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span> Maintenance
+                    </span>
                 </div>
             </div>
 
+            <div class="space-y-10">
+
+                @php
+                    $floorLabels = [
+                        '1' => 'First Floor',
+                        '2' => 'Second Floor',
+                        '3' => 'Third Floor',
+                        '4' => 'Fourth Floor',
+                    ];
+
+                    $statusConfig = [
+                        'Available'        => ['dot' => 'bg-emerald-500', 'badge' => 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/30', 'border' => 'border-emerald-100 dark:border-emerald-500/20'],
+                        'Not Available'    => ['dot' => 'bg-rose-500',    'badge' => 'bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/30',       'border' => 'border-rose-100 dark:border-rose-500/20'],
+                        'Under Maintenance'=> ['dot' => 'bg-amber-500',   'badge' => 'bg-amber-50 text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30',   'border' => 'border-amber-100 dark:border-amber-500/20'],
+                    ];
+
+                    $roomsByFloor = $rooms->groupBy('floor');
+                @endphp
+
+                @foreach ($roomsByFloor as $floor => $floorRooms)
+                    <div>
+                        {{-- Floor Header --}}
+                        <div class="mb-4 flex items-center gap-3">
+                            <h4 class="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+                                {{ $floorLabels[$floor] ?? "Floor $floor" }}
+                            </h4>
+                            <div class="h-px flex-1 bg-gray-100 dark:bg-gray-800"></div>
+                            <span class="text-xs font-medium text-gray-400 dark:text-gray-600">
+                                {{ $floorRooms->count() }} rooms
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+                            @foreach ($floorRooms as $room)
+                                @php
+                                    $cfg = $statusConfig[$room->status] ?? $statusConfig['Available'];
+                                @endphp
+
+                                <div
+                                    class="group relative cursor-pointer rounded-2xl border bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 {{ $cfg['border'] }}"
+                                    onclick="openModal('{{ $room->room_no }}', '{{ $room->room_type }}', '{{ $room->base_price }}', '{{ $room->status }}', '{{ $room->id }}')"
+                                    role="button"
+                                    tabindex="0"
+                                    onkeydown="if(event.key==='Enter')openModal('{{ $room->room_no }}', '{{ $room->room_type }}', '{{ $room->base_price }}', '{{ $room->status }}', '{{ $room->id }}')"
+                                    title="Click to update status"
+                                >
+                                    {{-- Status dot --}}
+                                    <span class="absolute right-3 top-3 h-2 w-2 rounded-full {{ $cfg['dot'] }}"></span>
+
+                                    {{-- Room Number --}}
+                                    <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        {{ $room->room_no }}
+                                    </p>
+
+                                    {{-- Room Type --}}
+                                    <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500 leading-tight">
+                                        {{ $room->room_type }}
+                                    </p>
+
+                                    {{-- Price --}}
+                                    <p class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                        ₱{{ number_format($room->base_price) }}
+                                    </p>
+
+                                    {{-- Status Badge --}}
+                                    <span class="mt-3 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium {{ $cfg['badge'] }}">
+                                        {{ $room->status }}
+                                    </span>
+
+                                    {{-- Edit hint on hover --}}
+                                    <div class="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/0 opacity-0 transition-all duration-150 group-hover:bg-black/[0.03] group-hover:opacity-100 dark:group-hover:bg-white/[0.03]">
+                                        <span class="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:ring-gray-700">
+                                            Update status
+                                        </span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+
+            </div>
         </div>
     </div>
+
+    <script>
+        const modal    = document.getElementById('statusModal');
+        const form     = document.getElementById('statusForm');
+        const roomNo   = document.getElementById('modalRoomNo');
+        const roomMeta = document.getElementById('modalRoomMeta');
+        const status   = document.getElementById('modalStatus');
+
+        function openModal(no, type, price, currentStatus, action) {
+            roomNo.textContent   = no;
+            roomMeta.textContent = type + ' · ₱' + Number(price).toLocaleString();
+            status.value         = currentStatus;
+            form.action          = action;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        // Close on backdrop click
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal();
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
 @endsection
