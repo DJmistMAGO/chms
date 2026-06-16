@@ -44,11 +44,11 @@ class BookingController extends Controller
 
     public function pending()
     {
-        $pendingBookings = Booking::where('status', 'pending')
+        $pendingBookings = Booking::where('status', 'Pending')
             ->latest()
             ->paginate(15);
 
-        $availableRooms = Room::where('status', 'available')
+        $availableRooms = Room::where('status', 'Available')
             ->orderBy('room_type')
             ->orderBy('floor')
             ->orderBy('room_no')
@@ -80,8 +80,9 @@ class BookingController extends Controller
 
     public function confirmed()
     {
-        // Fetch all confirmed bookings for the staff
-        $confirmedBookings = Booking::where('status', 'confirmed')->get();
+        $confirmedBookings = Booking::where('status', 'Confirmed')
+            ->latest()
+            ->paginate(15);
 
         return view('pages.chms-features.booking-management.confirmed-booking', compact('confirmedBookings'));
     }

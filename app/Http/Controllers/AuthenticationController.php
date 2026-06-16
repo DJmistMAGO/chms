@@ -161,6 +161,9 @@ class AuthenticationController extends Controller
 
             // Booking — must match migration columns
             'room_type'            => ['required', 'string'],
+            'floor_level'          => ['nullable', 'string'],
+            'ambiance'             => ['nullable', 'string'],
+            'food_package'         => ['nullable', 'string'],
             'check_in' => [
                 'required',
                 'date',
@@ -178,7 +181,7 @@ class AuthenticationController extends Controller
             'total_price'          => ['required', 'numeric', 'min:0'],
         ]);
 
-        // dd($request->all());
+        //dd($request->all());
 
         // ── 2. Attempt login ───────────────────────────────────────────────
         $credentials = $request->only('email', 'password');
@@ -203,6 +206,9 @@ class AuthenticationController extends Controller
             'user_id'              => Auth::id(),
             'reference_number'     => $this->generateReference(),
             'room_type'            => $request->room_type,
+            'floor_level'          => $request->floor_level,
+            'ambiance'             => $request->ambiance,
+            'food_package'         => $request->food_package,
             'check_in' => Carbon::parse($request->check_in)->format('Y-m-d'),
             'check_out' => Carbon::parse($request->check_out)->format('Y-m-d'),
             'number_of_guests'     => $request->number_of_guests,
