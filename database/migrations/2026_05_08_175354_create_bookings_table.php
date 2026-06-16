@@ -16,13 +16,17 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained();
             $table->string('reference_number')->unique();
             $table->string('room_type');
+            $table->string('floor_level');
+            $table->string('ambiance');
+            $table->string('food_package');
             $table->date('check_in');
             $table->date('check_out');
             $table->integer('number_of_guests');
             $table->decimal('room_price', 10, 2);
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->enum('status', ['pending', 'verified', 'confirmed', 'expired', 'cancelled'])->default('pending');
+            $table->enum('status', ['Pending', 'Verified', 'Confirmed', 'Expired', 'Cancelled'])->default('Pending');
+            $table->text('remarks')->nullable();
             $table->timestamp('expires_at');
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();

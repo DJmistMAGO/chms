@@ -22,11 +22,11 @@ return new class extends Migration
             $table->unsignedTinyInteger('floor');    // 1, 2, 4
             $table->decimal('base_price', 10, 2);   // 1500, 1900, 2700
             $table->enum('status', [
-                'available',
-                'occupied',
-                'maintenance',
-                'reserved',
-            ])->default('available');
+                'Available',
+                'Occupied',
+                'Maintenance',
+                'Reserved',
+            ])->default('Available');
             $table->timestamps();
         });
     }

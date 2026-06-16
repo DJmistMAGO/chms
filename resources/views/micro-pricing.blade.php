@@ -161,9 +161,9 @@
                 <input type="hidden" name="check_out"             id="check_out">
                 <input type="hidden" name="number_of_guests"      id="input-guests"   value="1">
                 <input type="hidden" name="nights"                id="input-nights"   value="0">
-                <input type="hidden" name="floor"                 id="input-floor"    value="Floor 1">
+                <input type="hidden" name="floor_level"           id="input-floor"    value="Floor 1">
                 <input type="hidden" name="ambiance"              id="input-ambiance" value="Regular Room">
-                <input type="hidden" name="food"                  id="input-food"     value="No Food">
+                <input type="hidden" name="food_package"          id="input-food"     value="No Food">
                 <input type="hidden" name="room_price"            value="{{ $price }}">
                 <input type="hidden" name="micro_pricing_amount"  id="input-addons"   value="0">
                 <input type="hidden" name="total_price"           id="input-total"    value="{{ $price }}">
@@ -225,7 +225,7 @@
                             </div>
                             <div class="space-y-2">
                                 <div class="option-row selected flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#D4A800;" data-group="floor" data-price="0">
+                                    style="border-color:#D4A800;" data-group="floor_level" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm font-medium text-warm">Floor 1</span>
@@ -233,7 +233,7 @@
                                     <span class="badge text-xs font-medium px-3 py-1 rounded-full" style="background:#FFF3A3; color:#B89200;">Free</span>
                                 </div>
                                 <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#FFE566;" data-group="floor" data-price="0">
+                                    style="border-color:#FFE566;" data-group="floor_level" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm text-warm">Floor 2</span>
@@ -241,7 +241,7 @@
                                     <span class="badge text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">Free</span>
                                 </div>
                                 <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#FFE566;" data-group="floor" data-price="0">
+                                    style="border-color:#FFE566;" data-group="floor_level" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm text-warm">Floor 4</span>
@@ -291,7 +291,7 @@
                             </div>
                             <div class="space-y-2">
                                 <div class="option-row selected flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#D4A800;" data-group="food" data-price="0">
+                                    style="border-color:#D4A800;" data-group="food_package" data-price="0">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm font-medium text-warm">No Food</span>
@@ -299,7 +299,7 @@
                                     <span class="badge text-xs font-medium px-3 py-1 rounded-full" style="background:#FFF3A3; color:#B89200;">Free</span>
                                 </div>
                                 <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#FFE566;" data-group="food" data-price="1500">
+                                    style="border-color:#FFE566;" data-group="food_package" data-price="1500">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm text-warm">Cozy Dinner for Family</span>
@@ -307,7 +307,7 @@
                                     <span class="badge text-xs font-medium text-muted px-3 py-1 rounded-full" style="background:#FFF8D6;">+ ₱1,500</span>
                                 </div>
                                 <div class="option-row flex items-center justify-between border rounded-xl px-4 py-3"
-                                    style="border-color:#FFE566;" data-group="food" data-price="1500">
+                                    style="border-color:#FFE566;" data-group="food_package" data-price="1500">
                                     <div class="flex items-center gap-3">
                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
                                         <span class="text-sm text-warm">Romantic Dinner</span>
@@ -444,9 +444,9 @@
                     <input type="hidden" name="check_out"            id="modal-check_out">
                     <input type="hidden" name="number_of_guests"     id="modal-guests"    value="1">
                     <input type="hidden" name="nights"               id="modal-nights"    value="0">
-                    <input type="hidden" name="floor"                id="modal-floor"     value="Floor 1">
+                    <input type="hidden" name="floor_level"          id="modal-floor"     value="Floor 1">
                     <input type="hidden" name="ambiance"             id="modal-ambiance"  value="Regular Room">
-                    <input type="hidden" name="food"                 id="modal-food"      value="No Food">
+                    <input type="hidden" name="food_package"         id="modal-food"      value="No Food">
                     <input type="hidden" name="room_price"           value="{{ $price }}">
                     <input type="hidden" name="micro_pricing_amount" id="modal-addons"    value="0">
                     <input type="hidden" name="total_price"          id="modal-total"     value="{{ $price }}">
@@ -663,7 +663,7 @@
                     const badge      = r.querySelector('.badge');
                     const badgePrice = parseInt(r.dataset.price) || 0;
 
-                    if (group === 'floor') {
+                    if (group === 'floor_level') {
                         badge.textContent     = 'Free';
                         badge.style.cssText   = 'background:#FFF8D6; color:#7A6E68;';
                     } else if (group === 'food' && badgePrice === 0) {
@@ -681,9 +681,9 @@
                 // Select this row
                 this.classList.add('selected');
                 const badge = this.querySelector('.badge');
-                if (group === 'floor') {
+                if (group === 'floor_level') {
                     badge.textContent   = 'Free';
-                } else if ((group === 'food' || group === 'ambiance') && price === 0) {
+                } else if ((group === 'food_package' || group === 'ambiance') && price === 0) {
                     badge.textContent   = group === 'ambiance' ? 'Base' : 'Free';
                 } else {
                     badge.textContent   = '+ ₱' + price.toLocaleString();
@@ -691,13 +691,13 @@
                 badge.style.cssText = 'background:#FFF3A3; color:#B89200;';
 
                 // Update groupAddons (floor never adds cost)
-                if (group !== 'floor') groupAddons[group] = price;
+                if (group !== 'floor_level') groupAddons[group] = price;
 
                 // Sync hidden input label
                 const label = this.querySelector('div span:last-child').textContent.trim();
-                if (group === 'floor')    document.getElementById('input-floor').value    = label;
+                if (group === 'floor_level')    document.getElementById('input-floor').value    = label;
                 if (group === 'ambiance') document.getElementById('input-ambiance').value = label;
-                if (group === 'food')     document.getElementById('input-food').value      = label;
+                if (group === 'food_package')     document.getElementById('input-food').value      = label;
 
                 recalcTotal();
             });
