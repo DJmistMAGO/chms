@@ -20,6 +20,7 @@ class Booking extends Model
         'micro_pricing_amount',
         'total_price',
         'status',
+        'remarks',
         'expires_at',
         'verified_by',
         'verified_at',

@@ -66,13 +66,13 @@ class BookingController extends Controller
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
 
         // Update the booking status to confirmed and assign the selected room
-        $booking->status = 'confirmed';
+        $booking->status = 'Confirmed';
         $booking->room_id = $request->input('room_id');
         $booking->save();
 
         // Update the room status to occupied
         $room = Room::find($request->input('room_id'));
-        $room->status = 'occupied';
+        $room->status = 'Occupied';
         $room->save();
 
         return redirect()->route('booking.confirmed')->with('success', 'Booking confirmed successfully.');
@@ -87,10 +87,37 @@ class BookingController extends Controller
         return view('pages.chms-features.booking-management.confirmed-booking', compact('confirmedBookings'));
     }
 
+    public function cancelBooking(Request $request, $selectedRef)
+    {
+        $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+
+        //validation
+        $request->validate([
+            'remarks' => 'nullable|string|max:255',
+        ]);
+
+        // Update the booking status to cancelled
+        $booking->status = 'Cancelled';
+        $booking->remarks = $request->input('remarks');
+        $booking->save();
+
+        // If the booking had an assigned room, update that room's status to available
+        if ($booking->room_id) {
+            $room = Room::find($booking->room_id);
+            if ($room) {
+                $room->status = 'Available';
+                $room->save();
+            }
+        }
+
+        return redirect()->route('booking.cancelled')->with('success', 'Booking cancelled successfully.');
+    }
+
     public function cancelled()
     {
-        // Fetch all cancelled bookings for the staff
-        $cancelledBookings = Booking::where('status', 'cancelled')->get();
+        $cancelledBookings = Booking::where('status', 'Cancelled')
+            ->latest()
+            ->paginate(15);
 
         return view('pages.chms-features.booking-management.cancelled-booking', compact('cancelledBookings'));
     }

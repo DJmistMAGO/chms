@@ -40,6 +40,7 @@ class MenuHelper
                         ['name' => 'Pending Bookings', 'path' => '/booking/pending', 'pro' => false],
                         ['name' => 'Confirmed Bookings', 'path' => '/booking/confirmed', 'pro' => false],
                         ['name' => 'Cancelled Bookings', 'path' => '/booking/cancelled', 'pro' => false],
+                        ['name' => 'Completed Bookings', 'path' => '/booking/completed', 'pro' => false],
                     ],
                 ],
                 [

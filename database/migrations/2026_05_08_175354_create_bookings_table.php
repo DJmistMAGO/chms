@@ -26,6 +26,7 @@ return new class extends Migration
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
             $table->enum('status', ['Pending', 'Verified', 'Confirmed', 'Expired', 'Cancelled'])->default('Pending');
+            $table->text('remarks')->nullable();
             $table->timestamp('expires_at');
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();
