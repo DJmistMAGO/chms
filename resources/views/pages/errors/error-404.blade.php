@@ -1,53 +1,66 @@
 @extends('layouts.authenticated.fullscreen-layout')
 
 @section('content')
-@php
-    $currentYear = date('Y');
-@endphp
+@php $currentYear = date('Y'); @endphp
+
 <style>
-    @keyframes falling {
-        0% {
-            transform: translateY(-100vh) rotate(0deg);
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(100vh) rotate(720deg);
-            opacity: 0;
-        }
+    @keyframes fade-up {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
-    .falling-animation {
-        animation: falling 3s ease-in infinite;
+    @keyframes dust-float {
+        0%, 100% { opacity: 0.18; }
+        50%       { opacity: 0.08; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .e404-fu1, .e404-fu2, .e404-fu3, .e404-fu4 { animation: none !important; }
+    }
+    .e404-fu1 { animation: fade-up .4s ease both; }
+    .e404-fu2 { animation: fade-up .4s .08s ease both; }
+    .e404-fu3 { animation: fade-up .4s .16s ease both; }
+    .e404-fu4 { animation: fade-up .4s .24s ease both; }
+
+    .dust {
+        background-image:
+            radial-gradient(circle, rgba(255,255,255,0.18) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px);
+        background-size: 120px 120px, 80px 80px, 200px 200px;
+        background-position: 0 0, 40px 60px, 90px 30px;
     }
 </style>
-    <div class="relative flex flex-col items-center justify-center min-h-screen p-6 overflow-hidden z-1">
-        <x-common.common-grid-shape />
 
-        <!-- Falling Room Animation -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-20 mb-8">
-            <svg class="falling-animation w-full h-full text-yellow-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 3h18v18H3V3m2 2v14h14V5H5m2 2h10v3H7V7m0 5h10v3H7v-3m0 5h10v2H7v-2z"/>
-            </svg>
-        </div>
+    <div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-14 text-center"
+        style="background: radial-gradient(ellipse at center, #f5a623 0%, #d4780a 50%, #b85e00 100%);">
 
-        <div class="mx-auto w-full max-w-[242px] text-center sm:max-w-[472px]">
-            <h1 class="mb-8 font-bold text-gray-800 text-title-md dark:text-white/90 xl:text-title-xl">
-                ROOM NOT FOUND
+        <div class="dust absolute inset-0 pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col items-center">
+
+            <h1 class="e404-fu1 font-black leading-none tracking-tighter text-white"
+                style="font-size: clamp(120px, 20vw, 200px);">
+                404
             </h1>
 
-            <img src="/images/error/404.svg" alt="404" class="dark:hidden" />
-            <img src="/images/error/404-dark.svg" alt="404" class="hidden dark:block" />
-
-            <p class="mt-10 mb-6 text-base text-gray-700 dark:text-gray-400 sm:text-lg">
-                Oops! The room or floor you're looking for seems to have fallen off our building!
+            <p class="e404-fu2 mt-2 mb-8 text-xs font-bold uppercase tracking-widest text-white">
+                We are sorry, but the page you requested was not found
             </p>
 
-            <a href="/"
-                class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200">
-                Back to Lobby
-            </a>
+            <div class="e404-fu3 flex flex-wrap items-center justify-center gap-4 mb-10">
+                <a href="/"
+                class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white bg-white/95 px-8 py-3 text-xs font-bold uppercase tracking-widest text-amber-700 transition-all duration-200 hover:border-amber-600 hover:bg-amber-600 hover:scale-105 hover:shadow-lg hover:text-white focus:outline-none focus:ring-2 focus:ring-amber-300">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                        viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                    Go Home
+                </a>
+            </div>
         </div>
-        <p class="absolute text-sm text-center text-gray-500 -translate-x-1/2 bottom-6 left-1/2 dark:text-gray-400">
-            &copy; {{ $currentYear }} - CHMS. All rights reserved.
+        <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-xs text-white/50">
+            &copy; {{ $currentYear }} Caree Hotel Management System
         </p>
     </div>
 @endsection
