@@ -9,15 +9,10 @@ use App\Models\Booking;
 
 class MicroPricingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
 
     public function booking($roomType)
     {
-        /*
-    ROOM CONFIGURATION
-    */
+
 
         $rooms = [
 
@@ -40,17 +35,13 @@ class MicroPricingController extends Controller
             ],
         ];
 
-        /*
-    CHECK ROOM TYPE
-    */
+
 
         if (!isset($rooms[$roomType])) {
             abort(404);
         }
 
-        /*
-    SELECTED ROOM
-    */
+
 
         $selectedRoom = $rooms[$roomType];
 
@@ -58,23 +49,17 @@ class MicroPricingController extends Controller
 
         $price = $selectedRoom['price'];
 
-        /*
-    TOTAL AVAILABLE ROOMS
-    */
+
 
         $totalRooms = $selectedRoom['total_rooms'];
 
-        /*
-    GET BOOKINGS
-    */
+
 
         $bookings = Booking::where('room_type', $roomName)
             ->whereIn('status', ['pending', 'confirmed'])
             ->get();
 
-        /*
-    COUNT BOOKINGS PER DATE
-    */
+        
 
         $dateCounts = [];
 

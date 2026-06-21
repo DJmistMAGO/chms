@@ -13,7 +13,6 @@ class BookingController extends Controller
 {
     public function create()
     {
-
         return view('pages.chms-features.booking-management.create-booking');
     }
 
@@ -21,21 +20,25 @@ class BookingController extends Controller
     {
         $user = auth()->user();
 
-        $pendingBookings = Booking::where('user_id', $user->id)
+        $userId = $user ? $user->getKey() : null;
+
+        $pendingBookings = Booking::where('user_id', $userId)
             ->where('status', 'pending')
             ->get()
             ->transform(function ($booking) {
-                $booking->check_in = Carbon::parse($booking->check_in);
-                $booking->check_out = Carbon::parse($booking->check_out);
+                // Convert to string dates for safe output and to avoid type warnings
+                $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
+                $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
 
-        $confirmedBookings = Booking::where('user_id', $user->id)
+        $confirmedBookings = Booking::where('user_id', $userId)
             ->where('status', 'confirmed')
             ->get()
             ->transform(function ($booking) {
-                $booking->check_in = Carbon::parse($booking->check_in);
-                $booking->check_out = Carbon::parse($booking->check_out);
+                // Convert to string dates for safe output and to avoid type warnings
+                $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
+                $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
 

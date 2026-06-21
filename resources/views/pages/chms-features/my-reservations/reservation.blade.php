@@ -26,8 +26,7 @@
         <div class="mb-6 flex gap-2 border-b border-gray-100 dark:border-gray-800" id="status-tabs">
 
             <button onclick="switchTab('pending')" id="tab-pending"
-                class="tab-btn relative pb-3 px-1 text-sm font-semibold transition-colors text-yellow-500
-                       after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-yellow-400">
+                class="tab-btn relative pb-3 px-1 text-sm font-semibold transition-colors text-yellow-500">
                 <span class="flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
                     Pending
@@ -38,8 +37,7 @@
             </button>
 
             <button onclick="switchTab('confirmed')" id="tab-confirmed"
-                class="tab-btn relative pb-3 px-1 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300
-                       after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-green-400 after:scale-x-0 after:transition-transform">
+                class="tab-btn relative pb-3 px-1 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300">
                 <span class="flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
                     Confirmed

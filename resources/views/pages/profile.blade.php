@@ -167,8 +167,7 @@
                     </div>
                 </div>
 
-                {{-- Change Password --}}
-                <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="rounded-2xl border border-red-600 bg-white p-6 dark:border-red-800 dark:bg-white/[0.03]">
                     <div class="mb-5 flex items-start justify-between gap-4">
                         <div>
                             <h4 class="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Change Password</h4>
