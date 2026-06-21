@@ -23,13 +23,9 @@
                 <x-dashboard.booking-history :bookings="$bookings" />
             </div>
 
-            <div class="col-span-12 md:col-span-6">
-                <x-dashboard.client-quick-actions />
-            </div>
 
-            <div class="col-span-12 md:col-span-6">
-                <x-dashboard.client-recent-bookings :bookings="$bookings" />
-            </div>
+
+
 
             <div class="col-span-12">
                 <x-dashboard.booking-confirmation-modal :referenceNumber="$referenceNumber" />
@@ -48,6 +44,11 @@
             </div>
 
             <x-dashboard.pending-approvals :pendingBookings="$pendingBookings" />
+
+            <div class="col-span-12 md:col-span-6 space-y-6">
+                <x-dashboard.client-quick-actions />
+                <x-dashboard.client-recent-bookings :bookings="$bookings" />
+            </div>
         </div>
     @endrole
 

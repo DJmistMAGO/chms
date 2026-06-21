@@ -16,7 +16,7 @@ class DashboardController extends Controller
             ->whereIn('status', ['Pending', 'Confirmed', 'Verified', 'Expired', 'Canceled'])
             ->get();
 
-        $rooms = Room::paginate(8);
+        $rooms = Room::paginate(7);
         $allBookings = Booking::all();
         $pendingBookings = Booking::where('status', 'Pending')->get();
         $totalRooms = Room::count();

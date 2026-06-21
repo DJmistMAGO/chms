@@ -18,7 +18,7 @@
             <div class="flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.04] px-4 py-3">
                 <div>
                     <p class="text-sm font-semibold text-gray-600 dark:text-white">{{ $booking->room_type ?? 'Reservation' }} — {{ $booking->user->name ?? 'Guest' }}</p>
-                    <p class="mt-0.5 text-xs text-gray-500">{{ optional($booking->check_in)->format('M j') ?? 'TBD' }} &bull; {{ optional($booking->check_in)->format('g:i A') ?? '' }} &rarr; {{ optional($booking->check_out)->format('M j') ?? 'TBD' }}</p>
+                    <p class="mt-0.5 text-xs text-gray-500">{{ optional($booking->check_in)->format('M j, Y') ?? 'TBD' }} &bull; {{ optional($booking->check_in)->format('g:i A') ?? '' }} &rarr; {{ optional($booking->check_out)->format('M j, Y') ?? 'TBD' }} &bull; {{ optional($booking->check_out)->format('g:i A') ?? '' }} &bull; {{ $booking->check_in->diffInDays($booking->check_out) ?? 0 }} nights</p>
                 </div>
                 <span class="rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-semibold text-green-400">{{ $booking->status ?? 'Confirmed' }}</span>
             </div>
