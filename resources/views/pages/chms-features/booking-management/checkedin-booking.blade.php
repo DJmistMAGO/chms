@@ -1,5 +1,5 @@
 @extends('layouts.authenticated.app')
-@section('title', 'Pending Bookings')
+@section('title', 'Checked In Bookings')
 
 @section('content')
 <div x-data="{
@@ -13,19 +13,19 @@
     }
 }">
 
-    <x-common.page-breadcrumb pageTitle="Pending Bookings" />
+    <x-common.page-breadcrumb pageTitle="Checked In Bookings" />
 
     <div class="rounded-3xl border border-gray-200 bg-white px-6 py-8 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 
         {{-- Header --}}
         <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Pending Bookings</h2>
-                <p class="mt-0.5 text-sm text-gray-400">Review and action incoming reservation requests.</p>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Checked In Bookings</h2>
+                <p class="mt-0.5 text-sm text-gray-400">Review and action checked in bookings</p>
             </div>
-            <div class="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-center dark:border-orange-400/20 dark:bg-orange-400/10">
-                <p class="text-xs font-medium text-orange-600 dark:text-orange-400">Pending</p>
-                <p class="text-xl font-bold text-orange-700 dark:text-orange-300">{{ $cancelledBookings->count() }}</p>
+            <div class="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-center dark:border-blue-400/20 dark:bg-blue-400/10">
+                <p class="text-xs font-medium text-blue-600 dark:text-blue-400">Checked In</p>
+                <p class="text-xl font-bold text-blue-700 dark:text-blue-300">{{ $checkedInBookings->count() }}</p>
             </div>
         </div>
 
@@ -50,7 +50,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800" id="bookings-tbody">
-                    @forelse ($cancelledBookings as $b)
+                    @forelse ($checkedInBookings as $b)
                         @php
                             $nights = $b->check_in->diffInDays($b->check_out);
                             $initials = strtoupper(substr($b->user->name ?? 'G', 0, 1))
@@ -165,7 +165,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
                                         </svg>
                                     </span>
-                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No pending bookings</p>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No checked in bookings</p>
                                     <p class="text-xs text-gray-400">All caught up! No reservations need attention.</p>
                                 </div>
                             </td>
@@ -175,8 +175,8 @@
             </table>
         </div>
 
-        @if ($cancelledBookings->hasPages())
-            <div class="mt-5">{{ $cancelledBookings->links() }}</div>
+        @if ($checkedInBookings->hasPages())
+            <div class="mt-5">{{ $checkedInBookings->links() }}</div>
         @endif
 
     </div>
