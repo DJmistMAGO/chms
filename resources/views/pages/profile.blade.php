@@ -1,10 +1,13 @@
 @extends('layouts.authenticated.app')
 
+@push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+@endpush
+
 @section('content')
     <x-common.page-breadcrumb pageTitle="User Profile" />
 
 
-    {{-- Flash messages --}}
     @if(session('success'))
         <div class="mb-5 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
             <svg class="mt-0.5 h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -34,19 +37,19 @@
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
                     <h4 class="mb-4 text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Photo</h4>
 
-                    {{-- Avatar preview --}}
                     <div class="flex flex-col items-center gap-5">
+                        {{-- Avatar preview --}}
                         <div class="relative">
-                            <div class="h-28 w-28 overflow-hidden rounded-full ring-4 ring-amber-100 dark:ring-amber-900/40">
+                            <div id="avatar-ring" class="h-28 w-28 overflow-hidden rounded-full ring-4 ring-amber-100 dark:ring-amber-900/40">
                                 @if($user->avatar)
-                                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="Profile photo" class="h-full w-full object-cover" />
+                                    <img id="avatar-preview" src="{{ asset('storage/' . $user->avatar) }}" alt="Profile photo" class="h-full w-full object-cover" />
                                 @else
-                                    <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 text-3xl font-bold text-amber-900 dark:from-amber-900 dark:to-orange-900 dark:text-amber-100">
+                                    <div id="avatar-initials" class="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200 text-3xl font-bold text-amber-900 dark:from-amber-900 dark:to-orange-900 dark:text-amber-100">
                                         {{ $user->initials }}
                                     </div>
+                                    <img id="avatar-preview" src="" alt="Profile photo" class="hidden h-full w-full object-cover" />
                                 @endif
                             </div>
-                            {{-- Camera badge --}}
                             <label for="avatar-upload" class="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-500 shadow-md shadow-amber-300/40 transition hover:bg-amber-600 dark:shadow-amber-900/40">
                                 <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             </label>
@@ -57,21 +60,45 @@
                             <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{{ $user->email }}</p>
                         </div>
 
-                        {{-- Hidden file input --}}
+                        {{-- Hidden file input + cropped base64 hidden input --}}
                         <div class="w-full">
-                            <input id="avatar-upload" type="file" name="avatar" accept="image/*" class="hidden" />
+                            <input id="avatar-upload" type="file" name="_avatar_raw" accept="image/*" class="hidden" />
+                            {{-- This hidden input carries the cropped base64 data on submit --}}
+                            <input type="hidden" name="avatar_cropped" id="avatar-cropped" />
+
                             <label for="avatar-upload" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-amber-600 dark:hover:bg-amber-900/10 dark:hover:text-amber-300">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                                 Upload new photo
                             </label>
                             <p class="mt-1.5 text-center text-xs text-gray-400 dark:text-gray-600">JPG, PNG or GIF · max 2 MB</p>
-                            @error('avatar')
+                            @error('avatar_cropped')
                                 <p class="mt-1 text-center text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
                 </div>
             </div>
+
+            {{-- Crop Modal --}}
+            <div id="crop-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+                <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
+                    <h3 class="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Crop your photo</h3>
+
+                    <div class="overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800" style="max-height: 340px;">
+                        <img id="crop-image" src="" alt="Crop preview" class="block max-w-full" />
+                    </div>
+
+                    <div class="mt-4 flex justify-end gap-3">
+                        <button type="button" id="crop-cancel" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800">
+                            Cancel
+                        </button>
+                        <button type="button" id="crop-confirm" class="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-amber-600">
+                            Apply crop
+                        </button>
+                    </div>
+                </div>
+            </div>
+
 
             {{-- ── RIGHT: Form sections ── --}}
             <div class="lg:col-span-2 space-y-5">
@@ -230,3 +257,93 @@
         </div>{{-- /grid --}}
     </form>
 @endsection
+
+
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+
+    <script>
+        (function () {
+            const fileInput    = document.getElementById('avatar-upload');
+            const cropModal    = document.getElementById('crop-modal');
+            const cropImage    = document.getElementById('crop-image');
+            const cropConfirm  = document.getElementById('crop-confirm');
+            const cropCancel   = document.getElementById('crop-cancel');
+            const preview      = document.getElementById('avatar-preview');
+            const initials     = document.getElementById('avatar-initials');
+            const croppedInput = document.getElementById('avatar-cropped');
+
+            let cropper = null;
+
+            fileInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                // Basic size guard (2 MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('Please choose an image under 2 MB.');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    cropImage.src = e.target.result;
+                    cropModal.classList.remove('hidden');
+                    cropModal.classList.add('flex');
+
+                    // Destroy old cropper instance if any
+                    if (cropper) { cropper.destroy(); cropper = null; }
+
+                    cropper = new Cropper(cropImage, {
+                        aspectRatio: 1,          // force square
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 0.85,
+                        responsive: true,
+                        restore: false,
+                        guides: false,
+                        center: true,
+                        highlight: false,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+
+            cropConfirm.addEventListener('click', function () {
+                if (!cropper) return;
+
+                // Get a 400×400 canvas (plenty for an avatar)
+                const canvas = cropper.getCroppedCanvas({ width: 400, height: 400 });
+                const dataURL = canvas.toDataURL('image/jpeg', 0.88);
+
+                // Update the visible preview circle
+                preview.src = dataURL;
+                preview.classList.remove('hidden');
+                if (initials) initials.classList.add('hidden');
+
+                // Store the base64 for form submission
+                croppedInput.value = dataURL;
+
+                closeModal();
+            });
+
+            cropCancel.addEventListener('click', closeModal);
+
+            // Close on backdrop click
+            cropModal.addEventListener('click', function (e) {
+                if (e.target === cropModal) closeModal();
+            });
+
+            function closeModal() {
+                cropModal.classList.add('hidden');
+                cropModal.classList.remove('flex');
+                if (cropper) { cropper.destroy(); cropper = null; }
+                fileInput.value = '';
+            }
+        })();
+    </script>
+@endpush

@@ -12,7 +12,7 @@
     @role('client')
         <div class="grid grid-cols-12 gap-6">
             <div class="col-span-12">
-                <x-dashboard.welcome-card :bookingStats="$bookingStats" />
+                <x-dashboard.welcome-card :bookingStats="$bookingStats"  />
             </div>
 
             <div class="col-span-12 md:col-span-6">
@@ -22,11 +22,6 @@
             <div class="col-span-12 md:col-span-6">
                 <x-dashboard.booking-history :bookings="$bookings" />
             </div>
-
-
-
-
-
             <div class="col-span-12">
                 <x-dashboard.booking-confirmation-modal :referenceNumber="$referenceNumber" />
             </div>

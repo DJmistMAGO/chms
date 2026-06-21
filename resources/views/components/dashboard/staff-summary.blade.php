@@ -5,7 +5,7 @@
         <div class="flex items-start gap-4">
             <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-yellow-600 shadow-lg shadow-amber-500/30">
                 @if (auth()->user()->avatar)
-                    <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="h-full w-full rounded-2xl object-cover">
+                    <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="h-full w-full rounded-2xl object-cover">
                 @else
                     <span class="text-lg font-bold text-white">{{ auth()->user()->getInitialsAttribute() }}</span>
                 @endif
