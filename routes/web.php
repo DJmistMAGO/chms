@@ -69,6 +69,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->prefix('room-management')
         ->group(function () {
             Route::get('/index', 'index')->name('room.index');
+            Route::put('/{room}', 'updateStatus')->name('room.updateStatus');
         });
 
 });
