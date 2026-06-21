@@ -22,25 +22,28 @@ class BookingController extends Controller
 
         $userId = $user ? $user->getKey() : null;
 
+        // dd($userId);
+
         $pendingBookings = Booking::where('user_id', $userId)
-            ->where('status', 'pending')
-            ->get()
-            ->transform(function ($booking) {
-                // Convert to string dates for safe output and to avoid type warnings
+            ->where('status', 'Pending')
+            ->get()->transform(function ($booking) {
                 $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
                 $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
 
+            // dd($pendingBookings);
+
         $confirmedBookings = Booking::where('user_id', $userId)
-            ->where('status', 'confirmed')
+            ->where('status', 'Confirmed')
             ->get()
             ->transform(function ($booking) {
-                // Convert to string dates for safe output and to avoid type warnings
                 $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
                 $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
+            
+            // dd($confirmedBookings);
 
         return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }
