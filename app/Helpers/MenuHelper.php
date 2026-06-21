@@ -39,8 +39,8 @@ class MenuHelper
                         ['name' => 'Create Walk-in Booking', 'path' => '/booking/create', 'pro' => false],
                         ['name' => 'Pending Bookings', 'path' => '/booking/pending', 'pro' => false],
                         ['name' => 'Confirmed Bookings', 'path' => '/booking/confirmed', 'pro' => false],
-                        ['name' => 'Cancelled Bookings', 'path' => '/booking/cancelled', 'pro' => false],
-                        ['name' => 'Completed Bookings', 'path' => '/booking/completed', 'pro' => false],
+                        ['name' => 'Checked In Bookings', 'path' => '/booking/checked-in', 'pro' => false],
+                        ['name' => 'Booking History', 'path' => '/booking/history', 'pro' => false],
                     ],
                 ],
                 [

@@ -113,12 +113,22 @@ class BookingController extends Controller
         return redirect()->route('booking.cancelled')->with('success', 'Booking cancelled successfully.');
     }
 
-    public function cancelled()
+    public function checkedInBookings()
     {
-        $cancelledBookings = Booking::where('status', 'Cancelled')
+        $checkedInBookings = Booking::where('status', 'Checked In')
             ->latest()
             ->paginate(15);
 
-        return view('pages.chms-features.booking-management.cancelled-booking', compact('cancelledBookings'));
+        return view('pages.chms-features.booking-management.checkedin-booking', compact('checkedInBookings'));
     }
+
+    public function bookingHistory()
+    {
+        $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
+        ->latest()
+        ->paginate(15);
+
+        return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+    }
+
 }

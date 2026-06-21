@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('room_price', 10, 2);
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->enum('status', ['Pending', 'Verified', 'Confirmed', 'Expired', 'Cancelled'])->default('Pending');
+            $table->enum('status', ['Pending', 'Confirmed', 'Checked In', 'Completed', 'Cancelled', 'Archived'])->default('Pending');
             $table->text('remarks')->nullable();
             $table->timestamp('expires_at');
             $table->foreignId('verified_by')->nullable()->constrained('users');
