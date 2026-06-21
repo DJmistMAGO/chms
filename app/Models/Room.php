@@ -20,6 +20,13 @@ class Room extends Model
         return $this->hasMany(Booking::class, 'room_id');
     }
 
+    public function currentBooking()
+    {
+        return $this->hasOne(Booking::class, 'room_id')
+            ->whereIn('status', ['Pending', 'Confirmed', 'Checked In'])
+            ->orderBy('check_in');
+    }
+
     public function roomType()
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');
