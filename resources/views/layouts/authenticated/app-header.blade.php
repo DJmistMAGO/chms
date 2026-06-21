@@ -66,7 +66,7 @@
             </button>
 
             <!-- Search Bar (desktop only) -->
-            <div class="hidden xl:block">
+            {{-- <div class="hidden xl:block">
                 <form>
                     <div class="relative">
                         <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
@@ -87,7 +87,7 @@
                         </button>
                     </div>
                 </form>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Application Menu (mobile) and Right Side Actions (desktop) -->
@@ -113,7 +113,7 @@
                 </button>
 
                 <!-- Notification Dropdown -->
-                <x-header.notification-dropdown />
+                {{-- <x-header.notification-dropdown /> --}}
             </div>
 
             <!-- User Dropdown -->

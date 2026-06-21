@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MicroPricingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RoomController;
@@ -47,6 +48,8 @@ Route::middleware('guest')->group(function () {
 // Routes accessible only to authenticated users
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard/{referenceNumber?}', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
 
     Route::controller(BookingController::class)
@@ -93,10 +96,6 @@ Route::middleware('guest')->group(function () {
 Route::get('/calendar', function () {
     return view('pages.calender', ['title' => 'Calendar']);
 })->name('calendar');
-
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
 
 Route::get('/form-elements', function () {
     return view('pages.form.form-elements', ['title' => 'Form Elements']);
