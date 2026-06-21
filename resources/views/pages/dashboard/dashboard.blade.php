@@ -15,7 +15,7 @@
     @endphp
 
     @if($showWarning)
-        <div class="bg-blue-100 dark:bg-gradient-to-br from-amber-300 to-yellow-200 border border-blue-400 dark:border-amber-600 text-black dark:text-black px-4 py-3 rounded relative mb-4" role="alert" id="google-login-warning">
+        <div class="bg-blue-100 dark:bg-gradient-to-br from-amber-300 to-yellow-200 border border-blue-400 dark:border-amber-400 text-black dark:text-black px-4 py-3 rounded relative mb-4" role="alert" id="google-login-warning">
             <strong class="font-bold">Welcome!</strong>
             <span class="block sm:inline">It looks like you signed in with Google. For security reasons, please update your password by <a href="{{ route('profile') }}" class="underline text-blue-400 dark:text-blue-400">clicking here</a>.</span>
         </div>
@@ -27,7 +27,7 @@
 
         {{-- Welcome Card --}}
         <div class="col-span-12">
-            <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-lg">
+            <div class="rounded-3xl border border-gray-200 dark:border-white/10 bg-white/[0.03] p-6 shadow-lg backdrop-blur-lg hover:border-gray-300 transition">
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
                     <div class="flex items-center gap-4">
@@ -76,7 +76,7 @@
 
         {{-- Upcoming Bookings --}}
         <div class="col-span-12 md:col-span-6">
-            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-white/20 hover:shadow-xl">
+            <div class="flex h-full flex-col rounded-3xl border border-gray-200 dark:border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-gray-300 hover:shadow-xl">
 
                 <div class="flex items-start justify-between">
                     <div>
@@ -98,7 +98,7 @@
                             <h4 class="mt-1 font-semibold text-gray-600 dark:text-white">Conference Room A</h4>
                             <p class="mt-1 text-sm text-gray-400">May 10, 2026 &bull; 10:00 AM</p>
                         </div>
-                        <span class="w-fit rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-300">Tomorrow</span>
+                        <span class="w-fit rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-900 dark:text-blue-300">Tomorrow</span>
                     </div>
 
                     <div class="flex flex-col gap-3 rounded-2xl border border-green-500/20 bg-green-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -107,7 +107,7 @@
                             <h4 class="mt-1 font-semibold text-gray-600 dark:text-white">Suite 204</h4>
                             <p class="mt-1 text-sm text-gray-400">May 12, 2026 &bull; 2:00 PM</p>
                         </div>
-                        <span class="w-fit rounded-full bg-green-400 dark:bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-300">In 2 days</span>
+                        <span class="w-fit rounded-full bg-green-300 dark:bg-green-500/20 px-3 py-1 text-xs font-semibold text-green-900 dark:text-green-300">In 2 days</span>
                     </div>
 
                 </div>
@@ -116,7 +116,7 @@
 
         {{-- Booking History --}}
         <div class="col-span-12 md:col-span-6">
-            <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-white/20 hover:shadow-xl">
+            <div class="flex h-full flex-col rounded-3xl border border-gray-200 dark:border-white/10 bg-white/[0.03] p-6 shadow-lg transition hover:border-gray-300 hover:shadow-xl">
 
                 <div class="flex items-start justify-between">
                     <div>

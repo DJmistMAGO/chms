@@ -39,33 +39,19 @@
     <style>
         * { font-family: 'DM Sans', sans-serif; }
         h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
-
-        /* Option rows */
         .option-row { cursor: pointer; transition: background 0.18s ease, border-color 0.18s ease; }
         .option-row.selected { background: #FFF3A3; border-color: #D4A800 !important; }
         .option-row:not(.selected):hover { background: #FFFAE6; }
         .option-row .dot { opacity: 0; transition: opacity 0.18s ease; }
         .option-row.selected .dot { opacity: 1; background: #D4A800; }
-
-        /* Price bump animation */
         .price-bump { transition: transform 0.2s ease; }
         .price-bump.bump { transform: scale(1.15); }
-
-        /* Image zoom */
         .room-img-wrap:hover img { transform: scale(1.04); }
         .room-img-wrap img { transition: transform 0.5s ease; }
-
-        /* Section label with trailing line */
         .section-label { display: flex; align-items: center; gap: 10px; }
         .section-label::after { content: ''; flex: 1; height: 1px; background: #FFE566; }
-
-        /* Input / select focus */
         input:focus, select:focus { outline: none; border-color: #FFD000 !important; box-shadow: 0 0 0 3px rgba(255,208,0,0.18); }
-
-        /* Sticky mobile bar shadow */
         .sticky-bar { box-shadow: 0 -8px 32px rgba(0,0,0,0.08); }
-
-        /* Page fade-in */
         @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
         .fade-up-1 { animation: fadeUp 0.5s ease both; }
         .fade-up-2 { animation: fadeUp 0.5s 0.08s ease both; }

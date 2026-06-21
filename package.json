@@ -5,7 +5,8 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "dev:prod": "vite --mode production"
+        "dev:prod": "vite --mode production",
+        "watch": "vite build --watch"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.1.12",
