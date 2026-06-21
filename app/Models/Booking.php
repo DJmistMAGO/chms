@@ -9,6 +9,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'reference_number',
+        'room_id',
         'room_type',
         'floor_level',
         'ambiance',
@@ -27,8 +28,8 @@ class Booking extends Model
     ];
 
     protected $dates = [
-        'check_in_date',
-        'check_out_date',
+        'check_in',
+        'check_out',
         'expires_at',
         'verified_at',
     ];
@@ -60,5 +61,15 @@ class Booking extends Model
     public function verifier()
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function getCheckInDateAttribute()
+    {
+        return $this->check_in;
+    }
+
+    public function getCheckOutDateAttribute()
+    {
+        return $this->check_out;
     }
 }
