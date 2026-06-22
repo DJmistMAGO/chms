@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\User;
+// use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Room;
 
@@ -42,7 +42,7 @@ class BookingController extends Controller
                 $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
-            
+
             // dd($confirmedBookings);
 
         return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));

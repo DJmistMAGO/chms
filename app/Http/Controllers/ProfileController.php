@@ -26,22 +26,10 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            // 'avatar' => 'nullable|image|max:2048',
             'valid_id' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'avatar_cropped' => ['nullable', 'string'],
         ]);
-
-        // if ($request->hasFile('avatar')) {
-        //     $avatarFile = $request->file('avatar');
-        //     $filename = $user->id . '_avatar_profile.' . $avatarFile->getClientOriginalExtension();
-        //     $destinationPath = public_path('avatars');
-        //     if (!file_exists($destinationPath)) {
-        //         mkdir($destinationPath, 0755, true);
-        //     }
-        //     $avatarFile->move($destinationPath, $filename);
-        //     $validated['avatar'] = 'avatars/' . $filename;
-        // }
 
         if ($request->filled('avatar_cropped')) {
             $data   = $request->input('avatar_cropped');
