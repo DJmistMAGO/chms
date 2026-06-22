@@ -23,11 +23,41 @@ Route::middleware('guest')->group(function () {
     //     return view('micro-pricing');
     // })->name('customized');
 
+    // Route::controller(MicroPricingController::class)
+    //     ->prefix('customize')
+    //     ->group(function () {
+    //         Route::get('/{roomType}', 'booking')->name('customize.booking');
+    // });
+
+
+    // Route::get('/micro-pricing/{roomType}', [MicroPricingController::class, 'booking'])->name('micro.pricing');
+    // Route::post('/login-with-booking', [MicroPricingController::class, 'loginOrRegisterWithBooking'])->name('login.with.booking');
+    // Route::post('/booking/google/store', [MicroPricingController::class, 'storeGoogleBookingSession'])->name('booking.google.store');
+    // Route::get('/booking/google/redirect', function () {
+    //     return redirect()->route('login.google');
+    // })->name('booking.google.redirect');
+
+    // Route::controller(AuthenticationController::class)
+    //     ->prefix('login')
+    //     ->group(function () {
+    //         Route::get('/', 'showLoginForm')->name('login');
+    //         Route::post('/', 'login')->name('login.post');
+    //         Route::get('/google', 'redirectToGoogle')->name('login.google');
+    //         Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+    //         Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
+    // });
+
     Route::controller(MicroPricingController::class)
-        ->prefix('customize')
-        ->group(function () {
-            Route::get('/{roomType}', 'booking')->name('customize.booking');
+    ->prefix('customize')
+    ->group(function () {
+        Route::get('/{roomType}', 'booking')->name('customize.booking');
+        Route::post('/login-with-booking', 'loginOrRegisterWithBooking')->name('customize.login.with.booking');
+        Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
     });
+
+    Route::get('/booking/google/redirect', function () {
+        return redirect()->route('login.google');
+    })->name('booking.google.redirect');
 
     Route::controller(AuthenticationController::class)
         ->prefix('login')
@@ -36,8 +66,9 @@ Route::middleware('guest')->group(function () {
             Route::post('/', 'login')->name('login.post');
             Route::get('/google', 'redirectToGoogle')->name('login.google');
             Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
-            Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
-    });
+        });
+
+
 
 
     Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');

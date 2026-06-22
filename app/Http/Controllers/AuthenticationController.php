@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Booking;
 use App\Models\User;
+use App\Traits\HandlesBookingCreation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Laravel\Socialite\Facades\Socialite;
-use App\Models\Booking;
 use Illuminate\Validation\ValidationException;
-use Carbon\Carbon;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticationController extends Controller
 {
+    use HandlesBookingCreation;
     public function showLoginForm()
     {
         return view('auth.sign-in');
@@ -119,6 +121,70 @@ class AuthenticationController extends Controller
         return redirect()->intended('dashboard');
     }
 
+    // public function handleGoogleCallback(Request $request)
+    // {
+    //     try {
+    //         $googleUser = Socialite::driver('google')->user();
+    //     } catch (\Exception $e) {
+    //         return redirect()->route('login')->withErrors([
+    //             'google' => 'Unable to login with Google. Please try again.',
+    //         ]);
+    //     }
+
+    //     $isNewUser = false;
+    //     $user = User::where('email', $googleUser->getEmail())->first();
+
+    //     if (!$user) {
+    //         $isNewUser = true;
+    //         $user = User::create([
+    //             'name' => $googleUser->getName(),
+    //             'email' => $googleUser->getEmail(),
+    //             'google_id' => $googleUser->getId(),
+    //             'password' => Hash::make(Str::random(24)),
+    //             'is_google_user' => true,
+    //             'has_changed_password' => false,
+    //             'first_google_login_at' => now(),
+    //         ]);
+    //     } else {
+    //         $updateData = [
+    //             'name' => $googleUser->getName(),
+    //             'google_id' => $googleUser->getId(),
+    //             'is_google_user' => true,
+    //         ];
+    //         if (!$user->first_google_login_at) {
+    //             $updateData['first_google_login_at'] = now();
+    //         }
+    //         $user->update($updateData);
+    //     }
+
+    //     if ($isNewUser) {
+    //         $user->assignRole('client');
+    //     }
+
+    //     Auth::login($user, true);
+    //     $request->session()->regenerate();
+
+    //     // If they arrived here mid-booking ("Continue with Google" on the
+    //     // customize page), finish that booking now using the data we stashed
+    //     // in storeGoogleBookingSession().
+    //     // $pendingBooking = session('pending_google_booking');
+
+    //     // \Log::info('pending_google_booking from session', $pendingBooking ?? []);  // 👈 add here
+
+    //     // if ($pendingBooking) {
+    //     //     session()->forget('pending_google_booking');
+
+    //     //     $this->persistBooking(
+    //     //         $pendingBooking,
+    //     //         $user->id,
+    //     //         null,
+    //     //         $user
+    //     //     );
+
+    //     //     }
+    //     return redirect()->route('dashboard')->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
+    // }
+
 
     public function setPassword(Request $request)
     {
@@ -151,90 +217,90 @@ class AuthenticationController extends Controller
     }
 
     //sign in with email and password and passing of data for bookings
-    public function loginWithBooking(Request $request)
-    {
-        // ── 1. Validate credentials + every booking field ──────────────────
-        $request->validate([
-            // Auth
-            'email'    => ['required', 'email'],
-            'password' => ['required', 'string'],
+    // public function loginWithBooking(Request $request)
+    // {
+    //     // ── 1. Validate credentials + every booking field ──────────────────
+    //     $request->validate([
+    //         // Auth
+    //         'email'    => ['required', 'email'],
+    //         'password' => ['required', 'string'],
 
-            // Booking — must match migration columns
-            'room_type'            => ['required', 'string'],
-            'floor_level'          => ['nullable', 'string'],
-            'ambiance'             => ['nullable', 'string'],
-            'food_package'         => ['nullable', 'string'],
-            'check_in' => [
-                'required',
-                'date',
-                'after_or_equal:today'
-            ],
+    //         // Booking — must match migration columns
+    //         'room_type'            => ['required', 'string'],
+    //         'floor_level'          => ['nullable', 'string'],
+    //         'ambiance'             => ['nullable', 'string'],
+    //         'food_package'         => ['nullable', 'string'],
+    //         'check_in' => [
+    //             'required',
+    //             'date',
+    //             'after_or_equal:today'
+    //         ],
 
-            'check_out' => [
-                'required',
-                'date',
-                'after:check_in'
-            ],
-            'number_of_guests'     => ['required', 'integer', 'min:1'],
-            'room_price'           => ['required', 'numeric', 'min:0'],
-            'micro_pricing_amount' => ['required', 'numeric', 'min:0'],
-            'total_price'          => ['required', 'numeric', 'min:0'],
-        ]);
+    //         'check_out' => [
+    //             'required',
+    //             'date',
+    //             'after:check_in'
+    //         ],
+    //         'number_of_guests'     => ['required', 'integer', 'min:1'],
+    //         'room_price'           => ['required', 'numeric', 'min:0'],
+    //         'micro_pricing_amount' => ['required', 'numeric', 'min:0'],
+    //         'total_price'          => ['required', 'numeric', 'min:0'],
+    //     ]);
 
-        //dd($request->all());
+    //     //dd($request->all());
 
-        // ── 2. Attempt login ───────────────────────────────────────────────
-        $credentials = $request->only('email', 'password');
-        $remember    = $request->boolean('remember');
+    //     // ── 2. Attempt login ───────────────────────────────────────────────
+    //     $credentials = $request->only('email', 'password');
+    //     $remember    = $request->boolean('remember');
 
-        if (! Auth::attempt($credentials, $remember)) {
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
+    //     if (! Auth::attempt($credentials, $remember)) {
+    //         throw ValidationException::withMessages([
+    //             'email' => __('auth.failed'),
+    //         ]);
+    //     }
 
-        // Regenerate session to prevent fixation
-        $request->session()->regenerate();
+    //     // Regenerate session to prevent fixation
+    //     $request->session()->regenerate();
 
-        // // ── 3. Store the valid ID file ─────────────────────────────────────
-        // // Stored in storage/app/private/valid_ids/{user_id}/
-        // $validIdPath = $request->file('valid_id_path')
-        //     ->store('valid_ids/' . Auth::id(), 'private');
+    //     // // ── 3. Store the valid ID file ─────────────────────────────────────
+    //     // // Stored in storage/app/private/valid_ids/{user_id}/
+    //     // $validIdPath = $request->file('valid_id_path')
+    //     //     ->store('valid_ids/' . Auth::id(), 'private');
 
-        // ── 4. Create the booking ──────────────────────────────────────────
-        $booking = Booking::create([
-            'user_id'              => Auth::id(),
-            'reference_number'     => $this->generateReference(),
-            'room_type'            => $request->room_type,
-            'floor_level'          => $request->floor_level,
-            'ambiance'             => $request->ambiance,
-            'food_package'         => $request->food_package,
-            'check_in' => Carbon::parse($request->check_in)->format('Y-m-d'),
-            'check_out' => Carbon::parse($request->check_out)->format('Y-m-d'),
-            'number_of_guests'     => $request->number_of_guests,
-            'room_price'           => $request->room_price,
-            'micro_pricing_amount' => $request->micro_pricing_amount,
-            'total_price'          => $request->total_price,
-            'special_requests'     => $request->special_requests,
-            'status'               => 'pending',
-            'expires_at'           => now()->addHours(24),
-        ]);
+    //     // ── 4. Create the booking ──────────────────────────────────────────
+    //     $booking = Booking::create([
+    //         'user_id'              => Auth::id(),
+    //         'reference_number'     => $this->generateReference(),
+    //         'room_type'            => $request->room_type,
+    //         'floor_level'          => $request->floor_level,
+    //         'ambiance'             => $request->ambiance,
+    //         'food_package'         => $request->food_package,
+    //         'check_in' => Carbon::parse($request->check_in)->format('Y-m-d'),
+    //         'check_out' => Carbon::parse($request->check_out)->format('Y-m-d'),
+    //         'number_of_guests'     => $request->number_of_guests,
+    //         'room_price'           => $request->room_price,
+    //         'micro_pricing_amount' => $request->micro_pricing_amount,
+    //         'total_price'          => $request->total_price,
+    //         'special_requests'     => $request->special_requests,
+    //         'status'               => 'pending',
+    //         'expires_at'           => now()->addHours(24),
+    //     ]);
 
-        // ── 5. Redirect to booking confirmation page ───────────────────────
-        return redirect()
-            ->route('dashboard', $booking->reference_number)
-            ->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
-    }
+    //     // ── 5. Redirect to booking confirmation page ───────────────────────
+    //     return redirect()
+    //         ->route('dashboard', $booking->reference_number)
+    //         ->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
+    // }
 
-    private function generateReference(): string
-    {
-        do {
-            $letters = strtoupper(Str::random(4)); // letters
-            $numbers = rand(1000, 9999);          // numbers
+    // private function generateReference(): string
+    // {
+    //     do {
+    //         $letters = strtoupper(Str::random(4)); // letters
+    //         $numbers = rand(1000, 9999);          // numbers
 
-            $ref = 'CH-' . $letters . $numbers;
-        } while (Booking::where('reference_number', $ref)->exists());
+    //         $ref = 'CH-' . $letters . $numbers;
+    //     } while (Booking::where('reference_number', $ref)->exists());
 
-        return $ref;
-    }
+    //     return $ref;
+    // }
 }

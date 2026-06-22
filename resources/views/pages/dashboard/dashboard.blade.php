@@ -9,6 +9,19 @@
 
     <x-dashboard.google-warning />
 
+    {{-- add success and error message --}}
+    @if (session('success'))
+        <div class="mb-4 font-medium text-sm text-green-600">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="mb-4 font-medium text-sm text-red-600">
+            {{ session('error') }}
+        </div>
+    @endif
+
+
     @role('client')
         <div class="grid grid-cols-12 gap-6">
             <div class="col-span-12">

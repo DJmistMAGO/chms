@@ -14,12 +14,6 @@ class MenuHelper
                 'name' => 'Dashboard',
                 'path' => '/dashboard',
             ]
-            // ,
-            // [
-            //     'icon' => 'calendar',
-            //     'name' => 'Calendar',
-            //     'path' => '/calendar',
-            // ],
         ];
 
         if (Auth::check() && Auth::user()->hasRole('admin')) {
