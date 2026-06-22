@@ -14,7 +14,7 @@ class DashboardController extends Controller
         $userId = $user ? $user->getKey() : null;
         $bookings = Booking::where('user_id', $userId)
             ->whereIn('status', ['Pending', 'Confirmed', 'Verified', 'Expired', 'Canceled'])
-            ->get();
+            ->get()->sortByDesc('created_at');
 
         $rooms = Room::paginate(7);
         $allBookings = Booking::all();

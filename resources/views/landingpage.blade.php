@@ -73,6 +73,9 @@
         });
     </script>
 
+@include('components.devtools-protection')
+
+
 </head>
 
 <body class="bg-white text-black font-sans">

@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use App\Traits\HandlesBookingCreation;
 
 class MicroPricingController extends Controller
 {
+    use HandlesBookingCreation;
+
     public function booking($roomType)
     {
         $rooms = [
@@ -124,177 +127,142 @@ class MicroPricingController extends Controller
 
     public function loginOrRegisterWithBooking(Request $request)
     {
-        $validated = $this->validateBookingRequest($request, true);
+        $request->validate(array_merge($this->bookingFieldRules(), [
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8'],
+        ]));
+
+        $validated = $this->validateBookingFields(
+            $request->only($this->bookingDataKeys())
+        );
 
         DB::beginTransaction();
 
         try {
-            $user = User::where('email', $validated['email'])->first();
+            $user = User::where('email', $request->email)->first();
 
             if ($user) {
-                if (! Auth::attempt([
-                    'email' => $validated['email'],
-                    'password' => $validated['password'],
-                ], $request->boolean('remember'))) {
+                if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
                     throw ValidationException::withMessages([
                         'email' => ['Invalid email or password.'],
                     ]);
                 }
-
                 $user = Auth::user();
             } else {
                 $user = User::create([
-                    'name' => $this->buildAutoName($validated['email']),
-                    'email' => $validated['email'],
-                    'password' => Hash::make($validated['password']),
+                    'name'           => $this->buildAutoName($request->email),
+                    'email'          => $request->email,
+                    'password'       => Hash::make($request->password),
+                    'is_google_user' => false,
                 ]);
-
+                $user->assignRole('client');
                 Auth::login($user, $request->boolean('remember'));
             }
 
-            $booking = $this->createBookingFromValidated($validated, $request, $user->id);
+            $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
+
+            // if ($booking->valid_id_path) {
+            //     $user->update(['valid_id' => $booking->valid_id_path]);
+            // }
 
             DB::commit();
 
             return redirect()
-                ->route('dashboard') // change to your actual route
-                ->with('success', 'Booking submitted successfully.');
+                ->route('dashboard', ['referenceNumber' => $booking->reference_number])
+                ->with('success', 'Booking submitted! We will verify your ID and confirm shortly.');
+
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
+
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            if ($e instanceof ValidationException) {
-                throw $e;
-            }
-
-            return back()
-                ->withInput()
-                ->withErrors(['general' => 'Unable to complete booking. Please try again.']);
+            // 👇 Pinpoint exactly where and what failed
+            return back()->withInput()->withErrors([
+                'general' => '[' . class_basename($e) . '] '
+                    . $e->getMessage()
+                    . ' — in ' . $e->getFile()
+                    . ' on line ' . $e->getLine(),
+            ]);
         }
     }
 
     public function storeGoogleBookingSession(Request $request)
     {
-        $validated = $this->validateBookingRequest($request, false);
+        \Log::info('storeGoogleBookingSession', [
+            'hasFile'  => $request->hasFile('valid_id_path'),
+            'allFiles' => $request->allFiles(),
+            'all'      => $request->except('valid_id_path'),
+        ]);
+
+        $request->validate($this->bookingFieldRules());
+
+        $validated = $this->validateBookingFields(
+            $request->only($this->bookingDataKeys())
+        );
 
         if ($request->hasFile('valid_id_path')) {
-            $tempPath = $request->file('valid_id_path')->store('booking-ids/temp', 'public');
-            $validated['valid_id_temp_path'] = $tempPath;
+            $validated['valid_id_temp_path'] = $request->file('valid_id_path')
+                ->store('booking-ids/temp', 'public');
         }
 
-        session([
-            'pending_google_booking' => $validated,
-        ]);
+        session(['pending_google_booking' => $validated]);
 
         return redirect()->route('booking.google.redirect');
     }
 
-    protected function validateBookingRequest(Request $request, bool $withCredentials = true): array
-    {
-        $rules = [
-            'room_type' => ['required', 'string', 'max:255'],
-            'check_in' => ['required', 'date', 'after_or_equal:today'],
-            'check_out' => ['required', 'date', 'after:check_in'],
-            'number_of_guests' => ['required', 'integer', 'min:1'],
-            'nights' => ['required', 'integer', 'min:1'],
-            'floor_level' => ['required', Rule::in(['Floor 1', 'Floor 2', 'Floor 4'])],
-            'ambiance' => ['required', Rule::in(['Regular Room', 'Cozy Ambiance', 'Romantic Ambiance'])],
-            'food_package' => ['required', Rule::in(['No Food', 'Cozy Dinner for Family', 'Romantic Dinner'])],
-            'room_price' => ['required', 'numeric', 'min:0'],
-            'micro_pricing_amount' => ['required', 'numeric', 'min:0'],
-            'total_price' => ['required', 'numeric', 'min:0'],
-            'valid_id_path' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
-        ];
+    // protected function createBookingFromValidated(array $validated, Request $request, int $userId): Booking
+    // {
+    //     $validIdPath = null;
 
-        if ($withCredentials) {
-            $rules['email'] = ['required', 'email:rfc,dns'];
-            $rules['password'] = ['required', 'string', 'min:8'];
-        }
+    //     if ($request->hasFile('valid_id_path')) {
+    //         $validIdPath = $request->file('valid_id_path')->store('booking-ids', 'public');
+    //     } elseif (!empty($validated['valid_id_temp_path'])) {
+    //         $from = $validated['valid_id_temp_path'];
+    //         $filename = basename($from);
+    //         $to = 'booking-ids/' . $filename;
 
-        $validated = $request->validate($rules);
+    //         if (Storage::disk('public')->exists($from)) {
+    //             Storage::disk('public')->move($from, $to);
+    //             $validIdPath = $to;
+    //         }
+    //     }
 
-        $checkIn = Carbon::parse($validated['check_in']);
-        $checkOut = Carbon::parse($validated['check_out']);
-        $computedNights = $checkIn->diffInDays($checkOut);
+    //     return Booking::create([
+    //         'user_id' => $userId,
+    //         'room_type' => $validated['room_type'],
+    //         'check_in' => $validated['check_in'],
+    //         'check_out' => $validated['check_out'],
+    //         'number_of_guests' => $validated['number_of_guests'],
+    //         'nights' => $validated['nights'],
+    //         'floor_level' => $validated['floor_level'],
+    //         'ambiance' => $validated['ambiance'],
+    //         'food_package' => $validated['food_package'],
+    //         'room_price' => $validated['room_price'],
+    //         'micro_pricing_amount' => $validated['micro_pricing_amount'],
+    //         'total_price' => $validated['total_price'],
+    //         'valid_id_path' => $validIdPath,
+    //         'status' => 'pending',
+    //     ]);
+    // }
 
-        if ($computedNights !== (int) $validated['nights']) {
-            throw ValidationException::withMessages([
-                'check_in' => ['Night count does not match selected dates.'],
-            ]);
-        }
+    // protected function getAddonAmount(string $ambiance, string $foodPackage): int
+    // {
+    //     $ambiancePrices = [
+    //         'Regular Room' => 0,
+    //         'Cozy Ambiance' => 500,
+    //         'Romantic Ambiance' => 1000,
+    //     ];
 
-        $expectedAddon = $this->getAddonAmount(
-            $validated['ambiance'],
-            $validated['food_package']
-        );
+    //     $foodPrices = [
+    //         'No Food' => 0,
+    //         'Cozy Dinner for Family' => 1500,
+    //         'Romantic Dinner' => 1500,
+    //     ];
 
-        if ((float) $validated['micro_pricing_amount'] !== (float) $expectedAddon) {
-            throw ValidationException::withMessages([
-                'micro_pricing_amount' => ['Addon total mismatch.'],
-            ]);
-        }
-
-        $expectedTotal = ((float) $validated['room_price'] + (float) $validated['micro_pricing_amount']) * $computedNights;
-
-        if ((float) $validated['total_price'] !== (float) $expectedTotal) {
-            throw ValidationException::withMessages([
-                'total_price' => ['Total price mismatch.'],
-            ]);
-        }
-
-        return $validated;
-    }
-
-    protected function createBookingFromValidated(array $validated, Request $request, int $userId): Booking
-    {
-        $validIdPath = null;
-
-        if ($request->hasFile('valid_id_path')) {
-            $validIdPath = $request->file('valid_id_path')->store('booking-ids', 'public');
-        } elseif (!empty($validated['valid_id_temp_path'])) {
-            $from = $validated['valid_id_temp_path'];
-            $filename = basename($from);
-            $to = 'booking-ids/' . $filename;
-
-            if (Storage::disk('public')->exists($from)) {
-                Storage::disk('public')->move($from, $to);
-                $validIdPath = $to;
-            }
-        }
-
-        return Booking::create([
-            'user_id' => $userId,
-            'room_type' => $validated['room_type'],
-            'check_in' => $validated['check_in'],
-            'check_out' => $validated['check_out'],
-            'number_of_guests' => $validated['number_of_guests'],
-            'nights' => $validated['nights'],
-            'floor_level' => $validated['floor_level'],
-            'ambiance' => $validated['ambiance'],
-            'food_package' => $validated['food_package'],
-            'room_price' => $validated['room_price'],
-            'micro_pricing_amount' => $validated['micro_pricing_amount'],
-            'total_price' => $validated['total_price'],
-            'valid_id_path' => $validIdPath,
-            'status' => 'pending',
-        ]);
-    }
-
-    protected function getAddonAmount(string $ambiance, string $foodPackage): int
-    {
-        $ambiancePrices = [
-            'Regular Room' => 0,
-            'Cozy Ambiance' => 500,
-            'Romantic Ambiance' => 1000,
-        ];
-
-        $foodPrices = [
-            'No Food' => 0,
-            'Cozy Dinner for Family' => 1500,
-            'Romantic Dinner' => 1500,
-        ];
-
-        return ($ambiancePrices[$ambiance] ?? 0) + ($foodPrices[$foodPackage] ?? 0);
-    }
+    //     return ($ambiancePrices[$ambiance] ?? 0) + ($foodPrices[$foodPackage] ?? 0);
+    // }
 
     protected function buildAutoName(string $email): string
     {
@@ -305,3 +273,4 @@ class MicroPricingController extends Controller
         return $name ?: 'Guest User';
     }
 }
+

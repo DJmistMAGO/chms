@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-// use App\Models\User;
+// use App\Models\User; 
 use Carbon\Carbon;
 use App\Models\Room;
 
