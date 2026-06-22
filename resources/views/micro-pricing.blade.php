@@ -142,22 +142,22 @@
 
 
                 {{-- Hidden fields — names match migration columns exactly --}}
-                <input type="hidden" name="room_type"             value="{{ $roomName ?? '' }}">
-                <input type="hidden" name="check_in"              id="check_in">
-                <input type="hidden" name="check_out"             id="check_out">
-                <input type="hidden" name="number_of_guests"      id="input-guests"   value="1">
-                <input type="hidden" name="nights"                id="input-nights"   value="0">
-                <input type="hidden" name="floor_level"           id="input-floor"    value="Floor 1">
-                <input type="hidden" name="ambiance"              id="input-ambiance" value="Regular Room">
-                <input type="hidden" name="food_package"          id="input-food"     value="No Food">
-                <input type="hidden" name="room_price"            value="{{ $price }}">
-                <input type="hidden" name="micro_pricing_amount"  id="input-addons"   value="0">
-                <input type="hidden" name="total_price"           id="input-total"    value="{{ $price }}">
+                <input type="hidden" name="room_type" value="{{ $roomName ?? '' }}">
+                <input type="hidden" name="check_in" id="check_in">
+                <input type="hidden" name="check_out"id="check_out">
+                <input type="hidden" name="number_of_guests" id="input-guests"   value="1">
+                <input type="hidden" name="nights" id="input-nights"   value="0">
+                <input type="hidden" name="floor_level" id="input-floor"    value="Floor 1">
+                <input type="hidden" name="ambiance" id="input-ambiance" value="Regular Room">
+                <input type="hidden" name="food_package" id="input-food"     value="No Food">
+                <input type="hidden" name="room_price" value="{{ $price }}">
+                <input type="hidden" name="micro_pricing_amount" id="input-addons"   value="0">
+                <input type="hidden" name="total_price" id="input-total"    value="{{ $price }}">
 
                 <div class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:1px solid #FFE566;">
 
                     {{-- Header --}}
-                    <div class="px-6 py-5" style="background:#FFD000;">
+                    <div class="px-6 py-5 bg-gradient-to-bl from-amber-300 via-transparent to-amber-500" >
                         <h2 class="font-display text-2xl font-semibold text-charcoal">Customize Your Stay</h2>
                         <p class="text-xs mt-1 font-light" style="color:rgba(28,28,30,0.55);">
                             Select your preferences to see transparent pricing breakdown
@@ -304,27 +304,36 @@
                         </div>
 
                         {{-- VALID ID UPLOAD --}}
-                        {{-- <div>
+                        <div>
                             <div class="section-label mb-3">
                                 <span class="text-xs font-medium tracking-widest uppercase text-charcoal">Valid ID</span>
                             </div>
                             <label for="valid_id"
-                                class="flex flex-col items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:bg-yellow-50"
-                                style="border-color:#FFE566; background:#FFF8D6; min-height:96px;"
-                                id="valid-id-label">
-                                <i class="fas fa-id-card text-xl" style="color:#D4A800;"></i>
-                                <span class="text-xs font-medium text-warm" id="valid-id-text">Click to upload a valid ID</span>
-                                <span class="text-xs text-muted">JPG, PNG or PDF · max 5MB</span>
-                                <input type="file" name="valid_id_path" id="valid_id"
-                                    accept="image/jpeg,image/png,application/pdf"
-                                    class="hidden" required
-                                    onchange="handleIdUpload(this)">
-                            </label>
+                                    class="flex flex-col items-center justify-center gap-2 w-full rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:bg-yellow-50"
+                                    style="border-color:#FFE566; background:#FFF8D6; min-height:96px;"
+                                    id="valid-id-label">
+                                    <div id="valid-id-placeholder" class="flex flex-col items-center gap-2">
+                                        <i class="fas fa-id-card text-xl" style="color:#D4A800;"></i>
+                                        <span class="text-xs font-medium text-warm" id="valid-id-text">Click to upload a valid ID</span>
+                                        <span class="text-xs text-muted">JPG, PNG or PDF · max 5MB</span>
+                                    </div>
+                                    <div id="valid-id-preview-wrap" class="hidden items-center gap-3">
+                                        <img id="valid-id-preview" src="" alt="ID preview" class="w-16 h-12 object-cover rounded-md border" />
+                                        <div class="flex flex-col items-start text-left">
+                                            <span class="text-xs font-medium text-warm" id="valid-id-name"></span>
+                                            <button type="button" class="text-xs text-red-500 mt-1" onclick="clearIdUpload()">Remove</button>
+                                        </div>
+                                    </div>
+                                    <input type="file" name="valid_id_path" id="valid_id"
+                                        accept="image/jpeg,image/png,application/pdf"
+                                        class="hidden" required
+                                        onchange="handleIdUpload(this)">
+                                </label>
                             <p class="hidden mt-1.5 text-xs text-red-500 flex items-center gap-1" id="valid-id-error">
                                 <i class="fas fa-circle-exclamation" style="font-size:10px;"></i>
                                 <span></span>
                             </p>
-                        </div> --}}
+                        </div>
 
                         {{-- SPECIAL REQUESTS --}}
                         {{-- <div>
@@ -704,28 +713,35 @@
             document.getElementById('input-guests').value = this.value;
         });
 
-        // // ── Valid ID upload preview ────────────────────────
-        // function handleIdUpload(input) {
-        //     const label   = document.getElementById('valid-id-text');
-        //     const errEl   = document.getElementById('valid-id-error');
-        //     const file    = input.files[0];
+        // ── Valid ID preview ─────────────────────────────
+        // Expects: <input type="file" id="valid_id"> and <img id="valid-id-preview"> somewhere in the DOM
+        (function () {
+            const fileInput = document.getElementById('valid_id');
+            const preview   = document.getElementById('valid-id-preview');
+            if (!fileInput || !preview) return;
 
-        //     errEl.classList.add('hidden');
+            fileInput.addEventListener('change', function () {
+                const file = this.files && this.files[0];
+                if (!file) {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    return;
+                }
+                if (!file.type.startsWith('image/')) {
+                    // not an image; clear preview
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                    return;
+                }
 
-        //     if (!file) { label.textContent = 'Click to upload a valid ID'; return; }
-
-        //     // 5MB limit
-        //     if (file.size > 5 * 1024 * 1024) {
-        //         errEl.querySelector('span').textContent = 'File is too large. Maximum size is 5MB.';
-        //         errEl.classList.remove('hidden');
-        //         input.value = '';
-        //         label.textContent = 'Click to upload a valid ID';
-        //         return;
-        //     }
-
-        //     label.textContent = '✓ ' + file.name;
-        //     document.getElementById('valid-id-label').style.borderColor = '#D4A800';
-        // }
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
 
         // ── Sign-in Modal ──────────────────────────────────
         function openSignInModal() {
