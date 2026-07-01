@@ -61,7 +61,9 @@
                                 <option value="">All Statuses</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
+                                @role('staff')
                                 <option value="archived">Archived</option>
+                                @endrole
                             </select>
                         </div>
 

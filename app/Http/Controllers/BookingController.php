@@ -137,9 +137,18 @@ class BookingController extends Controller
 
     public function bookingHistory()
     {
-        $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
-        ->latest()
-        ->paginate(15);
+        if (!auth()->user()->hasRole('staff')) {
+            $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
+                ->latest()
+                ->paginate(15);
+        }
+        else {
+            $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->paginate(15);
+        }
+
 
         return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
     }
@@ -173,12 +182,11 @@ class BookingController extends Controller
     public function deleteBooking(Request $request, $selectedRef)
     {
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
-        
+
 
         // Delete the booking
         $booking->delete();
 
         return redirect()->route('booking.pending')->with('success', 'Booking deleted successfully.');
     }
-
 }
