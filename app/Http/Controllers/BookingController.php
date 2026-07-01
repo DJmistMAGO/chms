@@ -107,6 +107,27 @@ class BookingController extends Controller
         return view('pages.chms-features.booking-management.checkedin-booking', compact('checkedInBookings'));
     }
 
+    public function earlyCheckout(Request $request, $selectedRef)
+    {
+        $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+
+        // Update the booking status to checked out
+        $booking->status = 'Completed';
+        $booking->save();
+
+        // If the booking had an assigned room, update that room's status to available
+        if ($booking->room_id) {
+            $room = Room::find($booking->room_id);
+
+            if ($room) {
+                $room->status = 'Available';
+                $room->save();
+            }
+        }
+
+        return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
+    }
+
     public function cancelBooking(Request $request, $selectedRef)
     {
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
