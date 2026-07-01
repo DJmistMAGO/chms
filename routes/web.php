@@ -59,6 +59,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::get('/my-reservations', 'myReservations')->name('booking.my-reservations');
             Route::get('/checked-in', 'checkedInBookings')->name('booking.checkin');
             Route::put('/confirm/{referenceNumber}', 'confirmBooking')->name('booking.confirm');
+            Route::put('/activate/{referenceNumber}', 'checkInActivate')->name('booking.activate');
             Route::put('/cancel/{referenceNumber}', 'cancelBooking')->name('booking.cancel');
         });
 

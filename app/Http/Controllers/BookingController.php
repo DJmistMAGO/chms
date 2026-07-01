@@ -87,6 +87,26 @@ class BookingController extends Controller
         return view('pages.chms-features.booking-management.confirmed-booking', compact('confirmedBookings'));
     }
 
+    public function checkInActivate(Request $request, $selectedRef)
+    {
+        $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+
+        // Update the booking status to checked in
+        $booking->status = 'Checked In';
+        $booking->save();
+
+        return redirect()->route('booking.checkin')->with('success', 'Booking checked in successfully.');
+    }
+
+    public function checkedInBookings()
+    {
+        $checkedInBookings = Booking::where('status', 'Checked In')
+            ->latest()
+            ->paginate(15);
+
+        return view('pages.chms-features.booking-management.checkedin-booking', compact('checkedInBookings'));
+    }
+
     public function cancelBooking(Request $request, $selectedRef)
     {
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
@@ -113,14 +133,7 @@ class BookingController extends Controller
         return redirect()->route('booking.cancelled')->with('success', 'Booking cancelled successfully.');
     }
 
-    public function checkedInBookings()
-    {
-        $checkedInBookings = Booking::where('status', 'Checked In')
-            ->latest()
-            ->paginate(15);
 
-        return view('pages.chms-features.booking-management.checkedin-booking', compact('checkedInBookings'));
-    }
 
     public function bookingHistory()
     {

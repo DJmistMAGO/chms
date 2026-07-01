@@ -62,7 +62,7 @@
                             {{-- Guest --}}
                             <td class="px-5 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-orange-100 text-xs font-bold text-orange-700 dark:bg-orange-400/20 dark:text-orange-300">
+                                    <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-400/20 dark:text-blue-300">
                                         {{ $initials }}
                                     </div>
                                     <div>
@@ -95,8 +95,8 @@
 
                             {{-- Status --}}
                             <td class="px-5 py-4">
-                                <span class="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700 ring-1 ring-orange-200 dark:bg-orange-400/10 dark:text-orange-400 dark:ring-orange-400/20">
-                                    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500"></span>Cancelled
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-200 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/20">
+                                    <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500"></span>Checked In
                                 </span>
                             </td>
 
@@ -127,13 +127,13 @@
                                     </button>
 
                                     {{-- Confirm --}}
-                                    {{-- <button title="Confirm booking"
+                                    <button title="Confirm booking"
                                         @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
-                                        class="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-50 text-orange-600 transition hover:bg-orange-100 hover:scale-105 dark:bg-orange-400/10 dark:text-orange-400 dark:hover:bg-orange-400/20">
+                                        class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                         </svg>
-                                    </button> --}}
+                                    </button>
 
                                     {{-- Cancel --}}
                                     {{-- <button title="Cancel booking"
