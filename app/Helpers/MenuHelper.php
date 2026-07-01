@@ -71,13 +71,13 @@ class MenuHelper
                 [
                     'icon' => 'tables',
                     'name' => 'Booking History',
-                    'path' => '/booking-history',
+                    'path' => '/booking/history',
                 ],
-                [
-                    'icon' =>'charts',
-                    'name' => 'Reports',
-                    'path' => '/reports',
-                ]
+                // [
+                //     'icon' =>'charts',
+                //     'name' => 'Reports',
+                //     'path' => '/reports',
+                // ]
             ]);
         }
 
