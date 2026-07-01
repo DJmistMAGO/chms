@@ -151,7 +151,7 @@ class BookingController extends Controller
             }
         }
 
-        return redirect()->route('booking.cancelled')->with('success', 'Booking cancelled successfully.');
+        return redirect()->route('booking.history')->with('success', 'Booking cancelled successfully.');
     }
 
 
