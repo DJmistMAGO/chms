@@ -3,12 +3,13 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestManagementController;
 use App\Http\Controllers\MicroPricingController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UserManagementController;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -114,6 +115,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/user-management/{id}/reset-password', [UserManagementController::class, 'resetPassword'])->name('user-management.reset-password');
     Route::post('/user-management/{id}/activate', [UserManagementController::class, 'activateStatus'])->name('user-management.activate');
     Route::post('/user-management/{id}/deactivate', [UserManagementController::class, 'deactivateStatus'])->name('user-management.deactivate');
+});
+
+Route::middleware(['auth', 'role:staff'])->group(function () {
+    Route::get('/guest-management', [GuestManagementController::class, 'index'])->name('guest-management.index');
+    Route::post('/guest-management/{id}', [GuestManagementController::class, 'update'])->name('guest-management.update');
+    Route::post('/guest-management/{id}/reset-password', [GuestManagementController::class, 'resetPassword'])->name('guest-management.reset-password');
+    Route::post('/guest-management/{id}/activate', [GuestManagementController::class, 'activateStatus'])->name('guest-management.activate');
+    Route::post('/guest-management/{id}/deactivate', [GuestManagementController::class, 'deactivateStatus'])->name('guest-management.deactivate');
 });
 
 Route::middleware('guest')->group(function () {

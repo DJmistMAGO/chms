@@ -106,7 +106,7 @@
                             <td class="py-3 pr-4">
                                 <div class="flex items-center gap-3">
                                     @if($user['avatar'])
-                                        <img src="{{ $user['avatar'] }}" alt="{{ $user['name'] }}'s Avatar" class="h-9 w-9 rounded-full object-cover">
+                                        <img src="{{ asset('storage/' . $user['avatar']) }}" alt="{{ $user['name'] }}'s Avatar" class="h-9 w-9 rounded-full object-cover">
                                     @else
                                         <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
                                             {{ strtoupper(substr($user['name'], 0, 2)) }}
