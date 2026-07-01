@@ -78,26 +78,58 @@
             font-size: 10px;
         }
 
-        .wizard-pill {
+        .wizard-step-pill {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            gap: 3px;
-            padding: 12px 10px;
-            border-radius: 18px;
-            border: 1px solid transparent;
-            background: rgba(255,237,187,0.75);
-            color: #6b5533;
-            font-size: 11px;
+            gap: 8px;
             text-align: center;
+            position: relative;
+        }
+
+        .wizard-pill {
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+            background: rgba(255,237,187,0.8);
+            color: #6b5533;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s ease;
+            padding: 0;
         }
 
         .wizard-pill.active {
             background: #fff3a3;
             border-color: #d4a800;
             color: #3d3530;
+            box-shadow: 0 0 0 4px rgba(212,168,0,0.12);
+        }
+
+        .wizard-pill.completed {
+            background: #d4a800;
+            border-color: #b89300;
+            color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(255, 216, 0, 0.16);
+        }
+
+        .wizard-step-pill.active .wizard-pill-label,
+        .wizard-step-pill.completed .wizard-pill-label {
+            color: #3d3530;
+            font-weight: 700;
+        }
+
+        .wizard-pill-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #765a2a;
+            max-width: 72px;
         }
     </style>
 </head>
@@ -223,23 +255,31 @@
                             <p class="text-xs mt-1 font-light" style="color:rgba(28,28,30,0.55);">
                                 Complete your booking in 4 simple steps.
                             </p>
-                            <div class="grid grid-cols-4 gap-2 mt-5">
-                                <button type="button" class="wizard-pill active" data-step="1" onclick="goToStep(1)">
-                                    <span class="text-sm font-semibold">1</span>
-                                    <span class="text-[10px] uppercase tracking-[.18em]">Options</span>
-                                </button>
-                                <button type="button" class="wizard-pill" data-step="2" onclick="goToStep(2)">
-                                    <span class="text-sm font-semibold">2</span>
-                                    <span class="text-[10px] uppercase tracking-[.18em]">Details</span>
-                                </button>
-                                <button type="button" class="wizard-pill" data-step="3" onclick="goToStep(3)">
-                                    <span class="text-sm font-semibold">3</span>
-                                    <span class="text-[10px] uppercase tracking-[.18em]">ID</span>
-                                </button>
-                                <button type="button" class="wizard-pill" data-step="4" onclick="goToStep(4)">
-                                    <span class="text-sm font-semibold">4</span>
-                                    <span class="text-[10px] uppercase tracking-[.18em]">Review</span>
-                                </button>
+                            <div class="grid grid-cols-4 gap-6 mt-5">
+                                <div class="wizard-step-pill" data-step="1">
+                                    <button type="button" class="wizard-pill active" onclick="goToStep(1)">
+                                        <span class="wizard-pill-number">1</span>
+                                    </button>
+                                    <span class="wizard-pill-label">Options</span>
+                                </div>
+                                <div class="wizard-step-pill" data-step="2">
+                                    <button type="button" class="wizard-pill" onclick="goToStep(2)">
+                                        <span class="wizard-pill-number">2</span>
+                                    </button>
+                                    <span class="wizard-pill-label">Details</span>
+                                </div>
+                                <div class="wizard-step-pill" data-step="3">
+                                    <button type="button" class="wizard-pill" onclick="goToStep(3)">
+                                        <span class="wizard-pill-number">3</span>
+                                    </button>
+                                    <span class="wizard-pill-label">ID</span>
+                                </div>
+                                <div class="wizard-step-pill" data-step="4">
+                                    <button type="button" class="wizard-pill" onclick="goToStep(4)">
+                                        <span class="wizard-pill-number">4</span>
+                                    </button>
+                                    <span class="wizard-pill-label">Review</span>
+                                </div>
                             </div>
                         </div>
 
@@ -554,8 +594,23 @@
             document.querySelectorAll('.wizard-step').forEach(el => {
                 el.classList.toggle('hidden', el.dataset.step !== String(step));
             });
-            document.querySelectorAll('.wizard-pill').forEach(el => {
-                el.classList.toggle('active', el.dataset.step === String(step));
+            document.querySelectorAll('.wizard-step-pill').forEach(pill => {
+                const pillStep = Number(pill.dataset.step);
+                const button = pill.querySelector('.wizard-pill');
+                const badge = pill.querySelector('.wizard-pill-number');
+                const isActive = pillStep === step;
+                const isComplete = pillStep < step;
+
+                pill.classList.toggle('active', isActive);
+                pill.classList.toggle('completed', isComplete);
+
+                if (button) {
+                    button.classList.toggle('active', isActive);
+                    button.classList.toggle('completed', isComplete);
+                }
+                if (badge) {
+                    badge.textContent = isComplete ? '✓' : pillStep;
+                }
             });
         }
 
@@ -627,6 +682,13 @@
             if (!modal) return;
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+        }
+
+        function focusDatePicker() {
+            const bookingRange = document.getElementById('booking_range');
+            if (!bookingRange) return;
+            bookingRange.focus();
+            bookingRange.click();
         }
 
         document.addEventListener('keydown', function (e) {
