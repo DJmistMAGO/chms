@@ -3,15 +3,21 @@
 
 @section('content')
 <div x-data="{
-    assignModal: false, cancelModal: false, deleteModal: false, detailModal: false,
-    selectedId: null, selectedRef: null, selectedRoomType: null, selectedBooking: {},
-    open(modal, booking) {
-        this.selectedId = booking.id;
-        this.selectedRef = booking.ref;
-        this.selectedRoomType = booking.roomType;
-        this[modal] = true;
-    }
-}">
+        assignModal: false,
+        cancelModal: false,
+        deleteModal: false,
+        detailModal: false,
+        selectedId: null,
+        selectedRef: null,
+        selectedRoomType: null,
+        selectedBooking: {},
+        open(modal, booking) {
+            this.selectedId = booking.id;
+            this.selectedRef = booking.ref;
+            this.selectedRoomType = booking.roomType;
+            this[modal] = true;
+        }
+    }">
 
     <x-common.page-breadcrumb pageTitle="Confirmed Bookings" />
 
@@ -112,6 +118,9 @@
                                             check_in: '{{ $b->check_in->format('M j, Y') }}',
                                             check_out: '{{ $b->check_out->format('M j, Y') }}',
                                             number_of_guests: '{{ $b->number_of_guests }}',
+                                            floor_level: '{{ $b->floor_level }}',
+                                            ambiance: '{{ $b->ambiance }}',
+                                            food_package: '{{ $b->food_package }}',
                                             room_price: '{{ number_format($b->room_price, 2) }}',
                                             micro_pricing_amount: '{{ number_format($b->micro_pricing_amount ?? 0, 2) }}',
                                             total_price: '{{ number_format($b->total_price, 2) }}',
@@ -182,75 +191,193 @@
     </div>
 
     {{-- DETAIL MODAL --}}
-    <div x-show="detailModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-        <div @click.away="detailModal=false" class="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
-            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100">
-            <div class="relative flex items-center justify-between px-5 py-4" style="background:#FFD000;">
-                <div>
-                    <p class="text-xs font-medium uppercase tracking-widest" style="color:rgba(28,28,30,0.45);">Reference</p>
-                    <h3 class="font-mono text-base font-bold text-gray-900" x-text="selectedBooking.reference_number || '—'"></h3>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-xs font-semibold text-gray-800">
-                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-gray-800"></span>
-                        <span x-text="selectedBooking.status || '—'"></span>
-                    </span>
-                    <button @click="detailModal=false" class="flex h-7 w-7 items-center justify-center rounded-full bg-black/10 text-gray-800 hover:bg-black/20 transition">
-                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="px-5 py-4 space-y-4">
-                <div class="flex items-center gap-3 rounded-xl bg-green-50 px-3 py-2.5 dark:bg-green-400/10">
-                    <span class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-green-400/30">
-                        <svg class="h-3.5 w-3.5 text-green-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21"/>
-                        </svg>
-                    </span>
-                    <div class="flex-1 min-w-0">
-                        <p class="truncate text-sm font-semibold text-green-900 dark:text-green-300" x-text="selectedBooking.room_type || '—'"></p>
-                        <p class="text-xs text-green-700/60" x-text="(selectedBooking.number_of_guests || '—') + ' guest(s)'"></p>
+    <div x-show="detailModal" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+            x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div @click.away="detailModal=false"
+                class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 scale-100">
+
+                {{-- Header --}}
+                <div class="relative flex items-center justify-between px-6 py-4" style="background:#FFD000;">
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-widest" style="color:rgba(28,28,30,0.45);">
+                            Reference</p>
+                        <h3 class="font-mono text-base font-bold text-gray-900"
+                            x-text="selectedBooking.reference_number || '—'"></h3>
                     </div>
-                    <span class="flex-shrink-0 rounded-full bg-green-200/60 px-2 py-0.5 text-xs font-semibold text-green-800" x-text="(selectedBooking.nights || '—') + 'N'"></span>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    @foreach(['check_in' => 'Check-in', 'check_out' => 'Check-out'] as $key => $label)
-                    <div class="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
-                        <p class="text-xs text-gray-400">{{ $label }}</p>
-                        <p class="mt-0.5 text-sm font-semibold text-gray-800 dark:text-white" x-text="selectedBooking.{{ $key }} || '—'"></p>
-                    </div>
-                    @endforeach
-                </div>
-                <div class="rounded-xl border border-green-100 bg-green-50/50 px-3 py-3 dark:border-green-400/10 dark:bg-green-400/5">
-                    <div class="space-y-1.5 text-sm">
-                        <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                            <span>Room rate</span><span x-text="selectedBooking.room_price ? '₱' + selectedBooking.room_price : '—'"></span>
-                        </div>
-                        <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                            <span>Add-ons</span><span x-text="selectedBooking.micro_pricing_amount ? '₱' + selectedBooking.micro_pricing_amount : '₱0.00'"></span>
-                        </div>
-                        <div class="flex justify-between border-t border-green-200/60 pt-1.5 dark:border-green-400/10">
-                            <span class="font-semibold text-gray-700 dark:text-gray-200">Total</span>
-                            <span class="font-bold text-gray-900 dark:text-white" x-text="selectedBooking.total_price ? '₱' + selectedBooking.total_price : '—'"></span>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full bg-black/10 px-2.5 py-1 text-xs font-semibold text-gray-800">
+                            <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-gray-800"></span>
+                            <span x-text="selectedBooking.status || '—'"></span>
+                        </span>
+                        <button @click="detailModal=false"
+                            class="flex h-7 w-7 items-center justify-center rounded-full bg-black/10 text-gray-800 hover:bg-black/20 transition">
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            </div>
-            <div class="flex items-center justify-between border-t border-gray-100 px-5 py-3 dark:border-gray-800">
-                <p class="text-xs text-gray-400">Booked <span class="text-gray-500 dark:text-gray-300" x-text="selectedBooking.booked_at || '—'"></span></p>
-                <button @click="detailModal=false" class="rounded-xl border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/5">Close</button>
+
+                {{-- Body — two-column layout, no scroll --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 py-5">
+
+                    {{-- LEFT COLUMN --}}
+                    <div class="space-y-3">
+
+                        {{-- Room + guests row --}}
+                        <div class="flex items-center gap-3 rounded-xl bg-yellow-50 px-3 py-2.5 dark:bg-yellow-400/10">
+                            <span
+                                class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-yellow-400/30">
+                                <svg class="h-3.5 w-3.5 text-yellow-700" fill="none" stroke="currentColor"
+                                    stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21" />
+                                </svg>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="truncate text-sm font-semibold text-yellow-900 dark:text-yellow-300"
+                                    x-text="selectedBooking.room_type || '—'"></p>
+                                <p class="text-xs text-yellow-700/60"
+                                    x-text="(selectedBooking.number_of_guests || '—') + ' guest(s)'"></p>
+                            </div>
+                            <span
+                                class="flex-shrink-0 rounded-full bg-yellow-200/60 px-2 py-0.5 text-xs font-semibold text-yellow-800"
+                                x-text="(selectedBooking.nights || '—') + 'N'"></span>
+                        </div>
+
+                        {{-- Dates --}}
+                        <div class="grid grid-cols-2 gap-2">
+                            @foreach (['check_in' => 'Check-in', 'check_out' => 'Check-out'] as $key => $label)
+                                <div
+                                    class="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
+                                    <p class="text-xs text-gray-400">{{ $label }}</p>
+                                    <p class="mt-0.5 text-sm font-semibold text-gray-800 dark:text-white"
+                                        x-text="selectedBooking.{{ $key }} || '—'"></p>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        {{-- Pricing breakdown --}}
+                        <div
+                            class="rounded-xl border border-yellow-100 bg-yellow-50/50 px-3 py-3 dark:border-yellow-400/10 dark:bg-yellow-400/5">
+                            <div class="space-y-1.5 text-sm">
+                                <div class="flex justify-between text-gray-500 dark:text-gray-400">
+                                    <span>Room rate</span><span
+                                        x-text="selectedBooking.room_price ? '₱' + selectedBooking.room_price : '—'"></span>
+                                </div>
+                                <div class="flex justify-between text-gray-500 dark:text-gray-400">
+                                    <span>Add-ons</span><span
+                                        x-text="selectedBooking.micro_pricing_amount ? '₱' + selectedBooking.micro_pricing_amount : '₱0.00'"></span>
+                                </div>
+                                <div
+                                    class="flex justify-between border-t border-yellow-200/60 pt-1.5 dark:border-yellow-400/10">
+                                    <span class="font-semibold text-gray-700 dark:text-gray-200">Total</span>
+                                    <span class="font-bold text-gray-900 dark:text-white"
+                                        x-text="selectedBooking.total_price ? '₱' + selectedBooking.total_price : '—'"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {{-- RIGHT COLUMN — Stay Preferences --}}
+                    <div class="space-y-2">
+                        <p class="mb-1 text-xs font-semibold uppercase tracking-widest text-gray-400">Stay Preferences</p>
+
+                        {{-- Floor Level --}}
+                        <div
+                            class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
+                            <span
+                                class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-400/15">
+                                <svg class="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none"
+                                    stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                                </svg>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-400">Floor Level</p>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white"
+                                    x-text="selectedBooking.floor_level || 'No preference'"></p>
+                            </div>
+                        </div>
+
+                        {{-- Ambiance --}}
+                        <div
+                            class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
+                            <span
+                                class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-400/15">
+                                <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M18 17v2M12 5.5V10m-6 7v2m15-2v-4c0-1.6569-1.3431-3-3-3H6c-1.65685 0-3 1.3431-3 3v4h18Zm-2-7V8c0-1.65685-1.3431-3-3-3H8C6.34315 5 5 6.34315 5 8v2h14Z" />
+                                </svg>
+
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-400">Ambiance</p>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white"
+                                    x-text="selectedBooking.ambiance || 'Regular Room'"></p>
+                            </div>
+                        </div>
+
+                        {{-- Food Package --}}
+                        <div
+                            class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
+                            <span
+                                class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-400/15">
+                                <svg class="h-4 w-4 text-orange-600 dark:text-orange-400" fill="none"
+                                    stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21M6.375 6.375 5.25 5.25m13.5 1.125-1.125-1.125m1.125 13.5-1.125-1.125M6.375 17.625 5.25 18.75M3 12a9 9 0 1 1 18 0 9 9 0 0 1-18 0Z" />
+                                </svg>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-400">Food Package</p>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white"
+                                    x-text="selectedBooking.food_package || 'No Food'"></p>
+                            </div>
+
+                        </div>
+
+                        {{-- Special requests (only shows if present) --}}
+                        <div x-show="selectedBooking.special_requests && selectedBooking.special_requests !== '—'"
+                            class="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
+                            <p class="text-xs text-gray-400">Special Requests</p>
+                            <p class="mt-0.5 text-sm text-gray-600 dark:text-gray-400"
+                                x-text="selectedBooking.special_requests"></p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- Footer --}}
+                <div class="flex items-center justify-between border-t border-gray-100 px-6 py-3 dark:border-gray-800">
+                    <p class="text-xs text-gray-400">Booked <span class="text-gray-500 dark:text-gray-300"
+                            x-text="selectedBooking.booked_at || '—'"></span></p>
+                    <button @click="detailModal=false"
+                        class="rounded-xl border border-gray-200 px-4 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/5">Close</button>
+                </div>
             </div>
         </div>
-    </div>
 
     {{-- CONFIRM MODAL --}}
     <div x-show="assignModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
-        <div @click.away="assignModal=false" class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl "
+        <div @click.away="assignModal=false" class="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-900"
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
             <!-- Header (Restored to flat bg-green-500) -->
             <div class="bg-green-500 px-6 py-5 flex items-center justify-between shadow-sm">

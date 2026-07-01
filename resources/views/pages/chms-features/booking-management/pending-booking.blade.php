@@ -337,10 +337,6 @@
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white"
                                     x-text="selectedBooking.floor_level || 'No preference'"></p>
                             </div>
-                            <span
-                                class="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700 dark:bg-blue-400/15 dark:text-blue-400">
-                                Free
-                            </span>
                         </div>
 
                         {{-- Ambiance --}}
@@ -348,21 +344,20 @@
                             class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
                             <span
                                 class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-400/15">
-                                <svg class="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none"
-                                    stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 3v2.25m6.364.386-1j.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                                <svg class="w-4 h-4 text-gray-800 dark:text-white" aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                    viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M18 17v2M12 5.5V10m-6 7v2m15-2v-4c0-1.6569-1.3431-3-3-3H6c-1.65685 0-3 1.3431-3 3v4h18Zm-2-7V8c0-1.65685-1.3431-3-3-3H8C6.34315 5 5 6.34315 5 8v2h14Z" />
                                 </svg>
+
                             </span>
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs text-gray-400">Ambiance</p>
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white"
                                     x-text="selectedBooking.ambiance || 'Regular Room'"></p>
                             </div>
-                            <span
-                                class="flex-shrink-0 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700 dark:bg-purple-400/15 dark:text-purple-400"
-                                x-text="selectedBooking.ambiance_price ? '+₱' + selectedBooking.ambiance_price : 'Base'">
-                            </span>
                         </div>
 
                         {{-- Food Package --}}
@@ -381,10 +376,7 @@
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white"
                                     x-text="selectedBooking.food_package || 'No Food'"></p>
                             </div>
-                            <span
-                                class="flex-shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700 dark:bg-orange-400/15 dark:text-orange-400"
-                                x-text="selectedBooking.food_price ? '+₱' + selectedBooking.food_price : 'Free'">
-                            </span>
+
                         </div>
 
                         {{-- Special requests (only shows if present) --}}
@@ -415,6 +407,7 @@
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
             <div @click.away="assignModal=false" class="w-full max-w-md rounded-3xl bg-white shadow-2xl dark:bg-gray-900"
                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-4"
                 x-transition:enter-end="opacity-100 translate-y-0">
