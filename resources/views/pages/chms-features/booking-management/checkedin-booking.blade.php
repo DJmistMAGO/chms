@@ -145,13 +145,13 @@
                                     </button> --}}
 
                                     {{-- Delete --}}
-                                    <button title="Delete booking"
+                                    {{-- <button title="Delete booking"
                                         @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; deleteModal=true"
                                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-500 transition hover:bg-red-100 hover:scale-105 dark:bg-red-400/10 dark:text-red-400 dark:hover:bg-red-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7L18 20H6L5 7M10 11v6M14 11v6M4 7h16M9 7V4h6v3"/>
                                         </svg>
-                                    </button>
+                                    </button> --}}
 
                                 </div>
                             </td>

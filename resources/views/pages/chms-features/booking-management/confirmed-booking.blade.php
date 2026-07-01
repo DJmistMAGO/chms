@@ -313,13 +313,13 @@
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <form method="POST" x-bind:action="">
-                @csrf @method('PATCH')
+            <form method="POST" x-bind:action="'{{ url('booking/cancel') }}/' + selectedRef">
+                @csrf @method('PUT')
                 <div class="px-6 py-5">
                     <p class="text-sm text-gray-500 dark:text-gray-400">This will mark the booking as <span class="font-semibold text-amber-600">cancelled</span>. The guest will be notified.</p>
                     <div class="mt-4">
                         <label class="mb-1.5 block text-xs font-medium uppercase tracking-widest text-gray-400">Reason (optional)</label>
-                        <textarea name="cancel_reason" rows="2" placeholder="Reason for cancellation…"
+                        <textarea name="remarks" rows="2" placeholder="Reason for cancellation…"
                             class="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white"></textarea>
                     </div>
                 </div>
