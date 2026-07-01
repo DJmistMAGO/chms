@@ -242,43 +242,69 @@
             </div>
         </div>
 
-        {{-- Edit Modal --}}
-        <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4">
-            <div class="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
-                <h3 class="mb-4 text-center text-base font-semibold text-gray-800 dark:text-white/90">Edit User</h3>
-                <form id="editForm" method="POST" class="space-y-4">
-                    @csrf
-                    {{-- @method('PUT') --}}
+        {{-- Edit Modal (styled like View modal) --}}
+        <div id="editModal"
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-6"
+            onclick="if (event.target === this) closeEditModal()"
+            role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+            <div class="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-900">
 
-                    <div>
-                        <label for="editName" class="text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
-                        <input id="editName" name="name" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
-                    </div>
+                {{-- Header --}}
+                <div class="relative bg-gradient-to-br from-amber-50 to-white px-6 pt-6 pb-5 dark:from-gray-800 dark:to-gray-900">
+                    <button type="button" onclick="closeEditModal()" aria-label="Close"
+                        class="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-black/5 hover:text-gray-600 dark:hover:bg-white/10 dark:hover:text-gray-300">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
 
-                    <div>
-                        <label for="editEmail" class="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input id="editEmail" name="email" type="email" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+                    <div class="flex items-center gap-4">
+                        <div id="editAvatar" class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-100 font-serif text-xl font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                            {{-- initials injected via JS --}}
+                        </div>
+                        <div>
+                            <p class="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">Edit User</p>
+                            <h3 id="editModalTitle" class="font-serif text-2xl font-semibold text-gray-900 dark:text-white">Edit user</h3>
+                        </div>
                     </div>
+                </div>
 
-                    <div>
-                        <label for="editPhone" class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                        <input id="editPhone" name="phone" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
-                    </div>
+                {{-- Body --}}
+                <div class="px-6 py-6">
+                    <form id="editForm" method="POST" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        @csrf
+                        {{-- @method('PUT') --}}
 
-                    <div>
-                        <label for="editAddress" class="text-sm font-medium text-gray-700 dark:text-gray-300">Address</label>
-                        <input id="editAddress" name="address" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
-                    </div>
+                        <div>
+                            <label for="editName" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Name</label>
+                            <input id="editName" name="name" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+                        </div>
 
-                    <div class="flex gap-3 mt-6">
-                        <button type="button" onclick="closeEditModal()" class="flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.05]">
-                            Cancel
-                        </button>
-                        <button type="submit" class="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 active:bg-blue-800">
-                            Save Changes
-                        </button>
-                    </div>
-                </form>
+                        <div>
+                            <label for="editEmail" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Email</label>
+                            <input id="editEmail" name="email" type="email" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+                        </div>
+
+                        <div>
+                            <label for="editPhone" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Phone</label>
+                            <input id="editPhone" name="phone" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+                        </div>
+
+                        <div>
+                            <label for="editAddress" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Address</label>
+                            <input id="editAddress" name="address" type="text" class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" />
+                        </div>
+
+                        <div class="sm:col-span-2 flex gap-3 justify-end mt-2">
+                            <button type="button" onclick="closeEditModal()" class="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-600 transition hover:bg-white dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05]">
+                                Cancel
+                            </button>
+                            <button type="submit" class="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 active:bg-blue-800">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -289,6 +315,7 @@
     <script>
         const modal = document.getElementById('statusModal');
         const editModal = document.getElementById('editModal');
+        const STORAGE_URL = "{{ asset('storage') }}";
 
         const routes = {
             activate: '{{ route('user-management.activate', ['id' => '__ID__']) }}',
@@ -325,6 +352,14 @@
             document.getElementById('editEmail').value = email || '';
             document.getElementById('editPhone').value = phone || '';
             document.getElementById('editAddress').value = address || '';
+
+            // populate avatar initials for header
+            const editAvatar = document.getElementById('editAvatar');
+            if (editAvatar) {
+                const initials = (name || '').split(' ').map(n => n[0] || '').slice(0,2).join('').toUpperCase();
+                editAvatar.textContent = initials;
+            }
+
             editModal.classList.remove('hidden');
             editModal.classList.add('flex');
         }
