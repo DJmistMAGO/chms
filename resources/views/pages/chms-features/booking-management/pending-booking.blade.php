@@ -525,7 +525,7 @@
                         </svg>
                     </button>
                 </div>
-                <form method="POST" x-bind:action="">
+                <form method="POST" x-bind:action="'{{ url('booking/delete') }}/' + selectedRef">
                     @csrf @method('DELETE')
                     <div class="px-6 py-5">
                         <div class="flex items-start gap-3 rounded-xl bg-red-50 p-4 dark:bg-red-400/10">

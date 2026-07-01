@@ -128,6 +128,16 @@ class BookingController extends Controller
         return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
     }
 
+
+    public function bookingHistory()
+    {
+        $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
+        ->latest()
+        ->paginate(15);
+
+        return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+    }
+
     public function cancelBooking(Request $request, $selectedRef)
     {
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
@@ -154,15 +164,15 @@ class BookingController extends Controller
         return redirect()->route('booking.history')->with('success', 'Booking cancelled successfully.');
     }
 
-
-
-    public function bookingHistory()
+    public function deleteBooking(Request $request, $selectedRef)
     {
-        $bookingHistory = Booking::whereIn('status', ['Cancelled', 'Completed', 'Archived'])
-        ->latest()
-        ->paginate(15);
+        $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+        
 
-        return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+        // Delete the booking
+        $booking->delete();
+
+        return redirect()->route('booking.pending')->with('success', 'Booking deleted successfully.');
     }
 
 }

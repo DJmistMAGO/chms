@@ -62,6 +62,7 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::put('/activate/{referenceNumber}', 'checkInActivate')->name('booking.activate');
             Route::put('/early-checkout/{referenceNumber}', 'earlyCheckout')->name('booking.early-checkout');
             Route::put('/cancel/{referenceNumber}', 'cancelBooking')->name('booking.cancel');
+            Route::delete('/delete/{referenceNumber}', 'deleteBooking')->name('booking.delete');
         });
 
     Route::controller(RoomController::class)
