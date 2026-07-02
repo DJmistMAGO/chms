@@ -3,11 +3,13 @@
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AuthenticationController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MicroPricingController;
-use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestManagementController;
+use App\Http\Controllers\MicroPricingController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -22,11 +24,41 @@ Route::middleware('guest')->group(function () {
     //     return view('micro-pricing');
     // })->name('customized');
 
+    // Route::controller(MicroPricingController::class)
+    //     ->prefix('customize')
+    //     ->group(function () {
+    //         Route::get('/{roomType}', 'booking')->name('customize.booking');
+    // });
+
+
+    // Route::get('/micro-pricing/{roomType}', [MicroPricingController::class, 'booking'])->name('micro.pricing');
+    // Route::post('/login-with-booking', [MicroPricingController::class, 'loginOrRegisterWithBooking'])->name('login.with.booking');
+    // Route::post('/booking/google/store', [MicroPricingController::class, 'storeGoogleBookingSession'])->name('booking.google.store');
+    // Route::get('/booking/google/redirect', function () {
+    //     return redirect()->route('login.google');
+    // })->name('booking.google.redirect');
+
+    // Route::controller(AuthenticationController::class)
+    //     ->prefix('login')
+    //     ->group(function () {
+    //         Route::get('/', 'showLoginForm')->name('login');
+    //         Route::post('/', 'login')->name('login.post');
+    //         Route::get('/google', 'redirectToGoogle')->name('login.google');
+    //         Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
+    //         Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
+    // });
+
     Route::controller(MicroPricingController::class)
-        ->prefix('customize')
-        ->group(function () {
-            Route::get('/{roomType}', 'booking')->name('customize.booking');
+    ->prefix('customize')
+    ->group(function () {
+        Route::get('/{roomType}', 'booking')->name('customize.booking');
+        Route::post('/login-with-booking', 'loginOrRegisterWithBooking')->name('customize.login.with.booking');
+        Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
     });
+
+    Route::get('/booking/google/redirect', function () {
+        return redirect()->route('login.google');
+    })->name('booking.google.redirect');
 
     Route::controller(AuthenticationController::class)
         ->prefix('login')
@@ -35,8 +67,9 @@ Route::middleware('guest')->group(function () {
             Route::post('/', 'login')->name('login.post');
             Route::get('/google', 'redirectToGoogle')->name('login.google');
             Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
-            Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
-    });
+        });
+
+
 
 
     Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
@@ -47,6 +80,8 @@ Route::middleware('guest')->group(function () {
 // Routes accessible only to authenticated users
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/dashboard/{referenceNumber?}', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
 
     Route::controller(BookingController::class)
@@ -69,6 +104,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         ->prefix('room-management')
         ->group(function () {
             Route::get('/index', 'index')->name('room.index');
+            Route::put('/{room}', 'updateStatus')->name('room.updateStatus');
         });
 
 });
@@ -80,6 +116,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/user-management/{id}/reset-password', [UserManagementController::class, 'resetPassword'])->name('user-management.reset-password');
     Route::post('/user-management/{id}/activate', [UserManagementController::class, 'activateStatus'])->name('user-management.activate');
     Route::post('/user-management/{id}/deactivate', [UserManagementController::class, 'deactivateStatus'])->name('user-management.deactivate');
+});
+
+Route::middleware(['auth', 'role:staff'])->group(function () {
+    Route::get('/guest-management', [GuestManagementController::class, 'index'])->name('guest-management.index');
+    Route::post('/guest-management/{id}', [GuestManagementController::class, 'update'])->name('guest-management.update');
+    Route::post('/guest-management/{id}/reset-password', [GuestManagementController::class, 'resetPassword'])->name('guest-management.reset-password');
+    Route::post('/guest-management/{id}/activate', [GuestManagementController::class, 'activateStatus'])->name('guest-management.activate');
+    Route::post('/guest-management/{id}/deactivate', [GuestManagementController::class, 'deactivateStatus'])->name('guest-management.deactivate');
 });
 
 Route::middleware('guest')->group(function () {
@@ -97,62 +141,20 @@ Route::get('/calendar', function () {
     return view('pages.calender', ['title' => 'Calendar']);
 })->name('calendar');
 
-Route::get('/profile', function () {
-    return view('pages.profile', ['title' => 'Profile']);
-})->name('profile');
-
-Route::get('/form-elements', function () {
-    return view('pages.form.form-elements', ['title' => 'Form Elements']);
-})->name('form-elements');
-
-Route::get('/basic-tables', function () {
-    return view('pages.tables.basic-tables', ['title' => 'Basic Tables']);
-})->name('basic-tables');
 
 // pages
 Route::get('/blank', function () {
     return view('pages.blank', ['title' => 'Blank']);
 })->name('blank');
 
-Route::get('/line-chart', function () {
-    return view('pages.chart.line-chart', ['title' => 'Line Chart']);
-})->name('line-chart');
 
-Route::get('/bar-chart', function () {
-    return view('pages.chart.bar-chart', ['title' => 'Bar Chart']);
-})->name('bar-chart');
-
-Route::get('/alerts', function () {
-    return view('pages.ui-elements.alerts', ['title' => 'Alerts']);
-})->name('alerts');
-
-Route::get('/avatars', function () {
-    return view('pages.ui-elements.avatars', ['title' => 'Avatars']);
-})->name('avatars');
-
-Route::get('/badge', function () {
-    return view('pages.ui-elements.badges', ['title' => 'Badges']);
-})->name('badges');
-
-Route::get('/buttons', function () {
-    return view('pages.ui-elements.buttons', ['title' => 'Buttons']);
-})->name('buttons');
-
-Route::get('/image', function () {
-    return view('pages.ui-elements.images', ['title' => 'Images']);
-})->name('images');
-
-Route::get('/videos', function () {
-    return view('pages.ui-elements.videos', ['title' => 'Videos']);
-})->name('videos');
 
 
 // end of to clean
 
 
 
-// test pages
 
 Route::fallback(function () {
-    return response()->view('pages.errors.error-404', [], 404);
+    return response()->view('errors.404', [], 404);
 });

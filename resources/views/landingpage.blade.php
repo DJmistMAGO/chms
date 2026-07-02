@@ -73,6 +73,9 @@
         });
     </script>
 
+@include('components.devtools-protection')
+
+
 </head>
 
 <body class="bg-white text-black font-sans">
@@ -139,10 +142,8 @@
         </div>
     </section>
 
-    {{-- Explore & Book Rooms Section --}}
     <section class="py-20 px-6 md:px-16 bg-white" id="rooms">
 
-        {{-- Section Header --}}
         <div class="text-center mb-14">
             <span
                 class="inline-block bg-yellow-400 text-yellow-900 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
@@ -156,10 +157,8 @@
             </p>
         </div>
 
-        {{-- Room Cards Grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            {{-- Standard Room --}}
             <div
                 class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                 <div class="relative overflow-hidden h-56 bg-yellow-50">
@@ -200,7 +199,6 @@
                 </div>
             </div>
 
-            {{-- Standard Premium Room --}}
             <div
                 class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                 <div class="relative overflow-hidden h-56 bg-yellow-50">
@@ -247,7 +245,6 @@
                 </div>
             </div>
 
-            {{-- Family Room --}}
             <div
                 class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                 <div class="relative overflow-hidden h-56 bg-yellow-50">

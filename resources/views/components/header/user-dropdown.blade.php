@@ -29,7 +29,7 @@
 
         <span class="mr-3 overflow-hidden rounded-full h-11 w-11 bg-gray-200 text-gray-700 flex items-center justify-center text-sm font-semibold dark:bg-gray-700 dark:text-gray-100">
             @if ($user?->avatar)
-                <img class="h-full w-full object-cover" src="{{ $user->avatar }}" alt="{{ $user->name }}" />
+                <img class="h-full w-full object-cover" src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" />
             @else
                 {{ $initials }}
             @endif

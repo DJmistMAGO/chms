@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\User;
+// use App\Models\User; 
 use Carbon\Carbon;
 use App\Models\Room;
 
@@ -13,7 +13,6 @@ class BookingController extends Controller
 {
     public function create()
     {
-
         return view('pages.chms-features.booking-management.create-booking');
     }
 
@@ -21,23 +20,30 @@ class BookingController extends Controller
     {
         $user = auth()->user();
 
-        $pendingBookings = Booking::where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->get()
-            ->transform(function ($booking) {
-                $booking->check_in = Carbon::parse($booking->check_in);
-                $booking->check_out = Carbon::parse($booking->check_out);
+        $userId = $user ? $user->getKey() : null;
+
+        // dd($userId);
+
+        $pendingBookings = Booking::where('user_id', $userId)
+            ->where('status', 'Pending')
+            ->get()->transform(function ($booking) {
+                $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
+                $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
 
-        $confirmedBookings = Booking::where('user_id', $user->id)
-            ->where('status', 'confirmed')
+            // dd($pendingBookings);
+
+        $confirmedBookings = Booking::where('user_id', $userId)
+            ->where('status', 'Confirmed')
             ->get()
             ->transform(function ($booking) {
-                $booking->check_in = Carbon::parse($booking->check_in);
-                $booking->check_out = Carbon::parse($booking->check_out);
+                $booking->check_in = $booking->check_in ? Carbon::parse($booking->check_in)->toDateString() : null;
+                $booking->check_out = $booking->check_out ? Carbon::parse($booking->check_out)->toDateString() : null;
                 return $booking;
             });
+
+            // dd($confirmedBookings);
 
         return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }

@@ -82,6 +82,14 @@
             <h2 class="font-display text-3xl font-semibold text-center text-stone-800 tracking-wide mb-1">Welcome Back</h2>
             <p class="text-center text-stone-400 text-sm mb-7 font-light">Sign in to your Caree Hotel account</p>
 
+            @if ($errors->has('deactivated') || $errors->has('inactive'))
+                <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 text-sm">
+                    {{ $errors->first('deactivated') ?: $errors->first('inactive') }}
+                </div>
+            @endif
+
+            
+
             <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
                 @csrf
 
