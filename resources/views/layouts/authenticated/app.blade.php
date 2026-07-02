@@ -13,9 +13,6 @@
 
     @stack('styles')
 
-    <!-- Alpine.js -->
-    {{-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
-
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
@@ -91,9 +88,11 @@
         })();
     </script>
 
+    {{-- uncomment below this if you want to prevent devtools access --}}
     {{-- @include('components.devtools-protection') --}}
 
 </head>
+
 
 <body
     x-data="{ 'loaded': true}"
@@ -109,9 +108,7 @@
     };
     window.addEventListener('resize', checkMobile);">
 
-    {{-- preloader --}}
     <x-common.preloader/>
-    {{-- preloader end --}}
 
     <div class="min-h-screen xl:flex">
         @include('layouts.authenticated.backdrop')
