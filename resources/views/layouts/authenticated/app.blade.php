@@ -91,7 +91,7 @@
         })();
     </script>
 
-    @include('components.devtools-protection')
+    {{-- @include('components.devtools-protection') --}}
 
 </head>
 

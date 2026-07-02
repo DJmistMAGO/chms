@@ -10,8 +10,4 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
-    server: {
-        host: "chms.test.com",
-        port: 3000,
-    },
 });
