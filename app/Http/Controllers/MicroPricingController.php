@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use App\Traits\HandlesBookingCreation;
@@ -20,9 +18,14 @@ class MicroPricingController extends Controller
 {
     use HandlesBookingCreation;
 
-    public function booking($roomType)
+    /**
+     * Single source of truth for room data + pricing. Both the booking
+     * page and the price-recalculation step read from here, keyed by slug.
+     * NEVER derive price from anything the client submits.
+     */
+    protected function roomCatalog(): array
     {
-        $rooms = [
+        return [
             'standard' => [
                 'name' => 'Standard Room',
                 'price' => 1500,
@@ -78,6 +81,30 @@ class MicroPricingController extends Controller
                 ],
             ],
         ];
+    }
+
+    /** Canonical add-on pricing — also the single source of truth for repricing. */
+    protected function ambiancePrices(): array
+    {
+        return [
+            'Regular Room' => 0,
+            'Cozy Ambiance' => 500,
+            'Romantic Ambiance' => 1000,
+        ];
+    }
+
+    protected function foodPrices(): array
+    {
+        return [
+            'No Food' => 0,
+            'Cozy Dinner for Family' => 1500,
+            'Romantic Dinner' => 1500,
+        ];
+    }
+
+    public function booking($roomType)
+    {
+        $rooms = $this->roomCatalog();
 
         if (! isset($rooms[$roomType])) {
             abort(404);
@@ -120,37 +147,107 @@ class MicroPricingController extends Controller
         return view('micro-pricing', compact(
             'room',
             'roomName',
+            'roomType',
             'price',
             'disabledDates'
         ));
     }
 
+    /**
+     * Called from Step 2 before ID upload / review. One unambiguous
+     * outcome per mode — either it succeeds with account info, or it
+     * throws a ValidationException. No silent "mode: new" fallback when
+     * the user explicitly asked to sign in.
+     */
+    public function checkExistingAccount(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8'],
+            'use_existing_account' => ['required', 'boolean'],
+        ]);
+
+        $user = User::where('email', $data['email'])->first();
+
+        if ($request->boolean('use_existing_account')) {
+            // Sign-in path: generic error either way, no email enumeration.
+            if (! $user || ! Hash::check($data['password'], $user->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['We could not find an account with those credentials.'],
+                ]);
+            }
+
+            return response()->json([
+                'mode' => 'existing',
+                'requires_id_upload' => empty($user->valid_id),
+                'has_valid_id' => ! empty($user->valid_id),
+            ]);
+        }
+
+        // Registration path: block collisions here, before the user
+        // fills out ID upload + review only to hit an error at the end.
+        if ($user) {
+            throw ValidationException::withMessages([
+                'email' => ['An account with this email already exists. Please sign in instead.'],
+            ]);
+        }
+
+        return response()->json([
+            'mode' => 'new',
+            'requires_id_upload' => true,
+        ]);
+    }
+
     public function loginOrRegisterWithBooking(Request $request)
     {
         $request->validate(array_merge($this->bookingFieldRules(), [
-            'email'    => ['required', 'email'],
+            'room_type_slug' => ['required', 'string'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8'],
+            'use_existing_account' => ['required', 'boolean'],
         ]));
 
         $validated = $this->validateBookingFields(
             $request->only($this->bookingDataKeys())
         );
 
+        // Server is the only source of truth for money. Whatever the
+        // client sent for room_price / micro_pricing_amount / total_price
+        // is discarded and recomputed here.
+        $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
+
+        $useExistingAccount = $request->boolean('use_existing_account');
+        $existingUser = User::where('email', $request->email)->first();
+
+        if ($useExistingAccount) {
+            if (! $existingUser || ! Hash::check($request->password, $existingUser->password)) {
+                throw ValidationException::withMessages([
+                    'email' => ['We could not find an account with those credentials.'],
+                ]);
+            }
+        } elseif ($existingUser) {
+            // Do NOT silently Auth::attempt() here — that's how a "new
+            // guest" form submission can end up logged into someone
+            // else's account. Force them back through the sign-in path.
+            throw ValidationException::withMessages([
+                'email' => ['An account with this email already exists. Please sign in instead.'],
+            ]);
+        }
+
         DB::beginTransaction();
 
         try {
-            $user = User::where('email', $request->email)->first();
+            if ($useExistingAccount) {
+                $user = $existingUser;
 
-            if ($user) {
-                if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-                    throw ValidationException::withMessages([
-                        'email' => ['Invalid email or password.'],
-                    ]);
+                if ($request->filled('name')) {
+                    $user->forceFill(['name' => $request->name])->save();
                 }
-                $user = Auth::user();
+
+                Auth::login($user, $request->boolean('remember'));
             } else {
                 $user = User::create([
-                    'name'           => $this->buildAutoName($request->email),
+                    'name'           => $request->filled('name') ? $request->name : $this->buildAutoName($request->email),
                     'email'          => $request->email,
                     'password'       => Hash::make($request->password),
                     'is_google_user' => false,
@@ -159,11 +256,13 @@ class MicroPricingController extends Controller
                 Auth::login($user, $request->boolean('remember'));
             }
 
-            $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
+            if (empty($user->valid_id) && ! $request->hasFile('valid_id_path')) {
+                throw ValidationException::withMessages([
+                    'valid_id_path' => ['Please upload a valid ID to continue.'],
+                ]);
+            }
 
-            // if ($booking->valid_id_path) {
-            //     $user->update(['valid_id' => $booking->valid_id_path]);
-            // }
+            $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
 
             DB::commit();
 
@@ -178,29 +277,28 @@ class MicroPricingController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            // 👇 Pinpoint exactly where and what failed
+            \Log::error('Booking submission failed', [
+                'exception' => $e,
+                'email' => $request->email,
+            ]);
+
             return back()->withInput()->withErrors([
-                'general' => '[' . class_basename($e) . '] '
-                    . $e->getMessage()
-                    . ' — in ' . $e->getFile()
-                    . ' on line ' . $e->getLine(),
+                'general' => 'Something went wrong while processing your booking. Please try again, or contact us if the problem continues.',
             ]);
         }
     }
 
     public function storeGoogleBookingSession(Request $request)
     {
-        \Log::info('storeGoogleBookingSession', [
-            'hasFile'  => $request->hasFile('valid_id_path'),
-            'allFiles' => $request->allFiles(),
-            'all'      => $request->except('valid_id_path'),
-        ]);
-
-        $request->validate($this->bookingFieldRules());
+        $request->validate(array_merge($this->bookingFieldRules(), [
+            'room_type_slug' => ['required', 'string'],
+        ]));
 
         $validated = $this->validateBookingFields(
             $request->only($this->bookingDataKeys())
         );
+
+        $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
 
         if ($request->hasFile('valid_id_path')) {
             $validated['valid_id_temp_path'] = $request->file('valid_id_path')
@@ -212,57 +310,35 @@ class MicroPricingController extends Controller
         return redirect()->route('booking.google.redirect');
     }
 
-    // protected function createBookingFromValidated(array $validated, Request $request, int $userId): Booking
-    // {
-    //     $validIdPath = null;
+    /**
+     * Recompute room_price / micro_pricing_amount / total_price from the
+     * canonical catalog + add-on tables. Anything the client submitted
+     * for these three fields is ignored — this is the fix for the
+     * client-controlled-pricing issue.
+     */
+    protected function repriceBooking(array $validated, ?string $roomTypeSlug): array
+    {
+        $room = $this->roomCatalog()[$roomTypeSlug] ?? null;
 
-    //     if ($request->hasFile('valid_id_path')) {
-    //         $validIdPath = $request->file('valid_id_path')->store('booking-ids', 'public');
-    //     } elseif (!empty($validated['valid_id_temp_path'])) {
-    //         $from = $validated['valid_id_temp_path'];
-    //         $filename = basename($from);
-    //         $to = 'booking-ids/' . $filename;
+        if (! $room) {
+            throw ValidationException::withMessages([
+                'room_type' => ['Selected room is no longer available.'],
+            ]);
+        }
 
-    //         if (Storage::disk('public')->exists($from)) {
-    //             Storage::disk('public')->move($from, $to);
-    //             $validIdPath = $to;
-    //         }
-    //     }
+        $ambiance = $validated['ambiance'] ?? 'Regular Room';
+        $food = $validated['food_package'] ?? 'No Food';
 
-    //     return Booking::create([
-    //         'user_id' => $userId,
-    //         'room_type' => $validated['room_type'],
-    //         'check_in' => $validated['check_in'],
-    //         'check_out' => $validated['check_out'],
-    //         'number_of_guests' => $validated['number_of_guests'],
-    //         'nights' => $validated['nights'],
-    //         'floor_level' => $validated['floor_level'],
-    //         'ambiance' => $validated['ambiance'],
-    //         'food_package' => $validated['food_package'],
-    //         'room_price' => $validated['room_price'],
-    //         'micro_pricing_amount' => $validated['micro_pricing_amount'],
-    //         'total_price' => $validated['total_price'],
-    //         'valid_id_path' => $validIdPath,
-    //         'status' => 'pending',
-    //     ]);
-    // }
+        $addonPerNight = ($this->ambiancePrices()[$ambiance] ?? 0) + ($this->foodPrices()[$food] ?? 0);
+        $nights = max(1, (int) ($validated['nights'] ?? 1));
 
-    // protected function getAddonAmount(string $ambiance, string $foodPackage): int
-    // {
-    //     $ambiancePrices = [
-    //         'Regular Room' => 0,
-    //         'Cozy Ambiance' => 500,
-    //         'Romantic Ambiance' => 1000,
-    //     ];
+        $validated['room_type'] = $room['name'];
+        $validated['room_price'] = $room['price'];
+        $validated['micro_pricing_amount'] = $addonPerNight;
+        $validated['total_price'] = ($room['price'] + $addonPerNight) * $nights;
 
-    //     $foodPrices = [
-    //         'No Food' => 0,
-    //         'Cozy Dinner for Family' => 1500,
-    //         'Romantic Dinner' => 1500,
-    //     ];
-
-    //     return ($ambiancePrices[$ambiance] ?? 0) + ($foodPrices[$foodPackage] ?? 0);
-    // }
+        return $validated;
+    }
 
     protected function buildAutoName(string $email): string
     {
@@ -273,4 +349,3 @@ class MicroPricingController extends Controller
         return $name ?: 'Guest User';
     }
 }
-

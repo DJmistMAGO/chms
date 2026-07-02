@@ -1,6 +1,7 @@
 @extends('layouts.authenticated.app')
 
 @section('content')
+
     <x-common.page-breadcrumb pageTitle="User Management" />
 
     @if (session('success'))
@@ -273,7 +274,6 @@
                 <div class="px-6 py-6">
                     <form id="editForm" method="POST" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         @csrf
-                        {{-- @method('PUT') --}}
 
                         <div>
                             <label for="editName" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Name</label>

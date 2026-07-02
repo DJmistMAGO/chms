@@ -74,6 +74,10 @@
             gap: 6px;
         }
 
+        .strength-bar {
+            transition: width 0.3s, background 0.3s;
+        }
+
         .field-error i {
             font-size: 10px;
         }
@@ -100,6 +104,11 @@
             justify-content: center;
             transition: all 0.2s ease;
             padding: 0;
+        }
+
+        .wizard-pill:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .wizard-pill.active {
@@ -238,6 +247,8 @@
                     @csrf
                     {{-- Hidden booking values on page side to save selection - MSMG --}}
                     <input type="hidden" name="room_type" value="{{ $roomName ?? '' }}">
+                    {{-- Authoritative room key the server uses to reprice; display name above is for humans only --}}
+                    <input type="hidden" name="room_type_slug" value="{{ $roomType ?? '' }}">
                     <input type="hidden" name="check_in" id="check_in" value="{{ old('check_in') }}">
                     <input type="hidden" name="check_out" id="check_out" value="{{ old('check_out') }}">
                     <input type="hidden" name="number_of_guests" id="input-guests" value="{{ old('number_of_guests', 1) }}">
@@ -245,6 +256,9 @@
                     <input type="hidden" name="floor_level" id="input-floor" value="{{ old('floor_level', 'Floor 1') }}">
                     <input type="hidden" name="ambiance" id="input-ambiance" value="{{ old('ambiance', 'Regular Room') }}">
                     <input type="hidden" name="food_package" id="input-food" value="{{ old('food_package', 'No Food') }}">
+                    {{-- These three are display-only on the client. The server recomputes them
+                         from room_type_slug + ambiance + food_package + nights and ignores
+                         whatever is submitted here. Kept only so the UI has values to render. --}}
                     <input type="hidden" name="room_price" value="{{ $price }}">
                     <input type="hidden" name="micro_pricing_amount" id="input-addons" value="{{ old('micro_pricing_amount', 0) }}">
                     <input type="hidden" name="total_price" id="input-total" value="{{ old('total_price', $price) }}">
@@ -257,25 +271,25 @@
                             </p>
                             <div class="grid grid-cols-4 gap-6 mt-5">
                                 <div class="wizard-step-pill" data-step="1">
-                                    <button type="button" class="wizard-pill active" onclick="goToStep(1)">
+                                    <button type="button" class="wizard-pill active" data-step-btn="1" onclick="goToStep(1)">
                                         <span class="wizard-pill-number">1</span>
                                     </button>
                                     <span class="wizard-pill-label">Options</span>
                                 </div>
                                 <div class="wizard-step-pill" data-step="2">
-                                    <button type="button" class="wizard-pill" onclick="goToStep(2)">
+                                    <button type="button" class="wizard-pill" data-step-btn="2" onclick="goToStep(2)" disabled>
                                         <span class="wizard-pill-number">2</span>
                                     </button>
                                     <span class="wizard-pill-label">Details</span>
                                 </div>
                                 <div class="wizard-step-pill" data-step="3">
-                                    <button type="button" class="wizard-pill" onclick="goToStep(3)">
+                                    <button type="button" class="wizard-pill" data-step-btn="3" onclick="goToStep(3)" disabled>
                                         <span class="wizard-pill-number">3</span>
                                     </button>
                                     <span class="wizard-pill-label">ID</span>
                                 </div>
                                 <div class="wizard-step-pill" data-step="4">
-                                    <button type="button" class="wizard-pill" onclick="goToStep(4)">
+                                    <button type="button" class="wizard-pill" data-step-btn="4" onclick="goToStep(4)" disabled>
                                         <span class="wizard-pill-number">4</span>
                                     </button>
                                     <span class="wizard-pill-label">Review</span>
@@ -382,40 +396,98 @@
                                 </div>
                             </div>
 
+                            {{-- ===== STEP 2: GUEST DETAILS (new vs returning) ===== --}}
                             <div class="wizard-step hidden" data-step="2">
-                                <div class="section-label mb-3"><span class="text-xs font-medium tracking-widest uppercase text-charcoal">Step 2: Your information</span></div>
-                                <p class="text-sm text-muted">We only need this to keep your reservation secure and to create your account.</p>
-                                <div class="space-y-4">
-                                    <div class="mt-3">
+                                <div class="section-label mb-3">
+                                    <span class="text-xs font-medium tracking-widest uppercase text-charcoal" id="step2-heading">Step 2: Your information</span>
+                                </div>
+
+                                {{-- Explicit choice, shown before any fields render --}}
+                                <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl mb-5" style="background:#FFF8D6; border:1px solid #FFE566;">
+                                    <button type="button" id="toggle-new-guest" onclick="setGuestMode('new')" class="py-2.5 rounded-xl text-sm font-medium transition-all">New Guest</button>
+                                    <button type="button" id="toggle-existing-guest" onclick="setGuestMode('existing')" class="py-2.5 rounded-xl text-sm font-medium transition-all">Returning Guest</button>
+                                </div>
+
+                                <input type="hidden" name="use_existing_account" id="use-existing-account" value="0">
+
+                                {{-- NEW GUEST PANEL --}}
+                                <div id="panel-new-guest" class="space-y-4">
+                                    <p class="text-sm text-muted">We only need this to keep your reservation secure and to create your account.</p>
+
+                                    <div>
                                         <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Name</label>
                                         <input type="text" name="name" id="wizard-name" value="{{ old('name') }}" placeholder="Your full name" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
                                         @error('name')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Email Address</label>
-                                        <input type="email" name="email" id="wizard-email" value="{{ old('email') }}" placeholder="you@email.com" required class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
-                                        <p class="field-error hidden" id="wizard-email-error"></p>
+                                        {{-- This is the input that actually submits as name="email" --}}
+                                        <input type="email" name="email" id="wizard-email-new" value="{{ old('email') }}" placeholder="you@email.com" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
+                                        <p class="field-error hidden" id="wizard-email-new-error"></p>
                                         @error('email')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
                                     </div>
                                     <div>
-                                        <div class="flex items-center justify-between mb-1.5"><label class="block text-xs font-medium tracking-widest uppercase" style="color:#7A6E68;">Password</label><span class="text-xs text-muted">Minimum 8 characters</span></div>
-                                        <input type="password" name="password" id="wizard-password" placeholder="••••••••" required class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
-                                        <p class="field-error hidden" id="wizard-password-error"></p>
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-medium tracking-widest uppercase" style="color:#7A6E68;">Password</label>
+                                            <span class="text-xs text-muted">Minimum 8 characters</span>
+                                        </div>
+                                        {{-- Submits as name="password" --}}
+                                        <div class="relative">
+                                            <input type="password" name="password" id="wizard-password-new" placeholder="••••••••" oninput="checkStrength(this.value)" class="w-full rounded-xl border px-4 py-3 text-sm text-warm pr-11" style="border-color:#FFE566; background:#FFF8D6;">
+                                            <button type="button" onclick="togglePasswordVisibility('wizard-password-new', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-warm/70 hover:text-warm transition">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        <div class="h-1 w-full bg-yellow-100 rounded-full overflow-hidden mt-2">
+                                            <div id="wizard-password-strength-bar" class="strength-bar h-full w-0 rounded-full bg-stone-300"></div>
+                                        </div>
+                                        <p id="wizard-password-strength-label" class="text-xs text-stone-400 mt-1"></p>
+                                        <p class="field-error hidden" id="wizard-password-new-error"></p>
                                         @error('password')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Confirm Password</label>
-                                        <input type="password" name="password_confirmation" id="wizard-password-confirmation" placeholder="••••••••" required class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
+                                        <div class="relative">
+                                            <input type="password" id="wizard-password-confirmation" placeholder="••••••••" class="w-full rounded-xl border px-4 py-3 text-sm text-warm pr-11" style="border-color:#FFE566; background:#FFF8D6;">
+                                            <button type="button" onclick="togglePasswordVisibility('wizard-password-confirmation', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-warm/70 hover:text-warm transition">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
                                         <p class="field-error hidden" id="wizard-password-confirmation-error"></p>
                                     </div>
                                 </div>
+
+                                {{-- EXISTING GUEST PANEL --}}
+                                <div id="panel-existing-guest" class="space-y-4 hidden">
+                                    <p class="text-sm text-muted">Sign in with your account to reuse your saved details.</p>
+
+                                    <div>
+                                        <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Email Address</label>
+                                        <input type="email" id="wizard-email-existing" placeholder="you@email.com" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
+                                        <p class="field-error hidden" id="wizard-email-existing-error"></p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Password</label>
+                                        <input type="password" id="wizard-password-existing" placeholder="••••••••" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
+                                        <p class="field-error hidden" id="wizard-password-existing-error"></p>
+                                        <button type="button" onclick="handleForgotPassword()" class="mt-2 text-xs font-medium" style="color:#B89200;">Forgot your password?</button>
+                                    </div>
+
+                                    <p class="field-error hidden" id="wizard-account-error"></p>
+                                    <p class="hidden text-xs font-medium" id="wizard-id-on-file-note" style="color:#B89200;"><i class="fas fa-check-circle mr-1"></i>Valid ID already on file — you'll skip the upload step.</p>
+                                </div>
+
                                 <div class="rounded-2xl p-4 bg-[#FFF8D6] border border-yellow-200 text-sm text-charcoal my-4">
                                     <p class="font-semibold mb-2">Why we ask for this</p>
                                     <p class="text-xs text-muted">Your information is used to secure your reservation, create your account, and make check-in faster. We store it securely and never share it without your consent.</p>
                                 </div>
+
                                 <div class="flex items-center justify-between gap-3">
                                     <button type="button" onclick="goToStep(1)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFFFFF; color:#1C1C1E; border:1px solid #FFE566;">Back</button>
-                                    <button type="button" onclick="handleNextStep(2)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFD000; color:#1C1C1E;">Continue to ID upload</button>
+                                    <button type="button" id="step2-continue-btn" onclick="handleNextStep(2)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95 flex items-center gap-2" style="background:#FFD000; color:#1C1C1E;">
+                                        <span id="step2-continue-label">Continue to ID upload</span>
+                                        <i class="fas fa-spinner fa-spin hidden" id="step2-spinner"></i>
+                                    </button>
                                 </div>
                             </div>
 
@@ -461,6 +533,7 @@
                                     <div class="flex justify-between text-sm text-muted"><span>Add-ons / night</span><span id="summary-addons">₱0</span></div>
                                     <div class="flex justify-between text-sm text-muted"><span>Nights</span><span id="summary-nights">—</span></div>
                                     <div class="pt-3 border-t border-yellow-200 flex justify-between items-center"><span class="text-xs uppercase tracking-[.18em] text-muted">Final total</span><span class="font-display text-2xl font-semibold text-charcoal" id="summary-total">₱{{ number_format($price) }}</span></div>
+                                    <p class="text-xs text-muted/70 pt-1">Final total is confirmed by the hotel upon submission.</p>
                                 </div>
                                 <div class="rounded-2xl p-4 bg-[#FFF8D6] border border-blue-200 text-sm text-charcoal my-4">
                                     <p class="font-semibold mb-2">Secure handling</p>
@@ -520,6 +593,7 @@
     <script>
         const BASE_PRICE = {{ $price }};
         const disabledDates = @json($disabledDates);
+        const accountCheckUrl = '{{ route('customize.account.check') }}';
 
         // important: use food_package key, not food
         const groupAddons = {
@@ -528,6 +602,8 @@
         };
 
         let selectedNights = 0;
+        let currentGuestMode = 'new';
+        let maxStepReached = 1; // sequential-step guard: pills can't skip ahead of validated steps
 
         function parsePeso(text) {
             return Number(String(text).replace(/[₱,\s]/g, '')) || 0;
@@ -607,6 +683,8 @@
                 if (button) {
                     button.classList.toggle('active', isActive);
                     button.classList.toggle('completed', isComplete);
+                    // Only unlock pills up to the furthest step the user has actually validated through
+                    button.disabled = pillStep > maxStepReached;
                 }
                 if (badge) {
                     badge.textContent = isComplete ? '✓' : pillStep;
@@ -615,8 +693,209 @@
         }
 
         function goToStep(step) {
+            if (step > maxStepReached) return; // guard against skipping ahead via pill clicks
             setActiveStep(step);
             if (step === 4) updateReviewSummary();
+        }
+
+        function advanceToStep(step) {
+            maxStepReached = Math.max(maxStepReached, step);
+            goToStep(step);
+        }
+
+        function hideAccountError() {
+            const el = document.getElementById('wizard-account-error');
+            if (!el) return;
+            el.textContent = '';
+            el.classList.add('hidden');
+        }
+
+        function setGuestMode(mode) {
+            currentGuestMode = mode;
+            const isNew = mode === 'new';
+
+            document.getElementById('panel-new-guest').classList.toggle('hidden', !isNew);
+            document.getElementById('panel-existing-guest').classList.toggle('hidden', isNew);
+            document.getElementById('use-existing-account').value = isNew ? '0' : '1';
+
+            document.getElementById('toggle-new-guest').style.cssText = isNew
+                ? 'background:#FFD000; color:#1C1C1E;' : 'background:transparent; color:#7A6E68;';
+            document.getElementById('toggle-existing-guest').style.cssText = !isNew
+                ? 'background:#FFD000; color:#1C1C1E;' : 'background:transparent; color:#7A6E68;';
+
+            document.getElementById('step2-heading').textContent = isNew
+                ? 'Step 2: Create your account' : 'Step 2: Sign in';
+            document.getElementById('step2-continue-label').textContent = isNew
+                ? 'Continue to ID upload' : 'Sign in and continue';
+
+            hideAccountError();
+            document.getElementById('wizard-id-on-file-note').classList.add('hidden');
+        }
+
+        function setStep2Loading(isLoading) {
+            const btn = document.getElementById('step2-continue-btn');
+            const spinner = document.getElementById('step2-spinner');
+            btn.disabled = isLoading;
+            btn.classList.toggle('opacity-60', isLoading);
+            spinner.classList.toggle('hidden', !isLoading);
+        }
+
+        function showFieldError(id, message) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = message;
+            el.classList.remove('hidden');
+        }
+
+        function handleForgotPassword() {
+            // Adjust to your actual password-reset route
+            window.location.href = '/forgot-password';
+        }
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            if (!input || !button) return;
+
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            button.innerHTML = isHidden ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+        }
+
+        function checkStrength(val) {
+            const bar = document.getElementById('wizard-password-strength-bar');
+            const label = document.getElementById('wizard-password-strength-label');
+            if (!bar || !label) return;
+
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val)) score++;
+
+            const map = [
+                { w: '0%', color: 'bg-stone-200', text: '' },
+                { w: '33%', color: 'bg-red-400', text: 'Weak' },
+                { w: '66%', color: 'bg-amber-400', text: 'Fair' },
+                { w: '85%', color: 'bg-lime-500', text: 'Good' },
+                { w: '100%', color: 'bg-green-500', text: 'Strong' },
+            ];
+
+            const s = map[score];
+            bar.className = `strength-bar h-full rounded-full ${s.color}`;
+            bar.style.width = s.w;
+            label.textContent = s.text;
+            label.className = `text-xs ${score <= 1 ? 'text-red-400' : score === 2 ? 'text-amber-500' : 'text-green-600'}`;
+        }
+
+        // Copies the panel actually in use into the fields that get POSTed (name="email"/"password")
+        function finalizeStep2Fields(mode) {
+            if (mode === 'existing') {
+                document.getElementById('wizard-email-new').value = document.getElementById('wizard-email-existing').value.trim();
+                document.getElementById('wizard-password-new').value = document.getElementById('wizard-password-existing').value;
+            }
+        }
+
+        async function handleStep2Continue() {
+            document.querySelectorAll('#panel-new-guest .field-error, #panel-existing-guest .field-error')
+                .forEach(el => el.classList.add('hidden'));
+
+            if (currentGuestMode === 'new') {
+                const email = document.getElementById('wizard-email-new');
+                const password = document.getElementById('wizard-password-new');
+                const confirm = document.getElementById('wizard-password-confirmation');
+                let hasError = false;
+
+                if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                    showFieldError('wizard-email-new-error', 'Enter a valid email address.');
+                    hasError = true;
+                }
+                if (!password.value || password.value.length < 8) {
+                    showFieldError('wizard-password-new-error', 'Use at least 8 characters.');
+                    hasError = true;
+                }
+                if (password.value !== confirm.value) {
+                    showFieldError('wizard-password-confirmation-error', 'Passwords do not match.');
+                    hasError = true;
+                }
+                if (hasError) return;
+
+                setStep2Loading(true);
+                try {
+                    const res = await fetch(accountCheckUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email.value.trim(), password: password.value, use_existing_account: false })
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        showFieldError('wizard-email-new-error', data.message || (data.errors && data.errors.email && data.errors.email[0]) || 'That email is already registered.');
+                        return;
+                    }
+
+                    syncBookingToHiddenFields();
+                    advanceToStep(3);
+                } catch (e) {
+                    showFieldError('wizard-email-new-error', 'Something went wrong. Please try again.');
+                } finally {
+                    setStep2Loading(false);
+                }
+
+            } else {
+                const email = document.getElementById('wizard-email-existing');
+                const password = document.getElementById('wizard-password-existing');
+                let hasError = false;
+
+                if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+                    showFieldError('wizard-email-existing-error', 'Enter a valid email address.');
+                    hasError = true;
+                }
+                if (!password.value || password.value.length < 8) {
+                    showFieldError('wizard-password-existing-error', 'Enter your password.');
+                    hasError = true;
+                }
+                if (hasError) return;
+
+                setStep2Loading(true);
+                try {
+                    const res = await fetch(accountCheckUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email.value.trim(), password: password.value, use_existing_account: true })
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        const message = data.message || (data.errors && data.errors.email && data.errors.email[0]) || 'We could not find an account with those credentials.';
+                        document.getElementById('wizard-account-error').textContent = message;
+                        document.getElementById('wizard-account-error').classList.remove('hidden');
+                        return;
+                    }
+
+                    finalizeStep2Fields('existing');
+                    syncBookingToHiddenFields();
+
+                    if (data.requires_id_upload) {
+                        advanceToStep(3);
+                    } else {
+                        document.getElementById('wizard-id-on-file-note').classList.remove('hidden');
+                        advanceToStep(4);
+                    }
+                } catch (e) {
+                    document.getElementById('wizard-account-error').textContent = 'Something went wrong. Please try again.';
+                    document.getElementById('wizard-account-error').classList.remove('hidden');
+                } finally {
+                    setStep2Loading(false);
+                }
+            }
         }
 
         function handleNextStep(currentStep) {
@@ -628,34 +907,13 @@
                     openDatesRequiredModal();
                     return;
                 }
+                syncBookingToHiddenFields();
+                advanceToStep(2);
+                return;
             }
             if (currentStep === 2) {
-                const email = document.getElementById('wizard-email');
-                const password = document.getElementById('wizard-password');
-                const confirmPassword = document.getElementById('wizard-password-confirmation');
-
-                let hasError = false;
-                document.querySelectorAll('#wizard-email-error, #wizard-password-error, #wizard-password-confirmation-error').forEach(el => el.classList.add('hidden'));
-
-                if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-                    const el = document.getElementById('wizard-email-error');
-                    el.textContent = 'Enter a valid email address.';
-                    el.classList.remove('hidden');
-                    hasError = true;
-                }
-                if (!password.value || password.value.length < 8) {
-                    const el = document.getElementById('wizard-password-error');
-                    el.textContent = 'Use at least 8 characters.';
-                    el.classList.remove('hidden');
-                    hasError = true;
-                }
-                if (password.value !== confirmPassword.value) {
-                    const el = document.getElementById('wizard-password-confirmation-error');
-                    el.textContent = 'Passwords do not match.';
-                    el.classList.remove('hidden');
-                    hasError = true;
-                }
-                if (hasError) return;
+                handleStep2Continue();
+                return; // async — advanceToStep() runs inside on success
             }
             if (currentStep === 3) {
                 const idInput = document.getElementById('valid_id_path');
@@ -665,9 +923,10 @@
                     el.classList.remove('hidden');
                     return;
                 }
+                syncBookingToHiddenFields();
+                advanceToStep(4);
+                return;
             }
-            syncBookingToHiddenFields();
-            goToStep(currentStep + 1);
         }
 
         function openDatesRequiredModal() {
@@ -742,6 +1001,8 @@
 
         // initialize from old values if present
         document.addEventListener('DOMContentLoaded', function () {
+            setGuestMode('new');
+
             const oldCheckIn = document.getElementById('check_in').value;
             const oldCheckOut = document.getElementById('check_out').value;
             const oldNights = parseInt(document.getElementById('input-nights').value || 0);
@@ -927,6 +1188,7 @@
         // reopen wizard after validation errors
         @if ($errors->any())
             window.addEventListener('load', () => {
+                maxStepReached = 4;
                 goToStep(1);
             });
         @endif

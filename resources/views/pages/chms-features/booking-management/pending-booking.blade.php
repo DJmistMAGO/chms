@@ -232,7 +232,7 @@
                 x-transition:enter-end="opacity-100 translate-y-0 scale-100">
 
                 {{-- Header --}}
-                <div class="relative flex items-center justify-between px-6 py-4" style="background:#FFD000;">
+                <div class="relative flex items-center justify-between px-6 py-4 bg-gradient-to-br from-amber-600 to-yellow-300" >
                     <div>
                         <p class="text-xs font-medium uppercase tracking-widest" style="color:rgba(28,28,30,0.45);">
                             Reference</p>
@@ -299,7 +299,8 @@
                             class="rounded-xl border border-yellow-100 bg-yellow-50/50 px-3 py-3 dark:border-yellow-400/10 dark:bg-yellow-400/5">
                             <div class="space-y-1.5 text-sm">
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Room rate</span><span
+                                    <span>Room rate</span> x <span x-text="selectedBooking.nights || '—'"></span> night(s)
+                                    <span
                                         x-text="selectedBooking.room_price ? '₱' + selectedBooking.room_price : '—'"></span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">

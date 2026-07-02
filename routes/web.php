@@ -13,6 +13,15 @@ use App\Http\Controllers\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::controller(MicroPricingController::class)
+    ->prefix('customize')
+    ->group(function () {
+        Route::get('/{roomType}', 'booking')->name('customize.booking');
+        Route::post('/account/check', 'checkExistingAccount')->name('customize.account.check');
+        Route::post('/login-with-booking', 'loginOrRegisterWithBooking')->name('customize.login.with.booking');
+        Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
+    });
+
 // Routes accessible only to guests (not authenticated users)
 Route::middleware('guest')->group(function () {
 
@@ -47,14 +56,6 @@ Route::middleware('guest')->group(function () {
     //         Route::get('/google/callback', 'handleGoogleCallback')->name('login.google.callback');
     //         Route::post('/loginWithBooking', 'loginWithBooking')->name('login.with.booking');
     // });
-
-    Route::controller(MicroPricingController::class)
-    ->prefix('customize')
-    ->group(function () {
-        Route::get('/{roomType}', 'booking')->name('customize.booking');
-        Route::post('/login-with-booking', 'loginOrRegisterWithBooking')->name('customize.login.with.booking');
-        Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
-    });
 
     Route::get('/booking/google/redirect', function () {
         return redirect()->route('login.google');
