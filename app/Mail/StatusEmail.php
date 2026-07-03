@@ -8,17 +8,26 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Booking;
 
 class StatusEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
+     * The booking instance.
+     * Making it public means it is automatically available in your Blade view.
+     *
+     * @var Booking
+     */
+    public $booking;
+
+    /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct(Booking $booking)
     {
-        //
+        $this->booking = $booking;
     }
 
     /**
@@ -27,7 +36,7 @@ class StatusEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Status Email',
+            subject: 'Update on your Booking #' . $this->booking->reference_number,
         );
     }
 
@@ -37,7 +46,7 @@ class StatusEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.booking_status',
         );
     }
 

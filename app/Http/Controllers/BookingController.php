@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-// use App\Models\User; 
+// use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Room;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StatusEmail;
 
 use Illuminate\Http\Request;
 
@@ -80,6 +82,8 @@ class BookingController extends Controller
         $room = Room::find($request->input('room_id'));
         $room->status = 'Occupied';
         $room->save();
+
+        Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
         return redirect()->route('booking.confirmed')->with('success', 'Booking confirmed successfully.');
     }
@@ -175,6 +179,8 @@ class BookingController extends Controller
                 $room->save();
             }
         }
+
+        Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
         return redirect()->route('booking.history')->with('success', 'Booking cancelled successfully.');
     }
