@@ -9,7 +9,7 @@
                 <div class="text-2xl font-bold text-amber-500 mb-4">{{ $referenceNumber }}</div>
                 <p class="text-sm text-gray-500">
                     Please check your email for full booking details. You can also view your booking history and details in your
-                    <a href="{{ route('dashboard') }}" class="underline text-indigo-600 hover:text-indigo-800">My Reservations</a>.
+                    <a href="{{ route('booking.my-reservations') }}" class="underline text-indigo-600 hover:text-indigo-800">My Reservations</a>.
                 </p>
 
                 <div class="mt-5 text-right">

@@ -252,7 +252,7 @@ class MicroPricingController extends Controller
 
             DB::commit();
 
-            Mail::to($booking->user->email)->send(new StatusEmail($booking));
+            // dd($booking);
 
             return redirect()
                 ->route('dashboard', ['referenceNumber' => $booking->reference_number])
@@ -265,14 +265,13 @@ class MicroPricingController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            \Log::error('Booking submission failed', [
-                'exception' => $e,
-                'email' => $request->email,
-            ]);
+            report($e);
 
-            return back()->withInput()->withErrors([
-                'general' => 'Something went wrong while processing your booking. Please try again, or contact us if the problem continues.',
-            ]);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'general' => 'Something went wrong while processing your booking. Please try again.',
+                ]);
         }
     }
 
