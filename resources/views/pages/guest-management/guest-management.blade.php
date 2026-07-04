@@ -46,7 +46,7 @@
                 </thead>
 
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                    @foreach ($guests as $guest)
+                    @forelse ($guests as $guest)
                         <tr class="transition hover:bg-gray-50 dark:hover:bg-white/[0.02]">
 
                             <td class="py-3 pr-4">
@@ -108,7 +108,25 @@
                                 @endif
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                    <tr>
+                        <td colspan="7" class="py-16 text-center">
+                            <div class="flex flex-col items-center gap-2">
+                                <span
+                                    class="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-400/10">
+                                    <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor"
+                                        stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                                    </svg>
+                                </span>
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No guest records found.
+                                </p>
+                                <p class="text-xs text-gray-400">All caught up! No guest records to display.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
