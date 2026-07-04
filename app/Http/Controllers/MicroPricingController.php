@@ -2,27 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StatusEmail;
 use App\Models\Booking;
 use App\Models\User;
+use App\Traits\HandlesBookingCreation;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use App\Traits\HandlesBookingCreation;
+use Illuminate\Validation\ValidationException;
 
 class MicroPricingController extends Controller
 {
     use HandlesBookingCreation;
 
-    /**
-     * Single source of truth for room data + pricing. Both the booking
-     * page and the price-recalculation step read from here, keyed by slug.
-     * NEVER derive price from anything the client submits.
-     */
+
     protected function roomCatalog(): array
     {
         return [
@@ -153,12 +151,7 @@ class MicroPricingController extends Controller
         ));
     }
 
-    /**
-     * Called from Step 2 before ID upload / review. One unambiguous
-     * outcome per mode — either it succeeds with account info, or it
-     * throws a ValidationException. No silent "mode: new" fallback when
-     * the user explicitly asked to sign in.
-     */
+
     public function checkExistingAccount(Request $request)
     {
         $data = $request->validate([
@@ -170,7 +163,7 @@ class MicroPricingController extends Controller
         $user = User::where('email', $data['email'])->first();
 
         if ($request->boolean('use_existing_account')) {
-            // Sign-in path: generic error either way, no email enumeration.
+
             if (! $user || ! Hash::check($data['password'], $user->password)) {
                 throw ValidationException::withMessages([
                     'email' => ['We could not find an account with those credentials.'],
@@ -184,8 +177,7 @@ class MicroPricingController extends Controller
             ]);
         }
 
-        // Registration path: block collisions here, before the user
-        // fills out ID upload + review only to hit an error at the end.
+
         if ($user) {
             throw ValidationException::withMessages([
                 'email' => ['An account with this email already exists. Please sign in instead.'],
@@ -211,9 +203,6 @@ class MicroPricingController extends Controller
             $request->only($this->bookingDataKeys())
         );
 
-        // Server is the only source of truth for money. Whatever the
-        // client sent for room_price / micro_pricing_amount / total_price
-        // is discarded and recomputed here.
         $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
 
         $useExistingAccount = $request->boolean('use_existing_account');
@@ -226,9 +215,6 @@ class MicroPricingController extends Controller
                 ]);
             }
         } elseif ($existingUser) {
-            // Do NOT silently Auth::attempt() here — that's how a "new
-            // guest" form submission can end up logged into someone
-            // else's account. Force them back through the sign-in path.
             throw ValidationException::withMessages([
                 'email' => ['An account with this email already exists. Please sign in instead.'],
             ]);
@@ -265,6 +251,8 @@ class MicroPricingController extends Controller
             $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
 
             DB::commit();
+
+            Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
             return redirect()
                 ->route('dashboard', ['referenceNumber' => $booking->reference_number])
@@ -310,12 +298,6 @@ class MicroPricingController extends Controller
         return redirect()->route('booking.google.redirect');
     }
 
-    /**
-     * Recompute room_price / micro_pricing_amount / total_price from the
-     * canonical catalog + add-on tables. Anything the client submitted
-     * for these three fields is ignored — this is the fix for the
-     * client-controlled-pricing issue.
-     */
     protected function repriceBooking(array $validated, ?string $roomTypeSlug): array
     {
         $room = $this->roomCatalog()[$roomTypeSlug] ?? null;
