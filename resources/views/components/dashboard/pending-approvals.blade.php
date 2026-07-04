@@ -10,6 +10,16 @@
     closeModal() {
         this.open = false;
         this.selected = {};
+    },
+    formatCurrency(value, multiplier = null) {
+        const num = Number(value);
+        if (value == null || Number.isNaN(num)) return '—';
+        const peso = (n) => '₱ ' + n.toLocaleString('en-PH', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        if (multiplier == null) return peso(num);
+        return   '(' + peso(num) + ' × ' + multiplier + 'N)' + ' ' + peso(num * multiplier);
     }
 }" class="col-span-12 md:col-span-6">
     <div class="flex h-full flex-col rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm transition hover:border-white/20">
@@ -138,16 +148,16 @@
                         <div class="rounded-xl border border-yellow-100 bg-yellow-50/50 px-3 py-3 dark:border-yellow-400/10 dark:bg-yellow-400/5">
                             <div class="space-y-1.5 text-sm">
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Room rate</span> x <span x-text="selected.nights || '—'"></span> night(s)
-                                    <span x-text="selected.roomPrice ? '₱' + selected.roomPrice : '—'"></span>
+                                    <span>Room rate</span>
+                                    <span x-text="formatCurrency(selected.roomPrice, selected.nights || 1)"></span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
                                     <span>Add-ons</span>
-                                    <span x-text="selected.microPricingAmount ? '₱' + selected.microPricingAmount : '₱0.00'"></span>
+                                    <span x-text="formatCurrency(selected.microPricingAmount, selected.nights || 1)"></span>
                                 </div>
                                 <div class="flex justify-between border-t border-yellow-200/60 pt-1.5">
                                     <span class="font-semibold text-gray-700 dark:text-gray-300">Total</span>
-                                    <span class="font-bold text-gray-900 dark:text-white" x-text="selected.totalPrice ? '₱' + selected.totalPrice : '—'"></span>
+                                    <span class="font-bold text-gray-900 dark:text-white" x-text="formatCurrency(selected.totalPrice)"></span>
                                 </div>
                             </div>
                         </div>

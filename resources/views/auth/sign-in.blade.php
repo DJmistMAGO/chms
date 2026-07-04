@@ -88,9 +88,9 @@
                 </div>
             @endif
 
-            
 
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
+
+            <form action="{{ route('login.post') }}" method="POST" class="space-y-5" data-confirm-leave>
                 @csrf
 
                 <div class="space-y-1">

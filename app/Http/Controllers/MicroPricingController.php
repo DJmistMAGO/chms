@@ -290,14 +290,13 @@ class MicroPricingController extends Controller
 
         if ($request->hasFile('valid_id_path')) {
             $validated['valid_id_temp_path'] = $request->file('valid_id_path')
-                ->store('booking-ids/temp', 'public');
+                ->store('valid-ids/temp', 'public');
         }
 
         session(['pending_google_booking' => $validated]);
 
         return redirect()->route('booking.google.redirect');
     }
-
     protected function repriceBooking(array $validated, ?string $roomTypeSlug): array
     {
         $room = $this->roomCatalog()[$roomTypeSlug] ?? null;

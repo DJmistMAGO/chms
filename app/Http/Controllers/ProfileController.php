@@ -11,9 +11,15 @@ class ProfileController extends Controller
 {
     public function edit()
     {
+        $user = Auth::user();
+        $user->load('idVerification');
+        $valid_id_status = $user->idVerification?->valid_id_status ?? 'pending';
+
+
         return view('pages.profile', [
             'title' => 'Profile',
-            'user' => Auth::user(),
+            'user' => $user,
+            'valid_id_status' => $valid_id_status,
         ]);
     }
 
@@ -21,15 +27,35 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        $canUpdateValidId = strtolower($user->idVerification?->valid_id_status ?? 'pending') === 'pending';
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'valid_id' => 'nullable|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'avatar_cropped' => ['nullable', 'string'],
+            'valid_id_upload' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
+
+        if ($request->hasFile('valid_id_upload')) {
+            if (! $canUpdateValidId) {
+                return back()->withErrors([
+                    'valid_id_upload' => 'You cannot update your valid ID while it is already verified.',
+                ])->withInput();
+            }
+
+            $file = $request->file('valid_id_upload');
+            $extension = $file->getClientOriginalExtension() ?: 'jpg';
+
+            if ($user->valid_id) {
+                Storage::disk('public')->delete($user->valid_id);
+            }
+
+            $path = $file->storeAs('valid_ids', $user->id . '_' . time() . '.' . $extension, 'public');
+            $user->valid_id = $path;
+        }
 
         if ($request->filled('avatar_cropped')) {
             $data   = $request->input('avatar_cropped');

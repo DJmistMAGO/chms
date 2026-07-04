@@ -16,7 +16,7 @@
             </div>
 
             {{-- Form Card --}}
-            <form method="POST" action="" class="space-y-6">
+            <form method="POST" action="" class="space-y-6" data-confirm-leave>
                 @csrf
 
                 {{-- ── Row 1: Full Name + Room No ── --}}
