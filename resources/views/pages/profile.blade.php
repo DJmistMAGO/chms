@@ -5,6 +5,8 @@
 @endpush
 
 @section('content')
+    @php($canEditValidId = strtolower($valid_id_status ?? 'pending') === 'pending')
+
     <x-common.page-breadcrumb pageTitle="User Profile" />
 
 
@@ -26,19 +28,16 @@
         </div>
     @endif
 
-    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" data-confirm-leave>
         @csrf
         @method('PUT')
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
-            {{-- ── LEFT: Avatar card ── --}}
             <div class="lg:col-span-1">
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
                     <h4 class="mb-4 text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Photo</h4>
-
                     <div class="flex flex-col items-center gap-5">
-                        {{-- Avatar preview --}}
                         <div class="relative">
                             <div id="avatar-ring" class="h-28 w-28 overflow-hidden rounded-full ring-4 ring-amber-100 dark:ring-amber-900/40">
                                 @if($user->avatar)
@@ -60,7 +59,6 @@
                             <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">{{ $user->email }}</p>
                         </div>
 
-                        {{-- Hidden file input + cropped base64 hidden input --}}
                         <div class="w-full">
                             <input id="avatar-upload" type="file" name="_avatar_raw" accept="image/*" class="hidden" />
                             {{-- This hidden input carries the cropped base64 data on submit --}}
@@ -77,9 +75,60 @@
                         </div>
                     </div>
                 </div>
+                <div class="mt-5 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+                    <div class="mb-4 flex items-start justify-between gap-3">
+                        <div>
+                            <h4 class="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Valid ID</h4>
+                            <p class="mt-1 text-xs text-gray-400 dark:text-gray-600">
+                                @if($canEditValidId)
+                                    Upload a clear image of your government-issued ID while it is still pending review.
+                                @else
+                                    Your valid ID is already {{ $valid_id_status }} and cannot be changed right now.
+                                @endif
+                            </p>
+                        </div>
+                        <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                            {{ ucfirst($valid_id_status ?? 'pending') }}
+                        </span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-800/50">
+                            @if($user->valid_id)
+                                <img id="valid-id-preview" src="{{ asset('storage/' . $user->valid_id) }}" alt="Valid ID preview" class="h-48 w-full rounded-lg bg-white object-contain" />
+                            @else
+                                <div id="valid-id-placeholder" class="flex h-48 items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white text-center text-sm text-gray-400 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-500">
+                                    No valid ID uploaded yet
+                                </div>
+                                <img id="valid-id-preview" src="" alt="Valid ID preview" class="hidden h-48 w-full rounded-lg bg-white object-contain" />
+                            @endif
+                        </div>
+
+                        <div class="w-full">
+                            <input id="valid-id-upload" type="file" name="valid_id_upload" accept="image/*" class="hidden" {{ $canEditValidId ? '' : 'disabled' }} />
+
+                            @if($canEditValidId)
+                                <label for="valid-id-upload" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-amber-600 dark:hover:bg-amber-900/10 dark:hover:text-amber-300">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                    Upload new valid ID
+                                </label>
+                            @else
+                                <div class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-400 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-500">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                    Upload unavailable
+                                </div>
+                            @endif
+
+                            <p class="mt-1.5 text-center text-xs text-gray-400 dark:text-gray-600">JPG, PNG or GIF · max 5 MB</p>
+                            @error('valid_id_upload')
+                                <p class="mt-1 text-center text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            {{-- Crop Modal --}}
             <div id="crop-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
                 <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
                     <h3 class="mb-4 text-sm font-semibold text-gray-700 dark:text-gray-200">Crop your photo</h3>
@@ -100,10 +149,8 @@
             </div>
 
 
-            {{-- ── RIGHT: Form sections ── --}}
             <div class="lg:col-span-2 space-y-5">
 
-                {{-- Personal Information --}}
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
                     <h4 class="mb-5 text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Personal Information</h4>
 
@@ -122,7 +169,6 @@
                             @enderror
                         </div>
 
-                        {{-- Email --}}
                         <div>
                             <label for="email" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Email Address
@@ -141,7 +187,6 @@
                             @enderror
                         </div>
 
-                        {{-- Phone --}}
                         <div>
                             <label for="phone" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Phone Number
@@ -159,24 +204,6 @@
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
-
-                        {{-- Valid ID --}}
-                        {{-- <div>
-                            <label for="valid_id" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Valid ID Number
-                            </label>
-                            <div class="relative">
-                                <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-gray-400 dark:text-gray-500">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2"/></svg>
-                                </span>
-                                <input id="valid_id" type="text" name="valid_id" value="{{ old('valid_id', $user->valid_id) }}"
-                                    class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
-                                    @error('valid_id') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror" />
-                            </div>
-                            @error('valid_id')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div> --}}
 
                         {{-- Address (spans full width) --}}
                         <div class="sm:col-span-2">
@@ -272,6 +299,9 @@
             const preview      = document.getElementById('avatar-preview');
             const initials     = document.getElementById('avatar-initials');
             const croppedInput = document.getElementById('avatar-cropped');
+            const validIdInput = document.getElementById('valid-id-upload');
+            const validIdPreview = document.getElementById('valid-id-preview');
+            const validIdPlaceholder = document.getElementById('valid-id-placeholder');
 
             let cropper = null;
 
@@ -332,6 +362,32 @@
             });
 
             cropCancel.addEventListener('click', closeModal);
+
+            if (validIdInput) {
+                validIdInput.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (!file) return;
+
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('Please choose an image under 5 MB.');
+                        this.value = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (validIdPreview) {
+                            validIdPreview.src = e.target.result;
+                            validIdPreview.classList.remove('hidden');
+                        }
+
+                        if (validIdPlaceholder) {
+                            validIdPlaceholder.classList.add('hidden');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
 
             // Close on backdrop click
             cropModal.addEventListener('click', function (e) {

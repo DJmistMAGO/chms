@@ -130,6 +130,8 @@
 
     </div>
 
+    @include('components.common.unsaved-changes')
+
 </body>
 
 @stack('scripts')

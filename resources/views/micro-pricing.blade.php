@@ -36,7 +36,7 @@
         }
     </script>
 
-    @include('components.devtools-protection')
+    {{-- @include('components.devtools-protection') --}}
 
     <style>
         * { font-family: 'DM Sans', sans-serif; }
@@ -145,6 +145,8 @@
 
 <body class="text-warm font-body antialiased min-h-screen pb-32 lg:pb-0" style="background:#FFFDF0;">
 
+
+
     {{-- NAVBAR --}}
     <nav class="sticky top-0 z-40 backdrop-blur border-b px-4 md:px-10 py-3 flex items-center gap-4"
         style="background:rgba(255,253,240,0.92); border-color:#FFE566;">
@@ -243,11 +245,9 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('customize.login.with.booking') }}" id="booking-wizard-form" class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:1px solid #FFE566;" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('customize.login.with.booking') }}" id="booking-wizard-form" class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:1px solid #FFE566;" enctype="multipart/form-data" data-confirm-leave>
                     @csrf
-                    {{-- Hidden booking values on page side to save selection - MSMG --}}
                     <input type="hidden" name="room_type" value="{{ $roomName ?? '' }}">
-                    {{-- Authoritative room key the server uses to reprice; display name above is for humans only --}}
                     <input type="hidden" name="room_type_slug" value="{{ $roomType ?? '' }}">
                     <input type="hidden" name="check_in" id="check_in" value="{{ old('check_in') }}">
                     <input type="hidden" name="check_out" id="check_out" value="{{ old('check_out') }}">
@@ -256,9 +256,6 @@
                     <input type="hidden" name="floor_level" id="input-floor" value="{{ old('floor_level', 'Floor 1') }}">
                     <input type="hidden" name="ambiance" id="input-ambiance" value="{{ old('ambiance', 'Regular Room') }}">
                     <input type="hidden" name="food_package" id="input-food" value="{{ old('food_package', 'No Food') }}">
-                    {{-- These three are display-only on the client. The server recomputes them
-                         from room_type_slug + ambiance + food_package + nights and ignores
-                         whatever is submitted here. Kept only so the UI has values to render. --}}
                     <input type="hidden" name="room_price" value="{{ $price }}">
                     <input type="hidden" name="micro_pricing_amount" id="input-addons" value="{{ old('micro_pricing_amount', 0) }}">
                     <input type="hidden" name="total_price" id="input-total" value="{{ old('total_price', $price) }}">
@@ -402,7 +399,6 @@
                                     <span class="text-xs font-medium tracking-widest uppercase text-charcoal" id="step2-heading">Step 2: Your information</span>
                                 </div>
 
-                                {{-- Explicit choice, shown before any fields render --}}
                                 <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl mb-5" style="background:#FFF8D6; border:1px solid #FFE566;">
                                     <button type="button" id="toggle-new-guest" onclick="setGuestMode('new')" class="py-2.5 rounded-xl text-sm font-medium transition-all">New Guest</button>
                                     <button type="button" id="toggle-existing-guest" onclick="setGuestMode('existing')" class="py-2.5 rounded-xl text-sm font-medium transition-all">Returning Guest</button>
@@ -1193,5 +1189,8 @@
             });
         @endif
     </script>
+
+@include('components.common.unsaved-changes')
+
 </body>
 </html>

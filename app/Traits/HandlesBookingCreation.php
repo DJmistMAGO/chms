@@ -74,11 +74,11 @@ trait HandlesBookingCreation
         $validIdPath = null;
 
         if ($uploadedFile && $uploadedFile->isValid()) {
-            $validIdPath = $uploadedFile->store('booking-ids', 'public');
+            $validIdPath = $uploadedFile->store('valid-ids', 'public');
         }  elseif (!empty($validated['valid_id_temp_path'])) {
             $from     = $validated['valid_id_temp_path'];
             $filename = basename($from);
-            $to       = 'booking-ids/' . $filename;
+            $to       = 'valid-ids/' . $filename;
 
             \Log::info('Google booking temp ID move', [
                 'from'   => $from,

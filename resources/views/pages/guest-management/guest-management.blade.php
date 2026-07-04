@@ -39,6 +39,7 @@
                         <!-- <th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Roles</th> -->
                         <th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Phone</th>
                         <th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Address</th>
+                        <th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
                         {{-- Actions --}}
                         <th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
                     </tr>
@@ -67,29 +68,19 @@
                                 {{ $guest['email'] }}
                             </td>
 
-                            {{-- <td class="py-3">
-                                <div class="flex flex-wrap gap-1.5">
-                                    @foreach ($guest['roles'] as $role)
-                                        @php
-                                            $badgeClass = match($role) {
-                                                'admin'     => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-                                                'staff'    => 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-                                                'client'      => 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
-                                            };
-                                        @endphp
-                                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
-                                            {{ ucfirst($role) }}
-                                        </span>
-                                    @endforeach
-                                </div>
-                            </td> --}}
-
                             <td class="py-3 text-sm text-gray-500 dark:text-gray-400">
                                 {{ $guest['phone'] ?? 'N/A' }}
                             </td>
 
                             <td class="py-3 text-sm text-gray-500 dark:text-gray-400">
                                 {{ $guest['address'] ?? 'N/A' }}
+                            </td>
+
+                            <td class="whitespace-nowrap py-3 text-sm">
+                                @php $guestStatus = strtolower($guest['status'] ?? 'inactive'); @endphp
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $guestStatus === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200' : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-200' }}">
+                                    {{ $guestStatus === 'active' ? 'Active' : 'Inactive' }}
+                                </span>
                             </td>
 
                             <td class="py-3 text-sm">
@@ -103,9 +94,8 @@
                                     </span>
                                 @else
                                     <div class="inline-flex items-center gap-2 flex-wrap">
-
                                         <button type="button"
-                                                onclick='openViewModal({{ json_encode($guest["id"]) }}, {{ json_encode($guest["avatar"]) }}, {{ json_encode($guest["name"] ?? "") }}, {{ json_encode($guest["email"] ?? "") }}, {{ json_encode($guest["phone"] ?? "") }}, {{ json_encode($guest["address"] ?? "") }}, {{ json_encode($guest["status"] ?? "") }}, {{ json_encode($guest["valid_id"] ?? "") }})'
+                                                onclick='openViewModal({{ json_encode($guest["id"]) }}, {{ json_encode($guest["avatar"]) }}, {{ json_encode($guest["name"] ?? "") }}, {{ json_encode($guest["email"] ?? "") }}, {{ json_encode($guest["phone"] ?? "") }}, {{ json_encode($guest["address"] ?? "") }}, {{ json_encode($guest["status"] ?? "") }}, {{ json_encode($guest["valid_id"] ?? "") }}, {{ json_encode($guest["valid_id_status"] ?? "pending") }})'
                                                 class="inline-flex items-center gap-1 rounded-lg bg-slate-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-slate-700 active:bg-slate-800">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none"
                                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -114,67 +104,19 @@
                                             </svg>
                                             View
                                         </button>
-
-                                        <button type="button"
-                                                onclick='openEditModal({{ json_encode($guest["id"]) }}, {{ json_encode($guest["name"] ?? "") }}, {{ json_encode($guest["email"] ?? "") }}, {{ json_encode($guest["phone"] ?? "") }}, {{ json_encode($guest["address"] ?? "") }})'
-                                                class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-700 active:bg-blue-800">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none"
-                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
-                                            </svg>
-                                            Edit
-                                        </button>
-
-                                        @if ($guest['status'] === 'active')
-                                            <button type="button"
-                                                    onclick="openStatusModal('{{ $guest['id'] }}', 'deactivate')"
-                                                    class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-red-700 active:bg-red-800">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                                                </svg>
-                                                Deactivate
-                                            </button>
-
-                                            <form action="{{ route('guest-management.reset-password', $guest['id']) }}" method="POST" class="inline-flex">
-                                                @csrf
-                                                <button type="submit"
-                                                        class="inline-flex items-center gap-1 rounded-lg bg-yellow-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-yellow-700 active:bg-yellow-800">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                        <path d="M12 20h9" />
-                                                        <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4L16.5 3.5z" />
-                                                    </svg>
-                                                    Reset Password
-                                                </button>
-                                            </form>
-                                        @else
-                                            <button type="button"
-                                                    onclick="openStatusModal('{{ $guest['id'] }}', 'activate')"
-                                                    class="inline-flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-green-700 active:bg-green-800">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M5 12l5 5L20 7" />
-                                                </svg>
-                                                Activate
-                                            </button>
-                                        @endif
                                     </div>
                                 @endif
                             </td>
-
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
 
-        {{-- Status Modal --}}
          <div id="statusModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
             <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
 
                 <div id="modalIcon" class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
-                    {{-- Icon swapped via JS --}}
                 </div>
 
                 <h3 id="modalTitle" class="mb-2 text-center text-base font-semibold text-gray-800 dark:text-white/90"></h3>
@@ -217,7 +159,6 @@
 
                     <div class="flex items-center gap-4">
                         <div id="editAvatar" class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-100 font-serif text-xl font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                            {{-- initials injected via JS --}}
                         </div>
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">Edit Guest</p>
@@ -228,7 +169,7 @@
 
                 {{-- Body --}}
                 <div class="px-6 py-6">
-                    <form id="editForm" method="POST" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    <form id="editForm" method="POST" class="grid grid-cols-1 gap-5 sm:grid-cols-2" data-confirm-leave>
                         @csrf
                         {{-- @method('PUT') --}}
 
@@ -282,8 +223,9 @@
                     </button>
 
                     <div class="flex items-center gap-4">
-                        <div id="viewAvatar" class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-100 font-serif text-xl font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                            <img src="" alt="" class="h-full w-full rounded-full object-cover" id="avatarID">
+                        <div id="viewAvatar" class="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-amber-100 font-serif text-xl font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                            <span id="avatarInitials" class="absolute inset-0 flex items-center justify-center"></span>
+                            <img src="" alt="" class="relative z-10 hidden h-full w-full rounded-full object-cover" id="avatarID">
                         </div>
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">Guest Details</p>
@@ -292,7 +234,6 @@
                     </div>
                 </div>
 
-                {{-- Body --}}
                 <div class="px-6 py-6">
                     <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <div class="flex items-start gap-3">
@@ -345,8 +286,38 @@
                         </div>
 
                         <div class="sm:col-span-2">
-                            <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Valid ID</p>
-                            <img id="viewValidID" src="" alt="Valid ID" class="hidden w-full max-h-60 object-contain rounded-md border" />
+                            <div class="flex items-center justify-between">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Valid ID</p>
+                                <span id="viewIdStatus" class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"></span>
+                            </div>
+
+                            <img id="viewValidID" src="" alt="Valid ID" class="mt-2 hidden w-full max-h-60 object-contain rounded-md border dark:border-gray-700" />
+                            <p id="viewValidIDEmpty" class="mt-2 hidden text-sm text-gray-400 dark:text-gray-500">No valid ID uploaded.</p>
+
+                            <div id="verifyIdActions" class="mt-3 flex gap-2">
+                                <form id="verifyIdForm" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="status" value="verified">
+                                    <button type="submit"
+                                        class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700 active:bg-emerald-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12l5 5L20 7" />
+                                        </svg>
+                                        Verify
+                                    </button>
+                                </form>
+                                <form id="rejectIdForm" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="status" value="rejected">
+                                    <button type="submit"
+                                        class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 active:bg-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                        </svg>
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -364,7 +335,7 @@
 @endsection
 
 
- @push('scripts')
+@push('scripts')
     <script>
         const modal = document.getElementById('statusModal');
         const editModal = document.getElementById('editModal');
@@ -377,6 +348,7 @@
         };
 
         const editRoute = '{{ route('guest-management.update', ['id' => '__ID__']) }}';
+        const verifyRoute = '{{ route('guest-management.verify-id', ['id' => '__ID__']) }}';
 
         function openStatusModal(guestId, action) {
             const isDeactivate = action === 'deactivate';
@@ -406,7 +378,6 @@
             document.getElementById('editEmail').value = email || '';
             document.getElementById('editPhone').value = phone || '';
             document.getElementById('editAddress').value = address || '';
-            // populate avatar initials for header
             const editAvatar = document.getElementById('editAvatar');
             if (editAvatar) {
                 const initials = (name || '').split(' ').map(n => n[0] || '').slice(0,2).join('').toUpperCase();
@@ -422,8 +393,7 @@
             editModal.classList.remove('flex');
         }
 
-        function openViewModal(id, avatar, name, email, phone, address, status, valid_id) {
-            // normalize inputs (roles may be passed as array or string)
+        function openViewModal(id, avatar, name, email, phone, address, status, valid_id, valid_id_status) {
             const guestName = name || '';
             const guest = {
                 id: id,
@@ -433,7 +403,8 @@
                 phone: phone || '',
                 address: address || '',
                 status: status || '',
-                valid_id: valid_id || '', // Placeholder for valid ID, adjust as needed
+                valid_id: valid_id || '',
+                valid_id_status: valid_id_status || 'pending',
             };
 
             document.getElementById('viewName').textContent = guest.name;
@@ -441,32 +412,9 @@
             document.getElementById('viewPhone').textContent = guest.phone;
             document.getElementById('viewAddress').textContent = guest.address;
 
-            // Avatar initials
             const initials = (guest.name || '').split(' ').map(n => n[0] || '').slice(0, 2).join('').toUpperCase();
-            document.getElementById('avatarID').textContent = initials;
+            document.getElementById('avatarInitials').textContent = initials;
 
-            // Status badge
-            const statusEl = document.getElementById('viewStatus');
-            const isActive = guest.status === 'active';
-            statusEl.textContent = isActive ? 'Active' : 'Inactive';
-            statusEl.className = 'mt-1 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ' +
-                (isActive
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                    : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400');
-
-            // Valid ID image
-            const validImg = document.getElementById('viewValidID');
-            if (guest.valid_id) {
-                validImg.src = STORAGE_URL + '/' + guest.valid_id;
-                validImg.alt = 'Valid ID';
-                validImg.classList.remove('hidden');
-            } else {
-                validImg.src = '';
-                validImg.alt = '';
-                validImg.classList.add('hidden');
-            }
-
-            // Avatar image
             const avatarImg = document.getElementById('avatarID');
             if (guest.avatar) {
                 avatarImg.src = STORAGE_URL + '/' + guest.avatar;
@@ -478,11 +426,47 @@
                 avatarImg.classList.add('hidden');
             }
 
-            // Roles
-            // const rolesEl = document.getElementById('viewRoles');
-            // rolesEl.innerHTML = (guest.roles || []).map(role =>
-            //     `<span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">${role}</span>`
-            // ).join('');
+            const statusEl = document.getElementById('viewStatus');
+            const isActive = guest.status === 'active';
+            statusEl.textContent = isActive ? 'Active' : 'Inactive';
+            statusEl.className = 'mt-1 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ' +
+                (isActive
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                    : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400');
+
+            const validImg = document.getElementById('viewValidID');
+            const validImgEmpty = document.getElementById('viewValidIDEmpty');
+            const verifyActions = document.getElementById('verifyIdActions');
+            if (guest.valid_id) {
+                validImg.src = STORAGE_URL + '/' + guest.valid_id;
+                validImg.alt = 'Valid ID';
+                validImg.classList.remove('hidden');
+                validImgEmpty.classList.add('hidden');
+                if (guest.valid_id_status === 'verified') {
+                    verifyActions.classList.add('hidden');
+                } else {
+                    verifyActions.classList.remove('hidden');
+                }
+            } else {
+                validImg.src = '';
+                validImg.alt = '';
+                validImg.classList.add('hidden');
+                validImgEmpty.classList.remove('hidden');
+                verifyActions.classList.add('hidden');
+            }
+
+            const idStatusEl = document.getElementById('viewIdStatus');
+            const idStatusStyles = {
+                verified: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+                pending:  'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                rejected: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+            };
+            const idStatus = guest.valid_id_status in idStatusStyles ? guest.valid_id_status : 'pending';
+            idStatusEl.textContent = idStatus.charAt(0).toUpperCase() + idStatus.slice(1);
+            idStatusEl.className = 'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ' + idStatusStyles[idStatus];
+
+            document.getElementById('verifyIdForm').action = verifyRoute.replace('__ID__', guest.id);
+            document.getElementById('rejectIdForm').action = verifyRoute.replace('__ID__', guest.id);
 
             document.getElementById('viewModal').classList.remove('hidden');
             document.getElementById('viewModal').classList.add('flex');
@@ -493,25 +477,25 @@
             document.getElementById('viewModal').classList.remove('flex');
         }
 
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) closeStatusModal();
-        });
+        // modal.addEventListener('click', function (e) {
+        //     if (e.target === modal) closeStatusModal();
+        // });
 
-        editModal.addEventListener('click', function (e) {
-            if (e.target === editModal) closeEditModal();
-        });
+        // editModal.addEventListener('click', function (e) {
+        //     if (e.target === editModal) closeEditModal();
+        // });
 
-        viewModal.addEventListener('click', function (e) {
-            if (e.target === viewModal) closeViewModal();
-        });
+        // viewModal.addEventListener('click', function (e) {
+        //     if (e.target === viewModal) closeViewModal();
+        // });
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeStatusModal();
-                closeEditModal();
-                closeViewModal();
-            }
-        });
+        // document.addEventListener('keydown', function (e) {
+        //     if (e.key === 'Escape') {
+        //         closeStatusModal();
+        //         closeEditModal();
+        //         closeViewModal();
+        //     }
+        // });
     </script>
 
     <script>
