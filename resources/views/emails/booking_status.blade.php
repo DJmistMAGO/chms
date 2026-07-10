@@ -184,6 +184,7 @@
             font-size: 13.5px;
             color: #888;
             text-align: center;
+            /* padding: 0 10px; */
         }
 
         /* ===== Torn-edge footer, like the bottom of a receipt ===== */
@@ -291,65 +292,64 @@
                 </table>
 
                 <div class="section-title">Billing Breakdown</div>
-                    <div class="receipt-box">
-                        <table>
+                <div class="receipt-box">
+                    <table>
 
-                            <tr>
-                                <td class="label">Length of Stay</td>
-                                <td class="value">
-                                    {{ $nights }}
-                                    {{ Str::plural('night', $nights) }}
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="label">Length of Stay</td>
+                            <td class="value">
+                                {{ $nights }}
+                                {{ Str::plural('night', $nights) }}
+                            </td>
+                        </tr>
 
-                            <tr>
-                                <td class="label">
-                                    Room Rate
-                                    <br>
-                                    <small>
-                                        ₱{{ number_format($roomRate,2) }}
-                                        × {{ $nights }}
-                                        {{ Str::plural('night',$nights) }}
-                                    </small>
-                                </td>
+                        <tr>
+                            <td class="label">
+                                Room Rate
+                                <br>
+                                <small>
+                                    ₱{{ number_format($roomRate,2) }}
+                                    × {{ $nights }}
+                                    {{ Str::plural('night',$nights) }}
+                                </small>
+                            </td>
 
-                                <td class="value">
-                                    ₱{{ number_format($roomSubtotal,2) }}
-                                </td>
-                            </tr>
+                            <td class="value">
+                                ₱{{ number_format($roomSubtotal,2) }}
+                            </td>
+                        </tr>
 
-                            @if($addonsPerNight > 0)
+                        @if($addonsPerNight > 0)
 
-                            <tr>
-                                <td class="label">
-                                    Add-ons / Micro Pricing
-                                    <br>
-                                    <small>
-                                        ₱{{ number_format($addonsPerNight,2) }}
-                                        × {{ $nights }}
-                                        {{ Str::plural('night',$nights) }}
-                                    </small>
-                                </td>
+                        <tr>
+                            <td class="label">
+                                Add-ons / Micro Pricing
+                                <br>
+                                <small>
+                                    ₱{{ number_format($addonsPerNight,2) }}
+                                    × {{ $nights }}
+                                    {{ Str::plural('night',$nights) }}
+                                </small>
+                            </td>
 
-                                <td class="value">
-                                    ₱{{ number_format($addonsSubtotal,2) }}
-                                </td>
-                            </tr>
+                            <td class="value">
+                                ₱{{ number_format($addonsSubtotal,2) }}
+                            </td>
+                        </tr>
 
-                            @endif
+                        @endif
 
-                            <tr class="total-row">
-                                <td class="label">
-                                    Total Amount
-                                </td>
+                        <tr class="total-row">
+                            <td class="label">
+                                Total Amount
+                            </td>
 
-                                <td class="value">
-                                    ₱{{ number_format($grandTotal,2) }}
-                                </td>
-                            </tr>
+                            <td class="value">
+                                ₱{{ number_format($grandTotal,2) }}
+                            </td>
+                        </tr>
 
-                        </table>
-                    </div>
+                    </table>
                 </div>
 
                 <!-- Remarks -->

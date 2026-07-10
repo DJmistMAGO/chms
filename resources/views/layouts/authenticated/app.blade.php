@@ -89,7 +89,7 @@
     </script>
 
     {{-- uncomment below this if you want to prevent devtools access --}}
-    {{-- @include('components.devtools-protection') --}}
+    @include('components.devtools-protection')
 
 </head>
 
