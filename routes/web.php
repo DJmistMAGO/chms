@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
+// use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
