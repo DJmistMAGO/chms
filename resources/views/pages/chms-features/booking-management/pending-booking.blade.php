@@ -68,7 +68,7 @@
                     <thead>
                         <tr
                             class="border-b border-gray-100 bg-gray-50/80 text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:border-gray-800 dark:bg-white/5 dark:text-gray-500">
-                            @foreach (['Guest', 'Reference', 'Room Type', 'Stay', 'Total', 'Status', 'Actions'] as $col)
+                            @foreach (['Guest', 'Reference', 'Room Type', 'Stay', 'Total', 'Status', 'Id Status', 'Actions'] as $col)
                                 <th class="px-5 py-3.5 {{ $col === 'Actions' ? 'text-center' : '' }}">{{ $col }}
                                 </th>
                             @endforeach
@@ -134,6 +134,32 @@
                                     </span>
                                 </td>
 
+                                {{-- ID Status --}}
+                                @php
+                                    $idStatus = strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
+
+                                    $statusClasses = [
+                                        'verified' => 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:ring-emerald-800',
+                                        'pending' => 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800',
+                                        'rejected' => 'bg-red-50 text-red-700 ring-red-200 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-800',
+                                        'unverified' => 'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700',
+                                    ];
+
+                                    $dotClasses = [
+                                        'verified' => 'bg-emerald-500',
+                                        'pending' => 'bg-amber-500',
+                                        'rejected' => 'bg-red-500',
+                                        'unverified' => 'bg-gray-400',
+                                    ];
+                                @endphp
+
+                                <td class="px-5 py-4">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $statusClasses[$idStatus] ?? $statusClasses['unverified'] }}">
+                                        <span class="h-1.5 w-1.5 rounded-full {{ $dotClasses[$idStatus] ?? $dotClasses['unverified'] }}"></span>
+                                        {{ ucfirst($idStatus) }}
+                                    </span>
+                                </td>
+
                                 {{-- Actions --}}
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-center gap-1.5">
@@ -166,26 +192,26 @@
                                             </svg>
                                         </button>
 
-                                        {{-- Confirm --}}
-                                        <button title="Confirm booking"
-                                            @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
-                                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
+                                        @if ($b->user?->idVerification?->valid_id_status === 'verified')
+                                            {{-- Confirm --}}
+                                            <button title="Confirm booking"
+                                                @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
+                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </button>
 
-                                        {{-- Cancel --}}
-                                        <button title="Cancel booking"
-                                            @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; cancelModal=true"
-                                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
+                                            {{-- Cancel --}}
+                                            <button title="Cancel booking"
+                                                @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; cancelModal=true"
+                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+
+                                        @endif
 
                                         {{-- Delete --}}
                                         {{-- <button title="Delete booking"
