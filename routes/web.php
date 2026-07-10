@@ -62,6 +62,11 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/logout', [AuthenticationController::class, 'logout'])->name('logout');
 
+    Route::get('/my-reservations/new-booking/rooms', [MicroPricingController::class, 'newBookingRoomOptions'])->name('reservations.booking.rooms');
+    Route::get('/my-reservations/new-booking/{roomType}', [MicroPricingController::class, 'newBookingWizard'])->name('reservations.booking.wizard');
+    Route::post('/my-reservations/new-booking', [MicroPricingController::class, 'storeAuthenticatedBooking'])->name('reservations.booking.store');
+
+
     Route::controller(BookingController::class)
         ->prefix('booking')
         ->group(function () {
