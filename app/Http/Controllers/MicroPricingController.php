@@ -250,9 +250,11 @@ class MicroPricingController extends Controller
 
             $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
 
+            // dd($booking);
+
             DB::commit();
 
-            // dd($booking);
+            Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
             return redirect()
                 ->route('dashboard', ['referenceNumber' => $booking->reference_number])
