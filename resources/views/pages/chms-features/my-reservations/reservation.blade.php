@@ -23,27 +23,26 @@
         </div>
 
         <div id="newBookingModal"
-            class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6"
+            class="fixed inset-0 z-50 hidden items-center justify-center bg-white dark:bg-black/60 backdrop-blur-sm px-4 py-6"
             onclick="if (event.target === this) closeNewBookingModal()"
             role="dialog" aria-modal="true" aria-labelledby="newBookingTitle">
-            <div class="w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden rounded-3xl bg-[#12172a] border border-white/10 shadow-2xl">
+            <div class="w-full max-w-2xl max-h-[88vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-[#12172a] border border-white/10 shadow-2xl">
 
                 {{-- Header --}}
                 <div class="flex items-center justify-between border-b border-white/10 px-6 py-4">
-                    <h3 id="newBookingTitle" class="text-lg font-semibold text-white">
+                    <h3 id="newBookingTitle" class="text-lg font-semibold text-gray-900 dark:text-white">
                         <span id="newBookingHeaderText">Choose a room</span>
                     </h3>
                     <button type="button" onclick="closeNewBookingModal()" aria-label="Close"
-                        class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-white/10 hover:text-white">
+                        class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-dark dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
 
-                {{-- Body — swapped between room picker and wizard --}}
                 <div id="newBookingBody" class="flex-1 overflow-y-auto px-6 py-5">
-                    <div id="roomPickerLoading" class="hidden py-16 text-center text-sm text-slate-400">Loading rooms…</div>
+                    <div id="roomPickerLoading" class="hidden py-16 text-center text-sm text-gray-500 dark:text-slate-400">Loading rooms…</div>
                     <div id="roomPickerList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
                     <div id="wizardContainer" class="hidden"></div>
                 </div>
@@ -114,14 +113,14 @@
                         data.rooms.forEach(room => {
                             const card = document.createElement('button');
                             card.type = 'button';
-                            card.className = 'text-left rounded-2xl border border-white/10 bg-white/5 overflow-hidden transition hover:border-amber-400/60 hover:bg-white/[0.08]';
+                            card.className = 'text-left rounded-2xl border border-gray-300 dark:border-white/10 bg-gray-100 dark:bg-white/5 overflow-hidden transition hover:border-amber-400/60 hover:bg-white/[0.08] hover:dark:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2';
                             card.onclick = () => loadWizard(room.slug, room.name);
                             card.innerHTML = `
                                 <div class="h-28 w-full bg-cover bg-center" style="background-image:url('${room.image}')"></div>
                                 <div class="p-4">
-                                    <p class="text-sm font-semibold text-white">${room.name}</p>
-                                    <p class="mt-1 text-xs text-slate-400">Up to ${room.capacity} guests</p>
-                                    <p class="mt-2 text-sm font-semibold text-amber-400">₱${room.price.toLocaleString()} <span class="text-xs font-normal text-slate-400">/night</span></p>
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">${room.name}</p>
+                                    <p class="mt-1 text-xs text-slate-400 dark:text-slate-400">Up to ${room.capacity} guests</p>
+                                    <p class="mt-2 text-sm font-semibold text-amber-400">₱${room.price.toLocaleString()} <span class="text-xs font-normaln text-gray-900 dark:text-slate-400">/night</span></p>
                                 </div>
                             `;
                             roomPickerList.appendChild(card);
@@ -167,9 +166,9 @@
         <div class="mb-6 flex gap-2 border-b border-gray-100 dark:border-gray-800" id="status-tabs">
 
             <button onclick="switchTab('pending')" id="tab-pending"
-                class="tab-btn relative pb-3 px-1 text-sm font-semibold transition-colors text-yellow-500">
+                class="tab-btn relative pb-3 px-1 text-sm font-semibold transition-colors text-amber-700 dark:text-yellow-500">
                 <span class="flex items-center gap-2">
-                    <span class="h-1.5 w-1.5 rounded-full bg-yellow-400"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-400 dark:bg-yellow-400"></span>
                     Pending
                     <span class="rounded-full bg-yellow-400/20 px-1.5 py-0.5 text-xs font-bold text-yellow-600">
                         {{ $pendingBookings->count() }}
@@ -180,7 +179,7 @@
             <button onclick="switchTab('confirmed')" id="tab-confirmed"
                 class="tab-btn relative pb-3 px-1 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300">
                 <span class="flex items-center gap-2">
-                    <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                    <span class="h-1.5 w-1.5 rounded-full bg-green-400 dark:bg-green-400"></span>
                     Confirmed
                     <span class="rounded-full bg-green-400/15 px-1.5 py-0.5 text-xs font-bold text-green-600">
                         {{ $confirmedBookings->count() }}
@@ -214,7 +213,7 @@
                         'booking'      => $booking,
                         'statusLabel'  => 'Confirmed',
                         'statusColor'  => 'green',
-                        'pulse'        => false,
+                  'pulse'        => false,
                     ])
                 @empty
                     @include('pages.chms-features.my-reservations.partials.booking-empty', ['label' => 'confirmed'])
@@ -246,14 +245,13 @@
                 }
             });
 
-            // Active underline via direct style (simpler than Tailwind JIT)
             document.querySelectorAll('.tab-btn').forEach(b => b.style.borderBottom = '');
             const active = document.getElementById('tab-' + tab);
             const colorMap = { pending: '#facc15', confirmed: '#4ade80' };
             active.style.borderBottom = '2px solid ' + colorMap[tab];
         }
 
-        // Init
+        // Init super
         document.getElementById('tab-pending').style.borderBottom  = '2px solid #facc15';
         document.getElementById('tab-confirmed').style.borderBottom = '';
     </script>

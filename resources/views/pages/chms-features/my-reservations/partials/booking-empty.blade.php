@@ -1,4 +1,3 @@
-{{-- Partial: partials/booking-empty.blade.php  Variable: $label --}}
 <div class="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-200 py-14 dark:border-gray-700">
     <span class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-400/10">
         <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -8,8 +7,8 @@
     </span>
     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No {{ $label }} reservations</p>
     <p class="mt-1 text-xs text-gray-400">Ready to book your next stay?</p>
-    <a href=""
+    <button type="button" onclick="openNewBookingModal()"
         class="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-yellow-400 px-4 py-2 text-xs font-semibold text-gray-900 transition hover:bg-yellow-500">
         Browse Rooms
-    </a>
+    </button>
 </div>

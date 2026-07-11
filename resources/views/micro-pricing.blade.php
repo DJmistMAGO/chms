@@ -36,7 +36,7 @@
         }
     </script>
 
-    {{-- @include('components.devtools-protection') --}}
+    @include('components.devtools-protection')
 
     <style>
         * { font-family: 'DM Sans', sans-serif; }
@@ -537,7 +537,10 @@
                                 </div>
                                 <div class="flex items-center justify-between gap-3">
                                     <button type="button" onclick="goToStep(3)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFFFFF; color:#1C1C1E; border:1px solid #FFE566;">Back</button>
-                                    <button type="submit" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFD000; color:#1C1C1E;">Confirm booking</button>
+                                    <button type="submit" id="final-submit-btn" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed" style="background:#FFD000; color:#1C1C1E;">
+                                        <i class="fas fa-spinner fa-spin hidden" id="final-submit-spinner"></i>
+                                        <span id="final-submit-label">Confirm booking</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -545,26 +548,6 @@
                 </form>
             </div>
 
-        </div>
-    </div>
-
-
-    {{-- MOBILE STICKY BAR --}}
-    <div class="lg:hidden sticky-bar fixed bottom-0 left-0 right-0 px-5 py-4 z-30 border-t"
-        style="background:#FFFDF0; border-color:#FFE566;">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-xs text-muted">Total</p>
-                <p class="font-display text-2xl font-semibold price-bump" style="color:#B89200;" id="total-price-mobile">
-                    ₱{{ number_format($price) }}
-                </p>
-            </div>
-            <button type="button" onclick="handleNextStep(1)"
-                class="px-7 py-3.5 rounded-2xl font-medium text-sm active:scale-95 transition-all flex items-center gap-2"
-                style="background:#FFD000; color:#1C1C1E;">
-                <i class="fas fa-calendar-check text-xs"></i>
-                Book Now
-            </button>
         </div>
     </div>
 
@@ -591,7 +574,6 @@
         const disabledDates = @json($disabledDates);
         const accountCheckUrl = '{{ route('customize.account.check') }}';
 
-        // important: use food_package key, not food
         const groupAddons = {
             ambiance: 0,
             food_package: 0
@@ -599,7 +581,8 @@
 
         let selectedNights = 0;
         let currentGuestMode = 'new';
-        let maxStepReached = 1; // sequential-step guard: pills can't skip ahead of validated steps
+        let maxStepReached = 1;
+        let isFinalSubmitting = false;
 
         function parsePeso(text) {
             return Number(String(text).replace(/[₱,\s]/g, '')) || 0;
@@ -679,7 +662,6 @@
                 if (button) {
                     button.classList.toggle('active', isActive);
                     button.classList.toggle('completed', isComplete);
-                    // Only unlock pills up to the furthest step the user has actually validated through
                     button.disabled = pillStep > maxStepReached;
                 }
                 if (badge) {
@@ -744,7 +726,6 @@
         }
 
         function handleForgotPassword() {
-            // Adjust to your actual password-reset route
             window.location.href = '/forgot-password';
         }
 
@@ -783,7 +764,6 @@
             label.className = `text-xs ${score <= 1 ? 'text-red-400' : score === 2 ? 'text-amber-500' : 'text-green-600'}`;
         }
 
-        // Copies the panel actually in use into the fields that get POSTed (name="email"/"password")
         function finalizeStep2Fields(mode) {
             if (mode === 'existing') {
                 document.getElementById('wizard-email-new').value = document.getElementById('wizard-email-existing').value.trim();
@@ -1180,6 +1160,23 @@
                 preview.src = '';
             }
         }
+
+        document.getElementById('booking-wizard-form').addEventListener('submit', function (e) {
+            if (isFinalSubmitting) {
+                e.preventDefault();
+                return;
+            }
+            isFinalSubmitting = true;
+
+            const btn = document.getElementById('final-submit-btn');
+            const spinner = document.getElementById('final-submit-spinner');
+            const label = document.getElementById('final-submit-label');
+            if (!btn) return;
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            label.textContent = 'Booking…';
+        });
 
         // reopen wizard after validation errors
         @if ($errors->any())
