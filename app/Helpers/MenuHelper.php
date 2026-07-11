@@ -47,11 +47,11 @@ class MenuHelper
                     'name' => 'Guest Management',
                     'path' => '/guest-management',
                 ],
-                [
-                    'icon' =>'charts',
-                    'name' => 'Reports',
-                    'path' => '/reports',
-                ]
+                // [
+                //     'icon' =>'charts',
+                //     'name' => 'Reports',
+                //     'path' => '/reports',
+                // ]
             ]);
         }
 

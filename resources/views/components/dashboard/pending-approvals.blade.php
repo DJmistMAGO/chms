@@ -179,7 +179,6 @@
                                 <p class="text-xs text-gray-400 dark:text-gray-500">Floor Level</p>
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white" x-text="selected.floorLevel || 'No preference'"></p>
                             </div>
-                            <span class="flex-shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">Free</span>
                         </div>
 
                         <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
@@ -195,7 +194,7 @@
                                 <p class="text-xs text-gray-400 dark:text-gray-500">Ambiance</p>
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white" x-text="selected.ambiance || 'Regular Room'"></p>
                             </div>
-                            <span class="flex-shrink-0 rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700" x-text="selected.ambiancePrice ? '+₱' + selected.ambiancePrice : 'Base'"></span>
+
                         </div>
 
                         <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
@@ -211,7 +210,6 @@
                                 <p class="text-xs text-gray-400 dark:text-gray-500">Food Package</p>
                                 <p class="text-sm font-semibold text-gray-800 dark:text-white" x-text="selected.foodPackage || 'No Food'"></p>
                             </div>
-                            <span class="flex-shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700" x-text="selected.foodPrice ? '+₱' + selected.foodPrice : 'Free'"></span>
                         </div>
 
                         <div x-show="selected.specialRequests && selected.specialRequests !== '—'" class="rounded-xl border border-gray-100 bg-gray-50 px-3 py-2.5 dark:border-gray-800 dark:bg-white/5">
