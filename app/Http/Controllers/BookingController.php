@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\WalkInBooking;
 // use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Room;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StatusEmail;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 use Illuminate\Http\Request;
 
@@ -107,11 +109,38 @@ class BookingController extends Controller
         return redirect()->route('booking.checkin')->with('success', 'Booking checked in successfully.');
     }
 
-    public function checkedInBookings()
+    public function checkedInBookings(Request $request)
     {
-        $checkedInBookings = Booking::where('status', 'Checked In')
-            ->latest()
-            ->paginate(15);
+        // 1. Fetch Online Bookings with a dynamic type property
+        $onlineBookings = Booking::where('status', 'Checked In')
+            ->get()
+            ->map(function ($booking) {
+                $booking->booking_type = 'Online';
+                return $booking;
+            });
+
+        // 2. Fetch Walk-In Bookings with a dynamic type property
+        $walkInBookings = WalkInBooking::where('status', 'Checked In')
+            ->get()
+            ->map(function ($booking) {
+                $booking->booking_type = 'Walk-in';
+                return $booking;
+            });
+
+        $items = $onlineBookings
+            ->concat($walkInBookings)
+            ->sortByDesc('created_at')
+            ->values();
+
+        // 4. Manual Pagination to match your exact pattern
+        $perPage = 15;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $checkedInBookings = new LengthAwarePaginator($currentItems, $items->count(), $perPage, $currentPage, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
 
         return view('pages.chms-features.booking-management.checkedin-booking', compact('checkedInBookings'));
     }
