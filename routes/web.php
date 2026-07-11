@@ -10,6 +10,7 @@ use App\Http\Controllers\MicroPricingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\WalkInBookingController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -90,6 +91,15 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::put('/{room}', 'updateStatus')->name('room.updateStatus');
         });
 
+    Route::controller(WalkInBookingController::class)
+        ->prefix('walk-in-booking')
+        ->group(function () {
+            Route::get('/create', 'create')->name('walk-in-booking.create');
+            Route::post('/store', 'store')->name('walk-in-booking.store');
+        });
+
+
+});
 
     // authenticated routes for admin only
     Route::middleware(['role:admin'])->group(function () {

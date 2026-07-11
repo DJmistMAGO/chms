@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <title>Caree Hotel - Booking Status Update</title>
@@ -12,13 +13,16 @@
             margin: 0;
             padding: 0;
         }
+
         .mono {
             font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
         }
+
         .wrapper {
             background-color: #f4f4f6;
             padding: 40px 20px;
         }
+
         .container {
             max-width: 560px;
             margin: 0 auto;
@@ -36,6 +40,7 @@
             text-align: center;
             position: relative;
         }
+
         .header .eyebrow {
             font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
             font-size: 11px;
@@ -45,12 +50,14 @@
             opacity: 0.65;
             margin: 0 0 6px 0;
         }
+
         .header h1 {
             margin: 0;
             font-size: 24px;
             font-weight: 800;
             letter-spacing: 0.5px;
         }
+
         .header .ref {
             margin: 10px 0 0 0;
             font-family: 'SF Mono', 'Consolas', 'Menlo', monospace;
@@ -61,12 +68,14 @@
             padding: 4px 12px;
             border-radius: 20px;
         }
+
         /* perforation strip simulating a torn ticket edge */
         .perforation {
             height: 20px;
             background-color: #facc15;
             position: relative;
         }
+
         .perforation::before {
             content: "";
             position: absolute;
@@ -80,10 +89,17 @@
             background-repeat: repeat-x;
         }
 
-        .content { padding: 34px 30px 10px 30px; background-color: #ffffff; }
+        .content {
+            padding: 34px 30px 10px 30px;
+            background-color: #ffffff;
+        }
 
         /* ===== Status pill ===== */
-        .status-row { text-align: center; margin-bottom: 30px; }
+        .status-row {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -98,6 +114,7 @@
             letter-spacing: 0.6px;
             border: 1px solid #fde047;
         }
+
         .status-badge .dot {
             width: 8px;
             height: 8px;
@@ -105,13 +122,38 @@
             background-color: #ca8a04;
             display: inline-block;
         }
-        .status-confirmed { background-color: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .status-confirmed .dot { background-color: #16a34a; }
-        .status-cancelled { background-color: #fee2e2; color: #991b1b; border-color: #fecaca; }
-        .status-cancelled .dot { background-color: #dc2626; }
 
-        .greeting { font-size: 15px; color: #444; margin: 0 0 4px 0; }
-        .subtext { font-size: 14px; color: #777; margin: 0 0 8px 0; }
+        .status-confirmed {
+            background-color: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .status-confirmed .dot {
+            background-color: #16a34a;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .status-cancelled .dot {
+            background-color: #dc2626;
+        }
+
+        .greeting {
+            font-size: 15px;
+            color: #444;
+            margin: 0 0 4px 0;
+        }
+
+        .subtext {
+            font-size: 14px;
+            color: #777;
+            margin: 0 0 8px 0;
+        }
 
         /* ===== Section titles ===== */
         .section-title {
@@ -126,15 +168,30 @@
             align-items: center;
             gap: 10px;
         }
+
         .section-title::after {
             content: "";
             flex: 1;
             border-top: 1px dashed #e0e0e0;
         }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
-        td { padding: 9px 0; font-size: 14.5px; vertical-align: top; }
-        td.label { color: #888888; width: 50%; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 4px;
+        }
+
+        td {
+            padding: 9px 0;
+            font-size: 14.5px;
+            vertical-align: top;
+        }
+
+        td.label {
+            color: #888888;
+            width: 50%;
+        }
+
         td.value {
             color: #161616;
             font-weight: 600;
@@ -150,13 +207,23 @@
             padding: 18px 18px 6px 18px;
             margin-top: 4px;
         }
-        .receipt-box td.value { font-size: 14px; }
+
+        .receipt-box td.value {
+            font-size: 14px;
+        }
+
         .total-row td {
             border-top: 1px dashed #d4d4d8;
             padding-top: 14px;
             margin-top: 6px;
         }
-        .total-row td.label { color: #1a1a1a; font-size: 15px; font-weight: 700; }
+
+        .total-row td.label {
+            color: #1a1a1a;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
         .total-row td.value {
             color: #854d0e;
             font-weight: 800;
@@ -170,6 +237,7 @@
             margin-top: 26px;
             border-radius: 0 8px 8px 0;
         }
+
         .remarks-box h4 {
             margin: 0 0 4px 0;
             color: #1a1a1a;
@@ -177,7 +245,12 @@
             text-transform: uppercase;
             letter-spacing: 0.6px;
         }
-        .remarks-box p { margin: 0; color: #6b5c1f; font-size: 14px; }
+
+        .remarks-box p {
+            margin: 0;
+            color: #6b5c1f;
+            font-size: 14px;
+        }
 
         .note {
             margin-top: 28px;
@@ -193,6 +266,7 @@
             position: relative;
             background-color: #ffffff;
         }
+
         .footer-perforation::before {
             content: "";
             position: absolute;
@@ -205,6 +279,7 @@
             background-position: -4px 0;
             background-repeat: repeat-x;
         }
+
         .footer {
             background-color: #fafafa;
             padding: 22px 20px 26px 20px;
@@ -212,9 +287,13 @@
             font-size: 11.5px;
             color: #aaaaaa;
         }
-        .footer p { margin: 3px 0; }
+
+        .footer p {
+            margin: 3px 0;
+        }
     </style>
 </head>
+
 <body>
     @php
         $nights = \Carbon\Carbon::parse($booking->check_in)
@@ -242,13 +321,14 @@
             <!-- Main Content -->
             <div class="content">
                 <p class="greeting">Dear Guest,</p>
-                <p class="subtext">Thank you for choosing Caree Hotel. The status of your reservation has changed &mdash; here's the latest.</p>
+                <p class="subtext">Thank you for choosing Caree Hotel. The status of your reservation has changed &mdash;
+                    here's the latest.</p>
 
                 <div class="status-row">
-                    <span class="status-badge
-                        @if(strtolower($booking->status) == 'confirmed' || strtolower($booking->status) == 'approved') status-confirmed
-                        @elseif(strtolower($booking->status) == 'cancelled' || strtolower($booking->status) == 'rejected') status-cancelled
-                        @endif">
+                    <span
+                        class="status-badge
+                        @if (strtolower($booking->status) == 'confirmed' || strtolower($booking->status) == 'approved') status-confirmed
+                        @elseif(strtolower($booking->status) == 'cancelled' || strtolower($booking->status) == 'rejected') status-cancelled @endif">
                         {{ $booking->status }}
                     </span>
                 </div>
@@ -258,15 +338,18 @@
                 <table>
                     <tr>
                         <td class="label">Check-In</td>
-                        <td class="value">{{ \Carbon\Carbon::parse($booking->check_in)->format('M d, Y - h:i A') }}</td>
+                        <td class="value">{{ \Carbon\Carbon::parse($booking->check_in)->format('M d, Y - h:i A') }}
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Check-Out</td>
-                        <td class="value">{{ \Carbon\Carbon::parse($booking->check_out)->format('M d, Y - h:i A') }}</td>
+                        <td class="value">{{ \Carbon\Carbon::parse($booking->check_out)->format('M d, Y - h:i A') }}
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Guests</td>
-                        <td class="value">{{ $booking->number_of_guests }} {{ Str::plural('guest', $booking->number_of_guests) }}</td>
+                        <td class="value">{{ $booking->number_of_guests }}
+                            {{ Str::plural('guest', $booking->number_of_guests) }}</td>
                     </tr>
                 </table>
 
@@ -302,7 +385,7 @@
                                 {{ Str::plural('night', $nights) }}
                             </td>
                         </tr>
-
+                        
                         <tr>
                             <td class="label">
                                 Room Rate
@@ -353,14 +436,18 @@
                 </div>
 
                 <!-- Remarks -->
-                @if($booking->remarks)
-                <div class="remarks-box">
-                    <h4>Front Desk Remarks</h4>
-                    <p>{{ $booking->remarks }}</p>
-                </div>
+                @if ($booking->status == 'Cancelled')
+                    @if ($booking->remarks)
+                        <div class="remarks-box">
+                            <h4>Front Desk Remarks</h4>
+                            <p>{{ $booking->remarks }}</p>
+                        </div>
+                    @endif
                 @endif
 
-                <p class="note">Need to change something? Reach out to Caree Hotel guest management and we'll take care of it.</p>
+
+                <p class="note">Need to change something? Reach out to Caree Hotel guest management and we'll take
+                    care of it.</p>
             </div>
 
             <div class="footer-perforation"></div>

@@ -30,7 +30,7 @@ class MenuHelper
                     'icon' => 'ecommerce',
                     'name' => 'Booking Management',
                     'subItems' => [
-                        ['name' => 'Create Walk-in Booking', 'path' => '/booking/create', 'pro' => false],
+                        ['name' => 'Create Walk-in Booking', 'path' => '/walk-in-booking/create', 'pro' => false],
                         ['name' => 'Pending Bookings', 'path' => '/booking/pending', 'pro' => false],
                         ['name' => 'Confirmed Bookings', 'path' => '/booking/confirmed', 'pro' => false],
                         ['name' => 'Checked In Bookings', 'path' => '/booking/checked-in', 'pro' => false],

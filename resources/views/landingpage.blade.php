@@ -144,155 +144,185 @@
 
     <section class="py-20 px-6 md:px-16 bg-white" id="rooms">
 
-        <div class="text-center mb-14">
-            <span
-                class="inline-block bg-yellow-400 text-yellow-900 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
-                Our Accommodations
-            </span>
-            <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                Explore & Book Your Room
-            </h2>
-            <p class="mt-4 text-gray-500 text-lg max-w-xl mx-auto">
-                Discover our carefully curated rooms — each designed for comfort, style, and a stay you'll remember.
-            </p>
+    <div class="text-center mb-14">
+        <span
+            class="inline-block bg-yellow-400 text-yellow-900 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
+            Our Accommodations
+        </span>
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            Explore & Book Your Room
+        </h2>
+        <p class="mt-4 text-gray-500 text-lg max-w-xl mx-auto">
+            Discover our carefully curated rooms — each designed for comfort, style, and a stay you'll remember.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <!-- Standard Room -->
+        <div
+            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div class="relative overflow-hidden h-56 bg-yellow-50">
+                <img src="{{ asset('assets/images/sRoom.png') }}" alt="Standard Room"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <span
+                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                    Standard
+                </span>
+            </div>
+            <div class="p-6 flex flex-col flex-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Standard Room</h3>
+
+                <ul class="space-y-3 mb-5 text-sm text-gray-600">
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                        </svg>
+                        20 sqm
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                        </svg>
+                        1 Queen Bed
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Up to 2 guests
+                    </li>
+                </ul>
+
+                <hr class="border-gray-100 mb-5">
+
+                <div class="flex items-center justify-between mt-auto">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
+                        <span class="text-2xl font-bold text-gray-900">₱1,500</span>
+                        <span class="text-gray-400 text-sm block">per night</span>
+                    </div>
+                    <a href="{{ route('customize.booking', ['roomType' => 'standard']) }}"
+                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
+                        View Details
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Standard Premium Room -->
+        <div
+            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div class="relative overflow-hidden h-56 bg-yellow-50">
+                <img src="{{ asset('assets/images/pRoom.png') }}" alt="Standard Premium Room"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <span
+                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                    Standard Premium
+                </span>
+            </div>
+            <div class="p-6 flex flex-col flex-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Standard Premium Room</h3>
 
-            <div
-                class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div class="relative overflow-hidden h-56 bg-yellow-50">
-                    <img src="{{ asset('assets/images/sRoom.png') }}" alt="Standard Room"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <span
-                        class="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                        Standard
-                    </span>
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">Standard Room</h3>
-                    <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                        A clean, comfortable room with all essential amenities — perfect for solo travelers or couples
-                        on a budget.
-                    </p>
-                    <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Free Wi-Fi
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Air Conditioning
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> 1 Queen Bed
-                        </li>
-                    </ul>
-                    <div class="flex items-center justify-between mt-auto">
-                        <div>
-                            <span class="text-2xl font-bold text-gray-900">₱1,500</span>
-                            <span class="text-gray-400 text-sm"> / night</span>
-                        </div>
-                        <a href="{{ route('customize.booking', ['roomType' => 'standard']) }}"
-                            class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                            Book Now
-                        </a>
+                <ul class="space-y-3 mb-5 text-sm text-gray-600">
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                        </svg>
+                        25 sqm
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                        </svg>
+                        1 Queen Bed
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Up to 2 guests
+                    </li>
+                </ul>
+
+                <hr class="border-gray-100 mb-5">
+
+                <div class="flex items-center justify-between mt-auto">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
+                        <span class="text-2xl font-bold text-gray-900">₱1,900</span>
+                        <span class="text-gray-400 text-sm block">per night</span>
                     </div>
+                    <a href="{{ route('customize.booking', ['roomType' => 'standard-premium']) }}"
+                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
+                        View Details
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
                 </div>
             </div>
-
-            <div
-                class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div class="relative overflow-hidden h-56 bg-yellow-50">
-                    <img src="{{ asset('assets/images/pRoom.png') }}" alt="Standard Room"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <span
-                        class="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                        Standard Premium
-                    </span>
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">Standard Premium Room</h3>
-                    <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                        A clean, comfortable room with all essential amenities — perfect for solo travelers or couples
-                        on a budget.
-                    </p>
-                    <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Free Wi-Fi
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Air Conditioning
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Free Wi-Fi
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Air Conditioning
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> 1 Queen Bed
-                        </li>
-                    </ul>
-                    <div class="flex items-center justify-between mt-auto">
-                        <div>
-                            <span class="text-2xl font-bold text-gray-900">₱1,500</span>
-                            <span class="text-gray-400 text-sm"> / night</span>
-                        </div>
-                        <a href="{{ route('customize.booking', ['roomType' => 'standard-premium']) }}"
-                            class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                            Book Now
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                <div class="relative overflow-hidden h-56 bg-yellow-50">
-                    <img src="{{ asset('assets/images/fRoom.png') }}" alt="Standard Room"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    <span
-                        class="absolute top-4 left-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                        Family
-                    </span>
-                </div>
-                <div class="p-6 flex flex-col flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">Family Room</h3>
-                    <p class="text-gray-500 text-sm mb-4 leading-relaxed">
-                        A clean, comfortable room with all essential amenities — perfect for solo travelers or couples
-                        on a budget.
-                    </p>
-                    <ul class="flex flex-wrap gap-2 mb-5 text-xs text-gray-500">
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Free Wi-Fi
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Air Conditioning
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Free Wi-Fi
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> Air Conditioning
-                        </li>
-                        <li class="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <span class="text-yellow-500">★</span> 1 Queen Bed
-                        </li>
-                    </ul>
-                    <div class="flex items-center justify-between mt-auto">
-                        <div>
-                            <span class="text-2xl font-bold text-gray-900">₱1,500</span>
-                            <span class="text-gray-400 text-sm"> / night</span>
-                        </div>
-                        <a href="{{ route('customize.booking', ['roomType' => 'family']) }}"
-                            class="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                            Book Now
-                        </a>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </section>
+
+        <!-- Family Room -->
+        <div
+            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+            <div class="relative overflow-hidden h-56 bg-yellow-50">
+                <img src="{{ asset('assets/images/fRoom.png') }}" alt="Family Room"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <span
+                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
+                    Family
+                </span>
+            </div>
+            <div class="p-6 flex flex-col flex-1">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Family Room</h3>
+
+                <ul class="space-y-3 mb-5 text-sm text-gray-600">
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                        </svg>
+                        30 sqm
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                        </svg>
+                        2 Queen Beds
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Up to 4 guests
+                    </li>
+                </ul>
+
+                <hr class="border-gray-100 mb-5">
+
+                <div class="flex items-center justify-between mt-auto">
+                    <div>
+                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
+                        <span class="text-2xl font-bold text-gray-900">₱2,700</span>
+                        <span class="text-gray-400 text-sm block">per night</span>
+                    </div>
+                    <a href="{{ route('customize.booking', ['roomType' => 'family']) }}"
+                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
+                        View Details
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
 
     <section class="flex flex-col md:flex-row items-center px-6 md:px-16 py-20 gap-10" id="about-us">
 
