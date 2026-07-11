@@ -16,8 +16,6 @@ return new class extends Migration
             $table->foreignId('room_id')->constrained('rooms');
             $table->string('fullname', 255);
             $table->string('phone_number', 20);
-            $table->string('room_type');
-            $table->string('floor_level');
             $table->string('ambiance');
             $table->string('food_package');
             $table->date('check_in');
@@ -26,7 +24,7 @@ return new class extends Migration
             $table->decimal('room_price', 10, 2);
             $table->decimal('micro_pricing_amount', 10, 2)->default(0);
             $table->decimal('total_price', 10, 2);
-            $table->enum('status', ['Confirmed', 'Checked In', 'Completed', 'Cancelled', 'Archived'])->default('Pending');
+            $table->enum('status', ['Confirmed', 'Checked In', 'Completed', 'Cancelled', 'Archived']);
             $table->text('remarks')->nullable();
             $table->timestamps();
         });

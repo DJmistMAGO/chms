@@ -10,8 +10,6 @@ class WalkInBooking extends Model
         'room_id',
         'fullname',
         'phone_number',
-        'room_type',
-        'floor_level',
         'ambiance',
         'food_package',
         'check_in',
@@ -20,8 +18,8 @@ class WalkInBooking extends Model
         'room_price',
         'micro_pricing_amount',
         'total_price',
+        'remarks',
         'status',
-        'remarks'
     ];
 
     protected $dates = [
@@ -38,7 +36,7 @@ class WalkInBooking extends Model
         'check_out'  => 'date',
     ];
 
-    
+
 
     public function room()
     {
