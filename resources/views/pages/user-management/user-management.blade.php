@@ -37,6 +37,17 @@
             </button>
         </div>
 
+        <div class="mb-5 relative">
+            <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+                fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" />
+            </svg>
+            <input type="text" id="search-input" placeholder="Search by name, email address,  role, phone number, or address"
+                oninput="filterTable()"
+                class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-700 transition focus:border-yellow-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-800/50 dark:text-white">
+        </div>
+
         {{-- Add Staff Modal --}}
         <div id="addStaffModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4">
             <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-gray-900">
@@ -102,7 +113,11 @@
 
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
                     @foreach ($users as $user)
-                        <tr class="transition hover:bg-gray-50 dark:hover:bg-white/[0.02]">
+                        <tr class="user-row transition hover:bg-gray-50 dark:hover:bg-white/[0.02]" data-search="
+                        {{ strtolower($user['name']) }}
+                        {{ strtolower($user['email']) }}
+                        {{ strtolower($user['phone'] ?? '') }}
+                        {{ strtolower($user['address'] ?? '') }}">
 
                             <td class="py-3 pr-4">
                                 <div class="flex items-center gap-3">
@@ -396,5 +411,14 @@
                 }
             });
         }, 4000);
+    </script>
+
+    <script>
+        function filterTable() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            document.querySelectorAll('.user-row').forEach(r => {
+                r.style.display = (r.dataset.search || '').includes(q) ? '' : 'none';
+            });
+        }
     </script>
 @endpush
