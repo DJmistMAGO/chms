@@ -26,14 +26,13 @@
         <input type="hidden" name="micro_pricing_amount" id="aw-input-addons" value="0">
         <input type="hidden" name="total_price" id="aw-input-total" value="{{ $price }}">
 
-        {{-- Slim progress bar (replaces the two big circular step pills) --}}
         <div class="mb-5">
             <div class="flex items-center gap-2">
                 <div class="aw-step-pill flex-1" data-step="1">
-                    <div class="aw-pill-track h-1.5 rounded-full bg-amber-400"></div>
+                    <div class="aw-pill-track h-1.5 rounded-full bg-amber-400 dark:bg-amber-400"></div>
                 </div>
                 <div class="aw-step-pill flex-1" data-step="2">
-                    <div class="aw-pill-track h-1.5 rounded-full bg-white/10"></div>
+                    <div class="aw-pill-track h-1.5 rounded-full bg-gray-200 dark:bg-white/10"></div>
                 </div>
             </div>
             <div class="mt-1.5 flex justify-between text-[10px] font-medium uppercase tracking-widest text-slate-500">
@@ -46,56 +45,55 @@
         <div class="aw-step" data-step="1">
             <div class="space-y-4">
 
-                {{-- Guests and Dates stacked vertically --}}
                 <div class="space-y-3">
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">Guests</label>
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-gray-700 dark:text-slate-400 mb-1.5">Guests</label>
                         <div class="flex items-center gap-2">
-                            <button type="button" onclick="awStepGuests(-1)" class="w-9 h-9 shrink-0 rounded-lg border border-white/10 text-base font-semibold text-white hover:bg-white/5">−</button>
-                            <input type="number" id="aw-pax_count" value="1" min="1" max="{{ $room->capacity }}" class="w-full rounded-lg border border-white/10 bg-white/5 py-2 text-center text-sm font-semibold text-white">
-                            <button type="button" onclick="awStepGuests(1)" class="w-9 h-9 shrink-0 rounded-lg border border-white/10 text-base font-semibold text-white hover:bg-white/5">+</button>
+                            <button type="button" onclick="awStepGuests(-1)" class="w-9 h-9 shrink-0 rounded-lg border border-amber-400 dark:border-white/10 text-base font-semibold text-gray-800 dark:text-white hover:bg-white/5">−</button>
+                            <input type="number" id="aw-pax_count" value="1" min="1" max="{{ $room->capacity }}" class="w-full rounded-lg border border-amber-400 dark:border-white/10 bg-amber-100 dark:bg-white/5 py-2 text-center text-sm font-semibold dark:text-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
+                            <button type="button" onclick="awStepGuests(1)" class="w-9 h-9 shrink-0 rounded-lg border border-amber-400 dark:border-white/10 text-base font-semibold text-gray-800 dark:text-white hover:bg-white/5">+</button>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
-                            Dates
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-gray-700 dark:text-slate-400 mb-1.5">
+                            Dates <span class="text-red-500 text-sm">*</span>
                             <span id="aw-nights-label" class="hidden normal-case tracking-normal text-amber-400 font-medium">· <span id="aw-nights-text"></span></span>
                         </label>
                         <div class="relative">
                             <i class="fas fa-calendar absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
                             <input type="text" id="aw-booking_range" placeholder="Check-in → check-out" readonly
-                                class="w-full rounded-lg border border-white/10 bg-white/5 pl-9 pr-3 py-2 text-sm text-white cursor-pointer">
+                                class="w-full rounded-lg border border-amber-400 dark:border-white/10 bg-amber-100 dark:bg-white/5 pl-9 pr-3 py-2 text-sm dark:text-white text-gray-800 cursor-pointer required focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">
                         </div>
+                        <span class="text-[10px] text-slate-400 mt-1 block">Select your check-in and check-out dates</span>
                     </div>
                 </div>
 
-                {{-- Compact chip grids instead of stacked full-width rows --}}
                 <div>
-                    <label class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
+                    <label class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-gray-700 dark:text-slate-400 mb-1.5">
                         <i class="fas fa-layer-group text-[10px]"></i> Floor Level
                     </label>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $i => $floor)
-                            <div class="aw-option-row aw-chip {{ $i === 0 ? 'aw-selected' : '' }}"
+                            <div class="aw-option-row aw-chip border border-amber-400 dark:border-white/10 {{ $i === 0 ? 'aw-selected' : '' }}"
                                 data-group="floor_level" data-price="0" data-label="{{ $floor }}">
-                                <span class="aw-chip-label">{{ $floor }}</span>
-                                <span class="aw-badge">Free</span>
+                                <span class="aw-chip-label dark:text-white text-gray-800">{{ $floor }}</span>
+                                <span class="aw-badge text-gray-800 dark:text-white">Free</span>
                             </div>
                         @endforeach
                     </div>
                 </div>
 
                 <div>
-                    <label class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">
+                    <label class="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-gray-700 dark:text-slate-400 mb-1.5">
                         <i class="fas fa-heart text-[10px]"></i> Ambiance
                     </label>
                     <div class="grid grid-cols-3 gap-2">
                         @foreach ([['label' => 'Regular Room', 'price' => 0], ['label' => 'Cozy Ambiance', 'price' => 500], ['label' => 'Romantic Ambiance', 'price' => 1000]] as $i => $ambiance)
                             <div class="aw-option-row aw-chip {{ $i === 0 ? 'aw-selected' : '' }}"
                                 data-group="ambiance" data-price="{{ $ambiance['price'] }}" data-label="{{ $ambiance['label'] }}">
-                                <span class="aw-chip-label">{{ $ambiance['label'] }}</span>
-                                <span class="aw-badge">{{ $ambiance['price'] == 0 ? 'Base' : '+₱' . number_format($ambiance['price']) }}</span>
+                                <span class="aw-chip-label dark:text-white text-gray-800">{{ $ambiance['label'] }}</span>
+                                <span class="aw-badge text-gray-800 dark:text-white">{{ $ambiance['price'] == 0 ? 'Base' : '+₱' . number_format($ambiance['price']) }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -109,8 +107,8 @@
                         @foreach ([['label' => 'No Food', 'price' => 0], ['label' => 'Cozy Dinner for Family', 'price' => 1500], ['label' => 'Romantic Dinner', 'price' => 1500]] as $i => $food)
                             <div class="aw-option-row aw-chip {{ $i === 0 ? 'aw-selected' : '' }}"
                                 data-group="food_package" data-price="{{ $food['price'] }}" data-label="{{ $food['label'] }}">
-                                <span class="aw-chip-label">{{ $food['label'] }}</span>
-                                <span class="aw-badge">{{ $food['price'] == 0 ? 'Free' : '+₱' . number_format($food['price']) }}</span>
+                                <span class="aw-chip-label dark:text-white text-gray-800">{{ $food['label'] }}</span>
+                                <span class="aw-badge text-gray-800 dark:text-white">{{ $food['price'] == 0 ? 'Free' : '+₱' . number_format($food['price']) }}</span>
                             </div>
                         @endforeach
                     </div>
@@ -128,22 +126,22 @@
             </div>
 
             <div class="mt-4 flex items-center justify-between gap-3">
-                <button type="button" onclick="backToRoomPicker()" class="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5">Back to rooms</button>
+                <button type="button" onclick="backToRoomPicker()" class="rounded-xl border border-amber-100 dark:border-white/10 px-4 py-2.5 text-sm font-medium dark:text-slate-300 text-gray-400 hover:bg-amber-100 dark:hover:bg-white/5">Back to rooms</button>
                 <button type="button" onclick="awNextStep(1)" class="rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-semibold text-slate-900 hover:bg-amber-300">Continue to review</button>
             </div>
         </div>
 
         {{-- STEP 2: REVIEW --}}
         <div class="aw-step hidden" data-step="2">
-            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div class="rounded-2xl border border-amber-100 dark:border-white/10 bg-white/5 p-4">
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2.5 text-sm">
-                    <span class="text-slate-400">Room</span><span class="text-white text-right">{{ $roomName }}</span>
-                    <span class="text-slate-400">Dates</span><span class="text-white text-right" id="aw-summary-dates">—</span>
-                    <span class="text-slate-400">Guests</span><span class="text-white text-right" id="aw-summary-guests">1</span>
-                    <span class="text-slate-400">Floor</span><span class="text-white text-right" id="aw-summary-floor">Floor 1</span>
-                    <span class="text-slate-400">Ambiance</span><span class="text-white text-right" id="aw-summary-ambiance">Regular Room</span>
-                    <span class="text-slate-400">Food package</span><span class="text-white text-right" id="aw-summary-food">No Food</span>
-                    <span class="text-slate-400">Nights</span><span class="text-white text-right" id="aw-summary-nights">—</span>
+                    <span class="text-gray-800  dark:text-slate-400">Room</span><span class="text-gray-500 dark:text-white text-right">{{ $roomName }}</span>
+                    <span class="text-gray-800  dark:text-slate-400">Dates</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-dates">—</span>
+                    <span class="text-gray-800  dark:text-slate-400">Guest/s</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-guests">1</span>
+                    <span class="text-gray-800  dark:text-slate-400">Floor</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-floor">Floor 1</span>
+                    <span class="text-gray-800  dark:text-slate-400">Ambiance</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-ambiance">Regular Room</span>
+                    <span class="text-gray-800  dark:text-slate-400">Food package</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-food">No Food</span>
+                    <span class="text-gray-800  dark:text-slate-400">Nights</span><span class="text-gray-500 dark:text-white text-right" id="aw-summary-nights">—</span>
                 </div>
                 <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
                     <span class="text-xs uppercase tracking-widest text-slate-400">Final total</span>
@@ -154,7 +152,7 @@
             <p id="aw-submit-error" class="hidden mt-3 text-sm text-red-400"></p>
 
             <div class="mt-5 flex items-center justify-between gap-3">
-                <button type="button" onclick="awGoToStep(1)" class="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-medium text-slate-300 hover:bg-white/5">Back</button>
+                <button type="button" onclick="awGoToStep(1)" class="rounded-xl border border-amber-100 dark:border-white/10 px-5 py-2.5 text-sm font-medium text-gray-400 hover:bg-amber-100 dark:text-slate-300 dark:hover:bg-white/5">Back</button>
                 <button type="button" id="aw-submit-btn" onclick="awSubmitBooking()" aria-busy="false"
                     class="relative min-w-[9.5rem] justify-center rounded-xl bg-amber-400 px-5 py-2.5 text-sm font-semibold text-slate-900 hover:bg-amber-300 flex items-center gap-2 transition-opacity disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-amber-400">
                     <i class="fas fa-spinner fa-spin hidden" id="aw-submit-spinner"></i>
@@ -273,7 +271,6 @@
             return data;
         })
         .then(data => {
-            // keep the button locked/spinning through the redirect so a stray click can't fire a second submit
             window.location.href = data.redirect;
         })
         .catch(err => {
@@ -351,7 +348,6 @@
 </script>
 
 <style>
-    /* Compact chip-style option rows (replaces the old full-width list rows) */
     #auth-wizard-root .aw-chip {
         display: flex;
         flex-direction: column;
@@ -368,12 +364,16 @@
     #auth-wizard-root .aw-chip:hover {
         background: rgba(255, 255, 255, 0.05);
     }
+
     #auth-wizard-root .aw-chip-label {
         font-size: 0.72rem;
         line-height: 1.05rem;
-        color: #e2e8f0; /* slate-200 */
         font-weight: 500;
+        /* default (light) mode color */
+        /* color: #334155; slate-700 */
     }
+
+
     #auth-wizard-root .aw-badge {
         font-size: 0.62rem;
         font-weight: 500;
@@ -387,7 +387,6 @@
         border-color: rgba(251, 191, 36, 0.5) !important;
     }
 
-    /* Keeps the price summary visible near the bottom of the scroll area on step 1 */
     #auth-wizard-root .aw-price-bar {
         position: sticky;
         bottom: -1px;
