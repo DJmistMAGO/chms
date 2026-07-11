@@ -98,9 +98,6 @@ Route::middleware(['web', 'auth'])->group(function () {
             Route::post('/store', 'store')->name('walk-in-booking.store');
         });
 
-
-});
-
     // authenticated routes for admin only
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/user-management', [UserManagementController::class, 'index'])->name('user-management.index');
