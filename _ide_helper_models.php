@@ -72,6 +72,33 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property int $user_id
+ * @property string $valid_id_status
+ * @property int|null $verified_by
+ * @property \Illuminate\Support\Carbon|null $verified_at
+ * @property string|null $remarks
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\User $user
+ * @property-read \App\Models\User|null $verifier
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereValidIdStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|IdVerification whereVerifiedBy($value)
+ */
+	class IdVerification extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property int $room_type_id
  * @property string $pricing_type
  * @property string $adjustment_type
@@ -185,6 +212,7 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Booking> $bookings
  * @property-read int|null $bookings_count
  * @property-read mixed $initials
+ * @property-read \App\Models\IdVerification|null $idVerification
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
@@ -226,10 +254,44 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property-read \App\Models\Room|null $room
+ * @property int $id
+ * @property int $room_id
+ * @property string $reference_number
+ * @property string $fullname
+ * @property string $phone_number
+ * @property string $ambiance
+ * @property string $food_package
+ * @property \Illuminate\Support\Carbon $check_in
+ * @property \Illuminate\Support\Carbon $check_out
+ * @property int $number_of_guests
+ * @property numeric $room_price
+ * @property numeric $micro_pricing_amount
+ * @property numeric $total_price
+ * @property string $status
+ * @property string|null $remarks
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Room $room
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereAmbiance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereCheckIn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereCheckOut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereFoodPackage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereFullname($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereMicroPricingAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereNumberOfGuests($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking wherePhoneNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereReferenceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereRoomId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereRoomPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WalkInBooking whereUpdatedAt($value)
  */
 	class WalkInBooking extends \Eloquent {}
 }

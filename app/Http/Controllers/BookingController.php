@@ -217,8 +217,6 @@ class BookingController extends Controller
     {
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
 
-
-        // Delete the booking
         $booking->delete();
 
         return redirect()->route('booking.pending')->with('success', 'Booking deleted successfully.');

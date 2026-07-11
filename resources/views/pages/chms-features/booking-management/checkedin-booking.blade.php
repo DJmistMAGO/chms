@@ -142,7 +142,7 @@
 
                     {{-- Total --}}
                     <td class="px-5 py-4">
-                        <span class="font-semibold text-gray-800 dark:text-white">
+                        <span class="font-semibold text-gray-800 dark:text-white text-xs">
                             ₱{{ number_format($b->total_price, 2) }}
                         </span>
                     </td>

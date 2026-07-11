@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('walk_in_bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_id')->constrained('rooms');
+            $table->string('reference_number')->unique();
             $table->string('fullname', 255);
             $table->string('phone_number', 20);
             $table->string('ambiance');
