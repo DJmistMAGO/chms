@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\WalkInBooking;
+use Illuminate\Support\Str;
 
 class WalkInBookingController extends Controller
 {
@@ -47,9 +48,17 @@ class WalkInBookingController extends Controller
         ]);
 
         $data['status'] = 'Checked In';
+        $data['reference_number'] = 'CH-' . strtoupper(Str::random(8));
 
         WalkInBooking::create($data);
 
-        return redirect()->route('walk-in-booking.create')->with('success', 'Walk-in booking created successfully.');
+        $room_id = $data['room_id'];
+        $room = Room::find($room_id);
+        $room->status = 'Occupied';
+        $room->save();
+
+        return redirect()->route('booking.checkin')->with('success', 'Walk-in booking created successfully.');
     }
+
+
 }

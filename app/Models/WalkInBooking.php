@@ -9,6 +9,7 @@ class WalkInBooking extends Model
     protected $fillable = [
         'room_id',
         'fullname',
+        'reference_number',
         'phone_number',
         'ambiance',
         'food_package',
