@@ -30,30 +30,26 @@ class WalkInBookingController extends Controller
     }
 
     public function store(Request $request)
-{
-    $data = $request->validate([
-        'room_id' => 'required|exists:rooms,id',
-        'fullname' => 'required|string|max:255',
-        'phone_number' => 'required|string|max:20',
-        'ambiance' => 'required|string|max:255',
-        'food_package' => 'required|string|max:255',
-        'check_in' => 'required|date|after_or_equal:today',
-        'check_out' => 'required|date|after:check_in',
-        'number_of_guests' => 'required|integer|min:1',
-        'room_price' => 'required|numeric|min:0',
-        'micro_pricing_amount' => 'required|numeric|min:0',
-        'total_price' => 'required|numeric|min:0',
-        'remarks' => 'nullable|string|max:500',
-    ]);
+    {
+        $data = $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+            'fullname' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
+            'ambiance' => 'required|string|max:255',
+            'food_package' => 'required|string|max:255',
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+            'number_of_guests' => 'required|integer|min:1',
+            'room_price' => 'required|numeric|min:0',
+            'micro_pricing_amount' => 'required|numeric|min:0',
+            'total_price' => 'required|numeric|min:0',
+            'remarks' => 'nullable|string|max:500',
+        ]);
 
-    $data['status'] = 'Checked In';
+        $data['status'] = 'Checked In';
 
-    WalkInBooking::create($data);
+        WalkInBooking::create($data);
 
-    return redirect()->route('walk-in-booking.create')->with('success', 'Walk-in booking created successfully.');
-
-
-}
-
-
+        return redirect()->route('walk-in-booking.create')->with('success', 'Walk-in booking created successfully.');
+    }
 }

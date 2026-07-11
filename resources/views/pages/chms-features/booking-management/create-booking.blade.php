@@ -115,7 +115,9 @@
                                             d="M3 10.5V6.75A2.25 2.25 0 0 1 5.25 4.5h13.5A2.25 2.25 0 0 1 21 6.75v10.5A2.25 2.25 0 0 1 18.75 19.5H5.25A2.25 2.25 0 0 1 3 17.25V10.5Z" />
                                     </svg>
                                 </span>
-                                <input type="date" id="check_in" name="check_in" required
+                                <input type="date" id="check_in" name="check_in"
+                                min="{{ date('Y-m-d') }}"
+                                    value="{{ old('check_in') }}"required
                                     class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-xs text-gray-700 dark:text-gray-300 dark:border-gray-800 dark:bg-white/[0.03] outline-none cursor-pointer focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
                             </div>
                         </div>
