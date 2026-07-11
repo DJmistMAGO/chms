@@ -21,6 +21,13 @@
         </div>
     @endif
 
+        <x-dashboard.guest-summary
+            :totalGuests="$totalGuests"
+            :activeGuests="$activeGuests"
+            :totalBookings="$totalBookings"
+            :totalRevenue="$totalRevenue"
+        />
+
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
 
         <div class="mb-5 flex items-center justify-between lg:mb-7">
