@@ -28,7 +28,7 @@
                 </button>
             </div>
 
-            <form id="statusForm" method="POST" action="">
+            <form id="statusForm" method="POST" action="" data-confirm-leave>
                 @csrf
                 @method('PUT')
 
@@ -206,12 +206,12 @@
             document.body.style.overflow = '';
         }
 
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) closeModal();
-        });
+        // modal.addEventListener('click', function (e) {
+        //     if (e.target === modal) closeModal();
+        // });
 
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeModal();
-        });
+        // document.addEventListener('keydown', function (e) {
+        //     if (e.key === 'Escape') closeModal();
+        // });
     </script>
 @endsection

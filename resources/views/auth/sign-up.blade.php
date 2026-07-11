@@ -79,7 +79,7 @@
             <h2 class="font-display text-3xl font-semibold text-center text-stone-800 tracking-wide mb-1">Create Account</h2>
             <p class="text-center text-stone-400 text-sm mb-7 font-light">Join Caree Hotel — it's free</p>
 
-            <form action="{{ route('signup.post') }}" method="POST" class="space-y-4">
+            <form action="{{ route('signup.post') }}" method="POST" class="space-y-4" data-confirm-leave>
                 @csrf
 
                 <div class="space-y-1">

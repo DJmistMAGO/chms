@@ -67,11 +67,6 @@ class MenuHelper
                     'name' => 'Booking History',
                     'path' => '/booking/history',
                 ],
-                // [
-                //     'icon' =>'charts',
-                //     'name' => 'Reports',
-                //     'path' => '/reports',
-                // ]
             ]);
         }
 

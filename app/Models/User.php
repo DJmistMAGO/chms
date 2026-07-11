@@ -70,4 +70,9 @@ class User extends Authenticatable
         return !is_null($this->valid_id);
     }
 
+    public function idVerification()
+    {
+        return $this->hasOne(IdVerification::class);
+    }
+
 }

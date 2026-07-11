@@ -257,6 +257,7 @@
             font-size: 13.5px;
             color: #888;
             text-align: center;
+            /* padding: 0 10px; */
         }
 
         /* ===== Torn-edge footer, like the bottom of a receipt ===== */
@@ -294,6 +295,18 @@
 </head>
 
 <body>
+    @php
+        $nights = \Carbon\Carbon::parse($booking->check_in)
+            ->diffInDays(\Carbon\Carbon::parse($booking->check_out));
+
+        $roomRate = $booking->room_price;
+        $addonsPerNight = $booking->micro_pricing_amount ?? 0;
+
+        $roomSubtotal = $roomRate * $nights;
+        $addonsSubtotal = $addonsPerNight * $nights;
+
+        $grandTotal = $roomSubtotal + $addonsSubtotal;
+    @endphp
     <div class="wrapper">
         <div class="container">
 
@@ -345,7 +358,7 @@
                 <table>
                     <tr>
                         <td class="label">Room Type</td>
-                        <td class="value">{{ $booking->room_type }} (No. {{ $booking->room->room_no }})</td>
+                        <td class="value">{{ $booking->room_type }} (No. {{ $booking->room->room_no ?? 'To be assigned' }})</td>
                     </tr>
                     <tr>
                         <td class="label">Floor</td>
@@ -361,24 +374,64 @@
                     </tr>
                 </table>
 
-                <!-- Billing -->
-                <div class="section-title">Billing</div>
+                <div class="section-title">Billing Breakdown</div>
                 <div class="receipt-box">
                     <table>
+
                         <tr>
-                            <td class="label">Base Rate</td>
-                            <td class="value">&#8369;{{ number_format($booking->room_price, 2) }}</td>
+                            <td class="label">Length of Stay</td>
+                            <td class="value">
+                                {{ $nights }}
+                                {{ Str::plural('night', $nights) }}
+                            </td>
                         </tr>
-                        @if ($booking->micro_pricing_amount > 0)
-                            <tr>
-                                <td class="label">Adjustments</td>
-                                <td class="value">+&#8369;{{ number_format($booking->micro_pricing_amount, 2) }}</td>
-                            </tr>
+                        
+                        <tr>
+                            <td class="label">
+                                Room Rate
+                                <br>
+                                <small>
+                                    ₱{{ number_format($roomRate,2) }}
+                                    × {{ $nights }}
+                                    {{ Str::plural('night',$nights) }}
+                                </small>
+                            </td>
+
+                            <td class="value">
+                                ₱{{ number_format($roomSubtotal,2) }}
+                            </td>
+                        </tr>
+
+                        @if($addonsPerNight > 0)
+
+                        <tr>
+                            <td class="label">
+                                Add-ons / Micro Pricing
+                                <br>
+                                <small>
+                                    ₱{{ number_format($addonsPerNight,2) }}
+                                    × {{ $nights }}
+                                    {{ Str::plural('night',$nights) }}
+                                </small>
+                            </td>
+
+                            <td class="value">
+                                ₱{{ number_format($addonsSubtotal,2) }}
+                            </td>
+                        </tr>
+
                         @endif
+
                         <tr class="total-row">
-                            <td class="label">Total Due</td>
-                            <td class="value">&#8369;{{ number_format($booking->total_price, 2) }}</td>
+                            <td class="label">
+                                Total Amount
+                            </td>
+
+                            <td class="value">
+                                ₱{{ number_format($grandTotal,2) }}
+                            </td>
                         </tr>
+
                     </table>
                 </div>
 
@@ -405,5 +458,4 @@
         </div>
     </div>
 </body>
-
 </html>

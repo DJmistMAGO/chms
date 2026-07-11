@@ -16,6 +16,19 @@
             this.selectedRef = booking.ref;
             this.selectedRoomType = booking.roomType;
             this[modal] = true;
+        },
+        formatCurrency(value, multiplier = null, zeroFallback = false) {
+            const num = Number(String(value ?? '').replace(/,/g, ''));
+            if (value == null || Number.isNaN(num)) {
+                return zeroFallback ? '₱0.00' : '—';
+            }
+            const peso = (n) => '₱' + n.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            if (multiplier == null) return peso(num);
+            const total = num * multiplier;
+            return ` (${peso(num)} × ${multiplier}N) ${peso(total)}`;
         }
     }">
 
@@ -270,18 +283,18 @@
                             class="rounded-xl border border-yellow-100 bg-yellow-50/50 px-3 py-3 dark:border-yellow-400/10 dark:bg-yellow-400/5">
                             <div class="space-y-1.5 text-sm">
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Room rate</span><span
-                                        x-text="selectedBooking.room_price ? '₱' + selectedBooking.room_price : '—'"></span>
+                                    <span>Room rate</span>
+                                    <span x-text="formatCurrency(selectedBooking.room_price, selectedBooking.nights || 1)"></span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Add-ons</span><span
-                                        x-text="selectedBooking.micro_pricing_amount ? '₱' + selectedBooking.micro_pricing_amount : '₱0.00'"></span>
+                                    <span>Add-ons</span>
+                                    <span x-text="formatCurrency(selectedBooking.micro_pricing_amount, selectedBooking.nights || 1, true)"></span>
                                 </div>
                                 <div
                                     class="flex justify-between border-t border-yellow-200/60 pt-1.5 dark:border-yellow-400/10">
                                     <span class="font-semibold text-gray-700 dark:text-gray-200">Total</span>
                                     <span class="font-bold text-gray-900 dark:text-white"
-                                        x-text="selectedBooking.total_price ? '₱' + selectedBooking.total_price : '—'"></span>
+                                        x-text="formatCurrency(selectedBooking.total_price)"></span>
                                 </div>
                             </div>
                         </div>

@@ -48,9 +48,12 @@ class BookingController extends Controller
 
     public function pending()
     {
-        $pendingBookings = Booking::where('status', 'Pending')
+        $pendingBookings = Booking::with('user.idVerification')
+            ->where('status', 'Pending')
             ->latest()
             ->paginate(15);
+
+            // dd($pendingBookings);
 
         $availableRooms = Room::where('status', 'Available')
             ->orderBy('room_type')

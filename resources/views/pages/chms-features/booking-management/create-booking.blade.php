@@ -17,7 +17,7 @@
             </div>
 
             {{-- Form Card --}}
-            <form method="POST" action="{{ route('walk-in-booking.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('walk-in-booking.store') }}" class="space-y-6" data-confirm-leave>
                 @csrf
 
                 {{-- ── SECTION 1: GUEST DETAILS ── --}}

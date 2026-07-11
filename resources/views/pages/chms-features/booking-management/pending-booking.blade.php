@@ -16,6 +16,19 @@
             this.selectedRef = booking.ref;
             this.selectedRoomType = booking.roomType;
             this[modal] = true;
+        },
+        formatCurrency(value, multiplier = null, zeroFallback = false) {
+            const num = Number(String(value ?? '').replace(/,/g, ''));
+            if (value == null || Number.isNaN(num)) {
+                return zeroFallback ? '₱ 0.00' : '—';
+            }
+            const peso = (n) => '₱ ' + n.toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            if (multiplier == null) return peso(num);
+            const total = num * multiplier;
+            return ` (${peso(num)} × ${multiplier}N) ${peso(total)}`;
         }
     }">
 
@@ -55,7 +68,7 @@
                     <thead>
                         <tr
                             class="border-b border-gray-100 bg-gray-50/80 text-left text-xs font-semibold uppercase tracking-wider text-gray-400 dark:border-gray-800 dark:bg-white/5 dark:text-gray-500">
-                            @foreach (['Guest', 'Reference', 'Room Type', 'Stay', 'Total', 'Status', 'Actions'] as $col)
+                            @foreach (['Guest', 'Reference', 'Room Type', 'Stay', 'Total', 'Status', 'Id Status', 'Actions'] as $col)
                                 <th class="px-5 py-3.5 {{ $col === 'Actions' ? 'text-center' : '' }}">{{ $col }}
                                 </th>
                             @endforeach
@@ -121,6 +134,32 @@
                                     </span>
                                 </td>
 
+                                {{-- ID Status --}}
+                                @php
+                                    $idStatus = strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
+
+                                    $statusClasses = [
+                                        'verified' => 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:ring-emerald-800',
+                                        'pending' => 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800',
+                                        'rejected' => 'bg-red-50 text-red-700 ring-red-200 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-800',
+                                        'unverified' => 'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700',
+                                    ];
+
+                                    $dotClasses = [
+                                        'verified' => 'bg-emerald-500',
+                                        'pending' => 'bg-amber-500',
+                                        'rejected' => 'bg-red-500',
+                                        'unverified' => 'bg-gray-400',
+                                    ];
+                                @endphp
+
+                                <td class="px-5 py-4">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $statusClasses[$idStatus] ?? $statusClasses['unverified'] }}">
+                                        <span class="h-1.5 w-1.5 rounded-full {{ $dotClasses[$idStatus] ?? $dotClasses['unverified'] }}"></span>
+                                        {{ ucfirst($idStatus) }}
+                                    </span>
+                                </td>
+
                                 {{-- Actions --}}
                                 <td class="px-5 py-4">
                                     <div class="flex items-center justify-center gap-1.5">
@@ -153,29 +192,29 @@
                                             </svg>
                                         </button>
 
-                                        {{-- Confirm --}}
-                                        <button title="Confirm booking"
-                                            @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
-                                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
+                                        @if ($b->user?->idVerification?->valid_id_status === 'verified')
+                                            {{-- Confirm --}}
+                                            <button title="Confirm booking"
+                                                @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
+                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </button>
 
-                                        {{-- Cancel --}}
-                                        <button title="Cancel booking"
-                                            @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; cancelModal=true"
-                                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
-                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
+                                            {{-- Cancel --}}
+                                            <button title="Cancel booking"
+                                                @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; cancelModal=true"
+                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+
+                                        @endif
 
                                         {{-- Delete --}}
-                                        <button title="Delete booking"
+                                        {{-- <button title="Delete booking"
                                             @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; deleteModal=true"
                                             class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-600 transition hover:bg-red-100 hover:scale-105 dark:bg-red-400/10 dark:text-red-400 dark:hover:bg-red-400/20">
                                             <svg class="w-4 h-4 text-red-800 dark:text-white" aria-hidden="true"
@@ -185,7 +224,7 @@
                                                     stroke-width="2"
                                                     d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z" />
                                             </svg>
-                                        </button>
+                                        </button> --}}
 
                                     </div>
                                 </td>
@@ -225,7 +264,7 @@
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
-            <div @click.away="detailModal=false"
+            <div
                 class="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900"
                 x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 translate-y-4 scale-95"
@@ -265,16 +304,16 @@
                         <div class="flex items-center gap-3 rounded-xl bg-yellow-50 px-3 py-2.5 dark:bg-yellow-400/10">
                             <span
                                 class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-yellow-400/30">
-                                <svg class="h-3.5 w-3.5 text-yellow-700" fill="none" stroke="currentColor"
+                                <svg class="h-3.5 w-3.5 text-yellow-700 dark:text-yellow-100" fill="none" stroke="currentColor"
                                     stroke-width="1.8" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21" />
                                 </svg>
                             </span>
                             <div class="flex-1 min-w-0">
-                                <p class="truncate text-sm font-semibold text-yellow-900 dark:text-yellow-300"
+                                <p class="truncate text-sm font-semibold text-yellow-900 dark:text-yellow-100"
                                     x-text="selectedBooking.room_type || '—'"></p>
-                                <p class="text-xs text-yellow-700/60"
+                                <p class="text-xs text-yellow-700/60 dark:text-yellow-100/60"
                                     x-text="(selectedBooking.number_of_guests || '—') + ' guest(s)'"></p>
                             </div>
                             <span
@@ -299,19 +338,18 @@
                             class="rounded-xl border border-yellow-100 bg-yellow-50/50 px-3 py-3 dark:border-yellow-400/10 dark:bg-yellow-400/5">
                             <div class="space-y-1.5 text-sm">
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Room rate</span> x <span x-text="selectedBooking.nights || '—'"></span> night(s)
-                                    <span
-                                        x-text="selectedBooking.room_price ? '₱' + selectedBooking.room_price : '—'"></span>
+                                    <span>Room rate</span>
+                                    <span x-text="formatCurrency(selectedBooking.room_price, selectedBooking.nights || 1)"></span>
                                 </div>
                                 <div class="flex justify-between text-gray-500 dark:text-gray-400">
-                                    <span>Add-ons</span><span
-                                        x-text="selectedBooking.micro_pricing_amount ? '₱' + selectedBooking.micro_pricing_amount : '₱0.00'"></span>
+                                    <span>Add-ons</span>
+                                    <span x-text="formatCurrency(selectedBooking.micro_pricing_amount, selectedBooking.nights || 1, true)"></span>
                                 </div>
                                 <div
                                     class="flex justify-between border-t border-yellow-200/60 pt-1.5 dark:border-yellow-400/10">
                                     <span class="font-semibold text-gray-700 dark:text-gray-200">Total</span>
                                     <span class="font-bold text-gray-900 dark:text-white"
-                                        x-text="selectedBooking.total_price ? '₱' + selectedBooking.total_price : '—'"></span>
+                                        x-text="formatCurrency(selectedBooking.total_price)"></span>
                                 </div>
                             </div>
                         </div>
