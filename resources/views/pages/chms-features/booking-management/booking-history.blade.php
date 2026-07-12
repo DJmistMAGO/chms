@@ -57,7 +57,6 @@
                         <div class="md:w-56">
                             <select id="status-filter" onchange="filterTable()"
                                 class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700 transition focus:border-orange-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-400/20 dark:border-gray-700 dark:bg-gray-800/50 dark:text-white">
-
                                 <option value="">All Statuses</option>
                                 <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
