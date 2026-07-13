@@ -65,7 +65,7 @@ class GuestManagementController extends Controller
             $activeGuests = User::role('client')->where('status', 'active')->count();
             $totalBookings = User::role('client')->withCount('bookings')->get()->sum('bookings_count');
             $totalRevenue = User::role('client')->with('bookings')->get()->sum(function ($guest) {
-                return $guest->bookings->where('status', 'Completed')->sum('total_amount');
+                return $guest->bookings->where('status', 'Completed')->sum('total_price');
             });
 
             // dd($totalRevenue, $totalBookings, $activeGuests, $totalGuests);
