@@ -119,7 +119,7 @@ If you are using Laragon, follow these steps:
 4. Visit your project in the browser at `http://chms.test.com` (or the domain Laragon assigns).
 
 
-5. Run the following commands simoultenously in your terminal to run the system:
+5. Run the following commands simultaneously in your terminal to run the system:
     ```sh
     npm run dev
     ```
