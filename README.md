@@ -116,4 +116,18 @@ If you are using Laragon, follow these steps:
     php artisan storage:link
     ```
 
-4. Visit your project in the browser at `http://chms.test` (or the domain Laragon assigns).
+4. Visit your project in the browser at `http://chms.test.com` (or the domain Laragon assigns).
+
+
+5. Run the following commands simoultenously in your terminal to run the system:
+    ```sh
+    npm run dev
+    ```
+
+    ```sh
+    php artisan schedule:work
+    ```
+
+    ```sh
+    php artisan queue:work   
+    ```
