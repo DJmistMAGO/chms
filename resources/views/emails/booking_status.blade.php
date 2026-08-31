@@ -385,20 +385,20 @@
                                 {{ Str::plural('night', $nights) }}
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <td class="label">
                                 Room Rate
                                 <br>
                                 <small>
-                                    ₱{{ number_format($roomRate,2) }}
-                                    × {{ $nights }}
+                                    &#8369; {{ number_format($roomRate,2) }}
+                                    x {{ $nights }}
                                     {{ Str::plural('night',$nights) }}
                                 </small>
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($roomSubtotal,2) }}
+                                &#8369; {{ number_format($roomSubtotal,2) }}
                             </td>
                         </tr>
 
@@ -409,14 +409,14 @@
                                 Add-ons / Micro Pricing
                                 <br>
                                 <small>
-                                    ₱{{ number_format($addonsPerNight,2) }}
-                                    × {{ $nights }}
+                                    &#8369; {{ number_format($addonsPerNight,2) }}
+                                    x {{ $nights }}
                                     {{ Str::plural('night',$nights) }}
                                 </small>
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($addonsSubtotal,2) }}
+                                &#8369; {{ number_format($addonsSubtotal,2) }}
                             </td>
                         </tr>
 
@@ -428,7 +428,7 @@
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($grandTotal,2) }}
+                                &#8369; {{ number_format($grandTotal,2) }}
                             </td>
                         </tr>
 

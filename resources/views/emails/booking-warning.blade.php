@@ -336,7 +336,7 @@
             <div class="footer-perforation"></div>
             <div class="footer">
                 <p>This is an automated notification regarding your booking.</p>
-                <p>&copy; {{ date('Y') }} Caree Hotel. All rights reserved.</p>
+                <p>&copy; 2026 Caree Hotel. All rights reserved.</p>
             </div>
         </div>
     </div>
