@@ -15,7 +15,7 @@ class DashboardController extends Controller
 
         $bookings = Booking::where('user_id', $userId)
             ->whereIn('status', ['Pending', 'Confirmed', 'Verified', 'Expired', 'Canceled'])
-            ->get()->sortByDesc('check-in');
+            ->get()->sortByDesc('check_in');
 
         $bookingHistory = Booking::where('user_id', $userId)
             ->where('status', 'Verified')
