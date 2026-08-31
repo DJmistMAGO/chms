@@ -261,11 +261,7 @@ class MicroPricingController extends Controller
 
             report($e);
 
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'general' => 'Something went wrong while processing your booking. Please try again.',
-                ]);
+            return back()->withInput()->withErrors(['general' => 'Something went wrong while processing your booking. Please try again.',]);
         }
 
         try {

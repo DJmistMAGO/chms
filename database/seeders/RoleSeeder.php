@@ -11,35 +11,18 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $roles = ['admin', 'farmer', 'officer'];
+        $roles = ['admin', 'staff', 'client'];
 
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
         }
 
         $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@psareco.com',
-            'password' => Hash::make('admin123'),
+            'name' => 'Rona',
+            'email' => 'admin@chms.com',
+            'password' => Hash::make('p@55w0rd'),
             'email_verified_at' => now(),
         ]);
         $admin->assignRole('admin');
-
-
-        $officer = User::create([
-            'name' => 'Maria Santos',
-            'email' => 'officer@psareco.com',
-            'password' => Hash::make('officer123'),
-            'email_verified_at' => now(),
-        ]);
-        $officer->assignRole('officer');
-
-        $farmer = User::create([
-            'name' => 'Juan Dela Cruz',
-            'email' => 'farmer@psareco.com',
-            'password' => Hash::make('farmer123'),
-            'email_verified_at' => now(),
-        ]);
-        $farmer->assignRole('farmer');
     }
 }
