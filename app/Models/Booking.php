@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Booking extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'reference_number',
@@ -71,5 +73,10 @@ class Booking extends Model
     public function getCheckOutDateAttribute()
     {
         return $this->check_out;
+    }
+
+    public function reminders()
+    {
+        return $this->hasMany(BookingReminder::class);
     }
 }
