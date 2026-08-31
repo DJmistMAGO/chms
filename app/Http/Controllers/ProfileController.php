@@ -14,20 +14,21 @@ class ProfileController extends Controller
         $user = Auth::user();
         $user->load('idVerification');
         $valid_id_status = $user->idVerification?->valid_id_status ?? 'pending';
-
+        $idVerificationRemarks = $user->idVerification?->remarks;
 
         return view('pages.profile', [
             'title' => 'Profile',
             'user' => $user,
             'valid_id_status' => $valid_id_status,
+            'idVerificationRemarks' => $idVerificationRemarks,
         ]);
     }
-
     public function update(Request $request)
     {
         $user = Auth::user();
 
-        $canUpdateValidId = strtolower($user->idVerification?->valid_id_status ?? 'pending') === 'pending';
+        $currentIdStatus = strtolower($user->idVerification?->valid_id_status ?? 'pending');
+        $canUpdateValidId = in_array($currentIdStatus, ['pending', 'rejected']);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -55,6 +56,17 @@ class ProfileController extends Controller
 
             $path = $file->storeAs('valid_ids', $user->id . '_' . time() . '.' . $extension, 'public');
             $user->valid_id = $path;
+
+            // Reset verification back to pending so staff sees it in the review queue again
+            $user->idVerification()->updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'valid_id_status' => 'pending',
+                    'verified_by'     => null,
+                    'verified_at'     => null,
+                    'remarks'         => null,
+                ]
+            );
         }
 
         if ($request->filled('avatar_cropped')) {

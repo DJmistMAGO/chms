@@ -32,7 +32,6 @@
             box-shadow: 0 8px 24px rgba(30, 27, 75, 0.08);
         }
 
-        /* ===== Ticket-stub header (urgency red/orange instead of yellow) ===== */
         .header {
             background-color: #fb923c;
             color: #1e1b4b;
@@ -263,7 +262,6 @@
     <div class="wrapper">
         <div class="container">
 
-            <!-- Header / ticket stub -->
             <div class="header">
                 <p class="eyebrow">Action Needed</p>
                 <h1>Caree Hotel</h1>
@@ -271,7 +269,6 @@
             </div>
             <div class="perforation"></div>
 
-            <!-- Main Content -->
             <div class="content">
                 <p class="greeting">Dear Guest,</p>
                 <p class="subtext">Your reservation is still pending and is about to expire. Please confirm soon to
@@ -284,7 +281,6 @@
                     </span>
                 </div>
 
-                <!-- Schedule -->
                 <div class="section-title">Stay Schedule</div>
                 <table>
                     <tr>
@@ -304,7 +300,6 @@
                     </tr>
                 </table>
 
-                <!-- Room Details -->
                 <div class="section-title">Accommodation</div>
                 <table>
                     <tr>

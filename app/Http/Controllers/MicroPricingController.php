@@ -81,7 +81,6 @@ class MicroPricingController extends Controller
         ];
     }
 
-    /** Canonical add-on pricing — also the single source of truth for repricing. */
     protected function ambiancePrices(): array
     {
         return [

@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\IdVerificationStatusEmail;
 use App\Models\IdVerification;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class GuestManagementController extends Controller
 {
@@ -135,6 +137,12 @@ class GuestManagementController extends Controller
                 'remarks'         => $request->remarks,
             ]
         );
+
+        try {
+            Mail::to($user->email)->send(new IdVerificationStatusEmail($verification));
+        } catch (\Throwable $e) {
+            report($e);
+        }
 
         return redirect()
             ->back()
