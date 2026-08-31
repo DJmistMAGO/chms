@@ -25,6 +25,6 @@ class IdVerificationStatusEmail extends Mailable
             : 'Your ID submission needs attention';
 
         return $this->subject($subject)
-            ->markdown('emails.id-verification-status');
+            ->view('emails.id-verification-status');
     }
 }
