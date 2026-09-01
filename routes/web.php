@@ -54,6 +54,9 @@ Route::middleware('guest')->group(function () {
     Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
     Route::post('/signup', [AuthenticationController::class, 'signup'])->name('signup.post')->middleware('web');
 
+    Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
+    Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms.of.service');
+
 });
 
 // Routes accessible only to authenticated users
