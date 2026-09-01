@@ -32,7 +32,7 @@
         }
     }">
 
-    <x-common.page-breadcrumb pageTitle="Confirmed Bookings" />
+    {{-- <x-common.page-breadcrumb pageTitle="Confirmed Bookings" /> --}}
 
     <div class="rounded-3xl border border-gray-200 bg-white px-6 py-8 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
 

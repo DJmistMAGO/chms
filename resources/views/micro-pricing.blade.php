@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hotel-datepicker@4.12.2/dist/css/hotel-datepicker.min.css">
     <link rel="shortcut icon" href="{{ asset('assets/images/chlogo.png') }}">
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
@@ -159,11 +158,9 @@
         <img src="{{ asset('assets/images/chlogo.png') }}" class="w-20 opacity-80" alt="Caree Hotel">
     </nav>
 
-    {{-- MAIN --}}
     <div class="max-w-6xl mx-auto px-4 md:px-8 py-6 md:py-10">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
 
-            {{-- Success --}}
             @if (session('success'))
                 <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
                     <div class="bg-green-500 text-white px-6 py-4 rounded-xl shadow-xl">
@@ -172,7 +169,6 @@
                 </div>
             @endif
 
-            {{-- ===== LEFT: Room Info ===== --}}
             <div class="fade-up-1">
                 {{-- Image --}}
                 <div class="room-img-wrap relative rounded-2xl overflow-hidden mb-5 shadow-md" style="height:280px;">
@@ -193,12 +189,10 @@
                     </div>
                 </div>
 
-                {{-- Title --}}
                 <h1 class="font-display text-3xl md:text-4xl font-semibold text-charcoal leading-tight mb-4">
                     {{ $roomName ?? 'Premium Deluxe Room' }}
                 </h1>
 
-                {{-- Stats --}}
                 <div class="grid grid-cols-3 gap-3 mb-5">
                     <div class="rounded-xl p-3 text-center" style="background:#FFF8D6; border:1px solid #FFE566;">
                         <i class="fas fa-expand-arrows-alt text-sm mb-1" style="color:#D4A800;"></i>
@@ -217,7 +211,6 @@
                     </div>
                 </div>
 
-                {{-- Amenities --}}
                 <div>
                     <p class="text-xs font-medium tracking-widest uppercase mb-3" style="color:#B89200;">Amenities</p>
                     <div class="grid grid-cols-2 gap-y-2 gap-x-4">
@@ -231,7 +224,6 @@
                 </div>
             </div>
 
-            {{-- ===== RIGHT: Customize Panel ===== --}}
             <div class="fade-up-2">
 
                 @if ($errors->any())
@@ -340,9 +332,11 @@
                                         <div class="space-y-2">
                                             @php $selectedFloor = old('floor_level', 'Floor 1'); @endphp
                                             @foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $floor)
-                                                <div class="option-row {{ $selectedFloor === $floor ? 'selected' : '' }} flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:{{ $selectedFloor === $floor ? '#D4A800' : '#FFE566' }};" data-group="floor_level" data-price="0">
-                                                    <div class="flex items-center gap-3"><span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span><span class="text-sm {{ $selectedFloor === $floor ? 'font-medium' : '' }} text-warm">{{ $floor }}</span></div>
-                                                    <span class="badge text-xs font-medium px-3 py-1 rounded-full" style="background:{{ $selectedFloor === $floor ? '#FFF3A3' : '#FFF8D6' }}; color:{{ $selectedFloor === $floor ? '#B89200' : '#7A6E68' }};">Free</span>
+                                                <div class="option-row {{ $selectedFloor === $floor ? 'selected' : '' }} flex items-center border rounded-xl px-4 py-3" style="border-color:{{ $selectedFloor === $floor ? '#D4A800' : '#FFE566' }};" data-group="floor_level" data-price="0">
+                                                    <div class="flex items-center gap-3">
+                                                        <span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+                                                        <span class="text-sm {{ $selectedFloor === $floor ? 'font-medium' : '' }} text-warm">{{ $floor }}</span>
+                                                    </div>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -393,7 +387,6 @@
                                 </div>
                             </div>
 
-                            {{-- ===== STEP 2: GUEST DETAILS (new vs returning) ===== --}}
                             <div class="wizard-step hidden" data-step="2">
                                 <div class="section-label mb-3">
                                     <span class="text-xs font-medium tracking-widest uppercase text-charcoal" id="step2-heading">Step 2: Your information</span>
@@ -406,7 +399,6 @@
 
                                 <input type="hidden" name="use_existing_account" id="use-existing-account" value="0">
 
-                                {{-- NEW GUEST PANEL --}}
                                 <div id="panel-new-guest" class="space-y-4">
                                     <p class="text-sm text-muted">We only need this to keep your reservation secure and to create your account.</p>
 
@@ -417,7 +409,6 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Email Address</label>
-                                        {{-- This is the input that actually submits as name="email" --}}
                                         <input type="email" name="email" id="wizard-email-new" value="{{ old('email') }}" placeholder="you@email.com" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
                                         <p class="field-error hidden" id="wizard-email-new-error"></p>
                                         @error('email')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
@@ -427,7 +418,6 @@
                                             <label class="block text-xs font-medium tracking-widest uppercase" style="color:#7A6E68;">Password</label>
                                             <span class="text-xs text-muted">Minimum 8 characters</span>
                                         </div>
-                                        {{-- Submits as name="password" --}}
                                         <div class="relative">
                                             <input type="password" name="password" id="wizard-password-new" placeholder="••••••••" oninput="checkStrength(this.value)" class="w-full rounded-xl border px-4 py-3 text-sm text-warm pr-11" style="border-color:#FFE566; background:#FFF8D6;">
                                             <button type="button" onclick="togglePasswordVisibility('wizard-password-new', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-warm/70 hover:text-warm transition">
@@ -453,7 +443,6 @@
                                     </div>
                                 </div>
 
-                                {{-- EXISTING GUEST PANEL --}}
                                 <div id="panel-existing-guest" class="space-y-4 hidden">
                                     <p class="text-sm text-muted">Sign in with your account to reuse your saved details.</p>
 
@@ -478,7 +467,16 @@
                                     <p class="text-xs text-muted">Your information is used to secure your reservation, create your account, and make check-in faster. We store it securely and never share it without your consent.</p>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-3">
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-charcoal">
+                                    <p class="font-semibold mb-2">Your data privacy</p>
+                                    <p class="text-xs leading-5 text-slate-600">
+                                        We collect your name, email, password, and valid ID only to secure your reservation, verify your identity, and support check-in and guest communication.
+                                        This information is stored securely in our hotel system and used strictly for booking, verification, and service-related communication.
+                                        We do not sell or share your personal data with third parties without your consent, and you may request access, correction, or deletion of your information at the front desk or through our support team.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-3 mt-5">
                                     <button type="button" onclick="goToStep(1)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFFFFF; color:#1C1C1E; border:1px solid #FFE566;">Back</button>
                                     <button type="button" id="step2-continue-btn" onclick="handleNextStep(2)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95 flex items-center gap-2" style="background:#FFD000; color:#1C1C1E;">
                                         <span id="step2-continue-label">Continue to ID upload</span>
@@ -490,25 +488,52 @@
                             <div class="wizard-step hidden" data-step="3">
                                 <div class="section-label mb-3"><span class="text-xs font-medium tracking-widest uppercase text-charcoal">Step 3: Upload a valid ID</span></div>
                                 <p class="text-sm text-muted">We verify your identity to protect your reservation and comply with hotel security requirements.</p>
-                                <div class="rounded-2xl p-4 bg-[#FFF8D6] border border-yellow-200">
+
+                                <div class="mt-4">
+                                    <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">ID Type</label>
+                                    <select name="id_type" id="id_type" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
+                                        <option value="government_id">Philippine Government-issued ID</option>
+                                        <option value="drivers_license">Driver's License</option>
+                                        <option value="passport">Passport (Filipino or Foreign)</option>
+                                        <option value="visa">Visa / ACR I-Card (Foreign Nationals)</option>
+                                    </select>
+                                </div>
+
+                                <div class="rounded-2xl p-4 bg-[#FFF8D6] border border-yellow-200 mt-4">
                                     <p class="font-semibold text-charcoal mb-2">Accepted documents</p>
-                                    <ul class="list-disc pl-5 text-xs text-muted space-y-1"><li>Government-issued ID</li><li>Passport</li><li>Driver’s license</li></ul>
+                                    <ul class="list-disc pl-5 text-xs text-muted space-y-1">
+                                        <li>Philippine government-issued ID (UMID, Postal ID, National ID, etc.)</li>
+                                        <li>Driver's license</li>
+                                        <li>Passport — Filipino or foreign nationals</li>
+                                        <li>Visa / Alien Certificate of Registration (ACR) I-Card — for foreign nationals</li>
+                                    </ul>
                                     <p class="mt-3 text-xs text-warm">Upload is encrypted and stored securely for verification only.</p>
                                 </div>
-                                <label for="valid_id_path" class="flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:bg-yellow-50" style="border-color:#FFE566; background:#FFF8D6; min-height:120px;">
-                                    <div id="id-upload-placeholder" class="flex flex-col items-center gap-2 mt-2">
+
+                                <label for="valid_id_path" class="mt-4 flex flex-col items-center justify-center gap-3 w-full rounded-xl border-2 border-dashed cursor-pointer transition-colors hover:bg-yellow-50" style="border-color:#FFE566; background:#FFF8D6; min-height:120px;">
+                                    <div id="id-upload-placeholder" class="flex flex-col items-center gap-2 my-3">
                                         <i class="fas fa-id-card text-xl" style="color:#D4A800;"></i>
                                         <span class="text-sm font-medium text-warm">Click or tap to upload a valid ID</span>
                                         <span class="text-xs text-muted">JPG, PNG or PDF · max 5MB</span>
                                     </div>
-                                    <div id="id-upload-preview-wrap" class="hidden items-center gap-3">
-                                        <img id="id-upload-preview" src="" alt="ID preview" class="w-16 h-12 object-cover rounded-md border" />
-                                        <div class="flex flex-col items-start text-left"><span class="text-xs font-medium text-warm" id="id-upload-name"></span><button type="button" class="text-xs text-red-500 mt-1" onclick="clearIdUpload()">Remove</button></div>
+
+                                    <div id="id-upload-preview-wrap" class="hidden flex-col items-center gap-3 py-4">
+                                        <img id="id-upload-preview" src="" alt="ID preview" class="hidden rounded-lg border shadow-sm object-cover" style="width:280px; height:180px; border-color:#FFE566;" />
+                                        <div id="id-upload-preview-pdf" class="hidden flex-col items-center justify-center rounded-lg border" style="width:280px; height:180px; border-color:#FFE566; background:#fff;">
+                                            <i class="fas fa-file-pdf text-3xl" style="color:#D4A800;"></i>
+                                            <span class="text-xs text-muted mt-2">PDF Document</span>
+                                        </div>
+                                        <div class="flex flex-col items-center text-center">
+                                            <span class="text-xs font-medium text-warm" id="id-upload-name"></span>
+                                            <button type="button" class="text-xs text-red-500 mt-1" onclick="clearIdUpload()">Remove</button>
+                                        </div>
                                     </div>
+
                                     <input type="file" name="valid_id_path" id="valid_id_path" accept="image/jpeg,image/png,application/pdf" class="hidden" onchange="handleIdUpload(this)">
                                 </label>
                                 <p class="hidden mt-1.5 text-xs text-red-500 flex items-center gap-1" id="id-upload-error"><i class="fas fa-circle-exclamation" style="font-size:10px;"></i><span></span></p>
                                 @error('valid_id_path')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
+
                                 <div class="flex items-center justify-between gap-3 mt-5">
                                     <button type="button" onclick="goToStep(2)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFFFFF; color:#1C1C1E; border:1px solid #FFE566;">Back</button>
                                     <button type="button" onclick="handleNextStep(3)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFD000; color:#1C1C1E;">Continue to review</button>
@@ -930,6 +955,18 @@
             if (e.key === 'Escape') {
                 closeDatesRequiredModal();
             }
+
+            if (e.key !== 'Enter') return;
+
+            const target = e.target;
+            const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+            const isField = ['input', 'textarea', 'select'].includes(tagName);
+
+            if (!target || !isField) return;
+            if (target.type === 'submit' || target.type === 'button') return;
+
+            e.preventDefault();
+            e.stopPropagation();
         });
 
         // datepicker
@@ -1021,15 +1058,11 @@
 
                 document.querySelectorAll(`.option-row[data-group="${group}"]`).forEach(r => {
                     r.classList.remove('selected');
-
                     const badge = r.querySelector('.badge');
+                    if (!badge) return; // floor_level rows no longer have a badge
                     const badgePrice = parseInt(r.dataset.price) || 0;
-
                     badge.style.cssText = 'background:#FFF8D6; color:#7A6E68;';
-
-                    if (group === 'floor_level') {
-                        badge.textContent = 'Free';
-                    } else if (group === 'ambiance' && badgePrice === 0) {
+                    if (group === 'ambiance' && badgePrice === 0) {
                         badge.textContent = 'Base';
                     } else if (group === 'food_package' && badgePrice === 0) {
                         badge.textContent = 'Free';
@@ -1041,17 +1074,16 @@
                 this.classList.add('selected');
                 const badge = this.querySelector('.badge');
 
-                if (group === 'floor_level') {
-                    badge.textContent = 'Free';
-                } else if (group === 'ambiance' && price === 0) {
-                    badge.textContent = 'Base';
-                } else if (group === 'food_package' && price === 0) {
-                    badge.textContent = 'Free';
-                } else {
-                    badge.textContent = '+ ₱' + price.toLocaleString();
+                if (badge) {
+                    if (group === 'ambiance' && price === 0) {
+                        badge.textContent = 'Base';
+                    } else if (group === 'food_package' && price === 0) {
+                        badge.textContent = 'Free';
+                    } else {
+                        badge.textContent = '+ ₱' + price.toLocaleString();
+                    }
+                    badge.style.cssText = 'background:#FFF3A3; color:#B89200;';
                 }
-
-                badge.style.cssText = 'background:#FFF3A3; color:#B89200;';
 
                 const label = this.querySelector('div span:last-child').textContent.trim();
 
@@ -1111,13 +1143,18 @@
             const previewWrap = document.getElementById('id-upload-preview-wrap');
             const placeholder = document.getElementById('id-upload-placeholder');
             const preview = document.getElementById('id-upload-preview');
+            const previewPdf = document.getElementById('id-upload-preview-pdf');
             const name = document.getElementById('id-upload-name');
 
             if (!input) return;
             input.value = '';
-            if (preview) preview.src = '';
+            if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+            if (previewPdf) previewPdf.classList.add('hidden');
             if (name) name.textContent = '';
-            if (previewWrap) previewWrap.classList.add('hidden');
+            if (previewWrap) {
+                previewWrap.classList.add('hidden');
+                previewWrap.classList.remove('flex');
+            }
             if (placeholder) placeholder.classList.remove('hidden');
             clearIdError();
         }
@@ -1144,20 +1181,28 @@
             const previewWrap = document.getElementById('id-upload-preview-wrap');
             const placeholder = document.getElementById('id-upload-placeholder');
             const preview = document.getElementById('id-upload-preview');
+            const previewPdf = document.getElementById('id-upload-preview-pdf');
             const name = document.getElementById('id-upload-name');
 
             if (name) name.textContent = file.name;
-            if (previewWrap) previewWrap.classList.remove('hidden');
+            if (previewWrap) {
+                previewWrap.classList.remove('hidden');
+                previewWrap.classList.add('flex');
+            }
             if (placeholder) placeholder.classList.add('hidden');
 
-            if (file.type.startsWith('image/') && preview) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            } else if (preview) {
-                preview.src = '';
+            if (file.type.startsWith('image/')) {
+                if (previewPdf) previewPdf.classList.add('hidden');
+                if (preview) {
+                    preview.classList.remove('hidden');
+                    const reader = new FileReader();
+                    reader.onload = function (e) { preview.src = e.target.result; };
+                    reader.readAsDataURL(file);
+                }
+            } else {
+                // PDF
+                if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+                if (previewPdf) previewPdf.classList.remove('hidden');
             }
         }
 

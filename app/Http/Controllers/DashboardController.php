@@ -12,9 +12,16 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $userId = $user ? $user->getKey() : null;
+
         $bookings = Booking::where('user_id', $userId)
             ->whereIn('status', ['Pending', 'Confirmed', 'Verified', 'Expired', 'Canceled'])
-            ->get()->sortByDesc('created_at');
+            ->get()->sortByDesc('check_in');
+
+        $bookingHistory = Booking::where('user_id', $userId)
+            ->where('status', 'Verified')
+            ->where('check_out', '<', now())
+            ->orderByDesc('check_out')
+            ->get();
 
         $rooms = Room::paginate(7);
         $allBookings = Booking::all();
@@ -32,6 +39,7 @@ class DashboardController extends Controller
             'title' => 'Caree Hotel',
             'referenceNumber' => $referenceNumber,
             'bookings' => $bookings,
+            'bookingHistory' => $bookingHistory,
             'rooms' => $rooms,
             'allBookings' => $allBookings,
             'pendingBookings' => $pendingBookings,

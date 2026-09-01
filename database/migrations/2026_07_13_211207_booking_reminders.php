@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('booking_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('booking_id')->constrained()->onDelete('cascade');
-            $table->string('type'); // 12h, 3h, 1h
+            $table->string('type'); // 12h, 3h
             $table->timestamp('sent_at')->nullable();
             $table->timestamps();
-
             $table->unique(['booking_id', 'type']);
         });
     }

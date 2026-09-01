@@ -14,12 +14,12 @@ class BookingReminderCommand extends Command
 {
     protected $signature = 'booking:reminders';
 
-    protected $description = 'Send expiration warning emails for pending bookings at 12h, 3h and 1h before expiry';
+    protected $description = 'Send expiration warning emails for pending bookings at 12h and 3h before expiry';
 
     protected array $warningStages = [
         12 => '12h',
         3  => '3h',
-        1  => '1h',
+        // 1  => '1h',
     ];
 
     public function handle(): int

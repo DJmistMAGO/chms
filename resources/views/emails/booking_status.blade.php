@@ -32,7 +32,6 @@
             box-shadow: 0 8px 24px rgba(30, 27, 75, 0.08);
         }
 
-        /* ===== Ticket-stub header ===== */
         .header {
             background-color: #facc15;
             color: #1e1b4b;
@@ -94,7 +93,6 @@
             background-color: #ffffff;
         }
 
-        /* ===== Status pill ===== */
         .status-row {
             text-align: center;
             margin-bottom: 30px;
@@ -155,7 +153,6 @@
             margin: 0 0 8px 0;
         }
 
-        /* ===== Section titles ===== */
         .section-title {
             font-size: 12px;
             font-weight: 800;
@@ -200,7 +197,6 @@
             font-size: 13.5px;
         }
 
-        /* ===== Receipt-style billing block ===== */
         .receipt-box {
             background-color: #fafafa;
             border-radius: 10px;
@@ -260,7 +256,6 @@
             /* padding: 0 10px; */
         }
 
-        /* ===== Torn-edge footer, like the bottom of a receipt ===== */
         .footer-perforation {
             height: 20px;
             position: relative;
@@ -310,7 +305,6 @@
     <div class="wrapper">
         <div class="container">
 
-            <!-- Header / ticket stub -->
             <div class="header">
                 <p class="eyebrow">Reservation Update</p>
                 <h1>Caree Hotel</h1>
@@ -318,7 +312,6 @@
             </div>
             <div class="perforation"></div>
 
-            <!-- Main Content -->
             <div class="content">
                 <p class="greeting">Dear Guest,</p>
                 <p class="subtext">Thank you for choosing Caree Hotel. The status of your reservation has changed &mdash;
@@ -333,7 +326,6 @@
                     </span>
                 </div>
 
-                <!-- Schedule -->
                 <div class="section-title">Stay Schedule</div>
                 <table>
                     <tr>
@@ -353,7 +345,6 @@
                     </tr>
                 </table>
 
-                <!-- Room Details -->
                 <div class="section-title">Accommodation</div>
                 <table>
                     <tr>
@@ -385,20 +376,20 @@
                                 {{ Str::plural('night', $nights) }}
                             </td>
                         </tr>
-                        
+
                         <tr>
                             <td class="label">
                                 Room Rate
                                 <br>
                                 <small>
-                                    ₱{{ number_format($roomRate,2) }}
-                                    × {{ $nights }}
+                                    &#8369; {{ number_format($roomRate,2) }}
+                                    x {{ $nights }}
                                     {{ Str::plural('night',$nights) }}
                                 </small>
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($roomSubtotal,2) }}
+                                &#8369; {{ number_format($roomSubtotal,2) }}
                             </td>
                         </tr>
 
@@ -409,14 +400,14 @@
                                 Add-ons / Micro Pricing
                                 <br>
                                 <small>
-                                    ₱{{ number_format($addonsPerNight,2) }}
-                                    × {{ $nights }}
+                                    &#8369; {{ number_format($addonsPerNight,2) }}
+                                    x {{ $nights }}
                                     {{ Str::plural('night',$nights) }}
                                 </small>
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($addonsSubtotal,2) }}
+                                &#8369; {{ number_format($addonsSubtotal,2) }}
                             </td>
                         </tr>
 
@@ -428,14 +419,13 @@
                             </td>
 
                             <td class="value">
-                                ₱{{ number_format($grandTotal,2) }}
+                                &#8369; {{ number_format($grandTotal,2) }}
                             </td>
                         </tr>
 
                     </table>
                 </div>
 
-                <!-- Remarks -->
                 @if ($booking->status == 'Cancelled')
                     @if ($booking->remarks)
                         <div class="remarks-box">
