@@ -49,23 +49,20 @@ class BookingController extends Controller
     }
 
     public function pending()
-    {
-        $pendingBookings = Booking::with('user.idVerification')
-            ->where('status', 'Pending')
-            ->latest()
-            ->paginate(15);
+{
+    $bookings = Booking::with('user.idVerification')
+        ->whereIn('status', ['Pending', 'Confirmed', 'Checked In'])
+        ->latest('check_in')
+        ->paginate(15);
 
-        // dd($pendingBookings);
+    $availableRooms = Room::where('status', 'Available')
+        ->orderBy('room_type')
+        ->orderBy('floor')
+        ->orderBy('room_no')
+        ->get();
 
-        $availableRooms = Room::where('status', 'Available')
-            ->orderBy('room_type')
-            ->orderBy('floor')
-            ->orderBy('room_no')
-            ->get();
-
-        return view('pages.chms-features.booking-management.pending-booking', compact('pendingBookings', 'availableRooms'));
-    }
-
+    return view('pages.chms-features.booking-management.pending-booking', compact('bookings', 'availableRooms'));
+}
     public function confirmBooking(Request $request, $selectedRef)
     {
         $request->validate([
@@ -86,7 +83,7 @@ class BookingController extends Controller
 
         Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
-        return redirect()->route('booking.confirmed')->with('success', 'Booking confirmed successfully.');
+        return redirect()->route('booking.pending')->with('success', 'Booking confirmed successfully.');
     }
 
     public function confirmed()
@@ -106,7 +103,7 @@ class BookingController extends Controller
         $booking->status = 'Checked In';
         $booking->save();
 
-        return redirect()->route('booking.checkin')->with('success', 'Booking checked in successfully.');
+        return redirect()->route('booking.pending')->with('success', 'Booking checked in successfully.');
     }
 
     public function checkedInBookings(Request $request)
@@ -146,93 +143,85 @@ class BookingController extends Controller
     }
 
     public function earlyCheckout(Request $request, $selectedRef)
-    {
-        //if booking_type is online
-        if ($request->input('booking_type') === 'Online') {
-            $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+{
+    // Search Online bookings first; fall back to Walk-in if not found
+    $booking = Booking::where('reference_number', $selectedRef)->first()
+        ?? WalkInBooking::where('reference_number', $selectedRef)->firstOrFail();
 
-            // Update the booking status to checked out
-            $booking->status = 'Completed';
-            $booking->save();
-        } else if ($request->input('booking_type') === 'Walk-in') {
-            $booking = WalkInBooking::where('reference_number', $selectedRef)->firstOrFail();
+    // Update booking status
+    $booking->status = 'Completed';
+    $booking->save();
 
-            // Update the booking status to checked out
-            $booking->status = 'Completed';
-            $booking->save();
+    // Update assigned room status to available
+    if ($booking->room_id) {
+        $room = Room::find($booking->room_id);
+
+        if ($room) {
+            $room->status = 'Available';
+            $room->save();
         }
-
-        // If the booking had an assigned room, update that room's status to available
-        if ($booking->room_id) {
-            $room = Room::find($booking->room_id);
-
-            if ($room) {
-                $room->status = 'Available';
-                $room->save();
-            }
-        }
-
-        return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
     }
+
+    return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
+}
 
 
     public function bookingHistory()
-{
-    $statuses = ['Cancelled', 'Completed', 'Archived'];
+    {
+        $statuses = ['Cancelled', 'Completed', 'Archived'];
 
-    if (auth()->user()->hasRole('staff')) {
+        if (auth()->user()->hasRole('staff')) {
 
-        // 1. Fetch Online Bookings
-        $onlineBookings = Booking::with('user')
-            ->whereIn('status', $statuses)
-            ->get()
-            ->map(function ($booking) {
+            // 1. Fetch Online Bookings
+            $onlineBookings = Booking::with('user')
+                ->whereIn('status', $statuses)
+                ->get()
+                ->map(function ($booking) {
+                    $booking->booking_type = 'Online';
+                    return $booking;
+                });
+
+            // 2. Fetch Walk-In Bookings
+            $walkInBookings = WalkInBooking::whereIn('status', $statuses)
+                ->get()
+                ->map(function ($booking) {
+                    $booking->booking_type = 'Walk-in';
+                    return $booking;
+                });
+
+            // 3. Concat and Sort Collections
+            $items = $onlineBookings
+                ->concat($walkInBookings)
+                ->sortByDesc('created_at')
+                ->values();
+
+            // 4. Manual Pagination Construction
+            $perPage = 15;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage();
+            $currentItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+            $bookingHistory = new LengthAwarePaginator($currentItems, $items->count(), $perPage, $currentPage, [
+                'path' => request()->url(),
+                'query' => request()->query(),
+            ]);
+
+            return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+        } else if (auth()->user()->hasRole('client')) {
+
+            $bookingHistory = Booking::whereIn('status', $statuses)
+                ->where('user_id', auth()->id())
+                ->latest()
+                ->paginate(15);
+
+            // Appends booking_type inline so your common view structure doesn't break
+            $bookingHistory->getCollection()->transform(function ($booking) {
                 $booking->booking_type = 'Online';
                 return $booking;
             });
 
-        // 2. Fetch Walk-In Bookings
-        $walkInBookings = WalkInBooking::whereIn('status', $statuses)
-            ->get()
-            ->map(function ($booking) {
-                $booking->booking_type = 'Walk-in';
-                return $booking;
-            });
-
-        // 3. Concat and Sort Collections
-        $items = $onlineBookings
-            ->concat($walkInBookings)
-            ->sortByDesc('created_at')
-            ->values();
-
-        // 4. Manual Pagination Construction
-        $perPage = 15;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $bookingHistory = new LengthAwarePaginator($currentItems, $items->count(), $perPage, $currentPage, [
-            'path' => request()->url(),
-            'query' => request()->query(),
-        ]);
-
-        return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
-
-    } else if (auth()->user()->hasRole('client')) {
-
-        $bookingHistory = Booking::whereIn('status', $statuses)
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->paginate(15);
-
-        // Appends booking_type inline so your common view structure doesn't break
-        $bookingHistory->getCollection()->transform(function ($booking) {
-            $booking->booking_type = 'Online';
-            return $booking;
-        });
-
-        return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+            return view('pages.chms-features.booking-management.booking-history', compact('bookingHistory'));
+        }
     }
-}
 
     public function cancelBooking(Request $request, $selectedRef)
     {

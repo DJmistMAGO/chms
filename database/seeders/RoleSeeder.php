@@ -24,5 +24,13 @@ class RoleSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
         $admin->assignRole('admin');
+
+        $staff = User::create([
+            'name' => 'Ben',
+            'email' => 'staff@chms.com',
+            'password' => Hash::make('p@55w0rd'),
+            'email_verified_at' => now(),
+        ]);
+        $staff->assignRole('staff');
     }
 }

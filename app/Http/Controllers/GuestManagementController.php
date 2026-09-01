@@ -15,7 +15,7 @@ class GuestManagementController extends Controller
         $guests = User::role('client')
             ->with([
                 'idVerification',
-                'bookings' => fn ($query) => $query->latest('created_at'),
+                'bookings' => fn ($query) => $query->latest('check_in'),
             ])
             ->paginate(6)
             ->through(function ($guest) {
@@ -36,7 +36,7 @@ class GuestManagementController extends Controller
                         return $booking->check_in_date &&
                             $booking->check_in_date->gte(Carbon::today());
                     })
-                    ->sortBy('check_in_date')
+                    ->sortBy('check_in')
                     ->first();
 
                 return [
