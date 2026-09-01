@@ -35,7 +35,7 @@
         }
     </script>
 
-    {{-- @include('components.devtools-protection') --}}
+    @include('components.devtools-protection')
 
     <style>
         * { font-family: 'DM Sans', sans-serif; }
@@ -409,7 +409,6 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-medium tracking-widest uppercase mb-1.5" style="color:#7A6E68;">Email Address</label>
-                                        {{-- This is the input that actually submits as name="email" --}}
                                         <input type="email" name="email" id="wizard-email-new" value="{{ old('email') }}" placeholder="you@email.com" class="w-full rounded-xl border px-4 py-3 text-sm text-warm" style="border-color:#FFE566; background:#FFF8D6;">
                                         <p class="field-error hidden" id="wizard-email-new-error"></p>
                                         @error('email')<p class="field-error"><i class="fas fa-circle-exclamation"></i><span>{{ $message }}</span></p>@enderror
@@ -419,7 +418,6 @@
                                             <label class="block text-xs font-medium tracking-widest uppercase" style="color:#7A6E68;">Password</label>
                                             <span class="text-xs text-muted">Minimum 8 characters</span>
                                         </div>
-                                        {{-- Submits as name="password" --}}
                                         <div class="relative">
                                             <input type="password" name="password" id="wizard-password-new" placeholder="••••••••" oninput="checkStrength(this.value)" class="w-full rounded-xl border px-4 py-3 text-sm text-warm pr-11" style="border-color:#FFE566; background:#FFF8D6;">
                                             <button type="button" onclick="togglePasswordVisibility('wizard-password-new', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-warm/70 hover:text-warm transition">
@@ -445,7 +443,6 @@
                                     </div>
                                 </div>
 
-                                {{-- EXISTING GUEST PANEL --}}
                                 <div id="panel-existing-guest" class="space-y-4 hidden">
                                     <p class="text-sm text-muted">Sign in with your account to reuse your saved details.</p>
 
@@ -470,7 +467,16 @@
                                     <p class="text-xs text-muted">Your information is used to secure your reservation, create your account, and make check-in faster. We store it securely and never share it without your consent.</p>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-3">
+                                <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-charcoal">
+                                    <p class="font-semibold mb-2">Your data privacy</p>
+                                    <p class="text-xs leading-5 text-slate-600">
+                                        We collect your name, email, password, and valid ID only to secure your reservation, verify your identity, and support check-in and guest communication.
+                                        This information is stored securely in our hotel system and used strictly for booking, verification, and service-related communication.
+                                        We do not sell or share your personal data with third parties without your consent, and you may request access, correction, or deletion of your information at the front desk or through our support team.
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-3 mt-5">
                                     <button type="button" onclick="goToStep(1)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95" style="background:#FFFFFF; color:#1C1C1E; border:1px solid #FFE566;">Back</button>
                                     <button type="button" id="step2-continue-btn" onclick="handleNextStep(2)" class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95 flex items-center gap-2" style="background:#FFD000; color:#1C1C1E;">
                                         <span id="step2-continue-label">Continue to ID upload</span>
@@ -949,6 +955,18 @@
             if (e.key === 'Escape') {
                 closeDatesRequiredModal();
             }
+
+            if (e.key !== 'Enter') return;
+
+            const target = e.target;
+            const tagName = target && target.tagName ? target.tagName.toLowerCase() : '';
+            const isField = ['input', 'textarea', 'select'].includes(tagName);
+
+            if (!target || !isField) return;
+            if (target.type === 'submit' || target.type === 'button') return;
+
+            e.preventDefault();
+            e.stopPropagation();
         });
 
         // datepicker

@@ -7,7 +7,7 @@
 @section('content')
     @php($canEditValidId = in_array(strtolower($valid_id_status ?? 'pending'), ['pending', 'rejected']))
 
-    <x-common.page-breadcrumb pageTitle="User Profile" />
+    {{-- <x-common.page-breadcrumb pageTitle="User Profile" /> --}}
 
 
     @if(session('success'))

@@ -1,7 +1,7 @@
 @extends('layouts.authenticated.app')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Guest Management" />
+    {{-- <x-common.page-breadcrumb pageTitle="Guest Management" /> --}}
 
     @if (session('success'))
         <div id="flash-success"

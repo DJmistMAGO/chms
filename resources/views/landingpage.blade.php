@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full" class="scroll-smooth">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full scroll-smooth">
 
 <head>
     <meta charset="utf-8">
@@ -8,26 +8,44 @@
 
     <title>{{ $title ?? 'Caree Hotel' }} | Caree Hotel</title>
 
+    <link rel="preload" as="image" href="{{ asset('assets/images/ch2.png') }}">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="shortcut icon" href="{{ asset('assets/images/clogo.svg') }}">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        display: ['"Fraunces"', 'serif'],
+                        sans: ['"Inter"', 'sans-serif']
+                    },
                     colors: {
-                        primary: '#FFD000',
-                        secondary: '#F9AE36',
-                        light: '#FFE1A4',
-                        dark: '#000000',
-
+                        primary: '#B8935A',
+                        secondary: '#9C7B41',
+                        light: '#EFDDBA',
+                        dark: '#0F1A22',
+                        ink: '#14202B',
+                        ivory: '#FAF7F2',
+                        gold: {
+                            50: '#FBF3E4',
+                            100: '#F3E4C2',
+                            200: '#E6CB93',
+                            400: '#C6A15B',
+                            500: '#B8935A',
+                            600: '#9C7B41',
+                            900: '#3B2E1A'
+                        },
                         neutral: {
                             50: '#FFFFFF',
-                            100: '#F5F5F5',
+                            100: '#F8F9FA',
                             200: '#E5E7EB',
                             300: '#D1D5DB',
                             400: '#9CA3AF',
@@ -36,23 +54,53 @@
                             700: '#374151',
                             800: '#1F2937',
                             900: '#111827'
-                        },
-
-                        accent: {
-                            blue: '#2563EB',
-                            teal: '#14B8A6',
-                            navy: '#1E3A8A'
-                        },
-
-                        success: '#22C55E',
-                        warning: '#F59E0B',
-                        error: '#EF4444',
-                        info: '#3B82F6'
+                        }
                     }
                 }
             }
         }
     </script>
+
+    <style>
+        .nav-solid {
+            background-color: rgba(250, 247, 242, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(15, 26, 34, 0.05);
+            border-bottom: 1px solid rgba(184, 147, 90, 0.15);
+        }
+
+        .nav-solid .nav-links a:not(.rounded-full) { color: #14202B; }
+        .nav-solid #bar1, .nav-solid #bar2, .nav-solid #bar3 { background-color: #14202B; }
+        .nav-solid .rounded-full { border-color: rgba(20,32,43,0.3); color: #14202B; }
+
+        .hero-slide {
+            opacity: 0;
+            transform: scale(1.05);
+            transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1), transform 1800ms ease-out;
+        }
+
+        .hero-slide.is-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hero-progress-bar {
+            width: 0%;
+            transition: width 5500ms linear;
+        }
+
+        .is-active .hero-progress-bar {
+            width: 100%;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(15, 26, 34, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+    </style>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -62,428 +110,560 @@
             const bar2 = document.getElementById('bar2');
             const bar3 = document.getElementById('bar3');
 
+            function closeMobileMenu() {
+                mobileMenu.classList.add('hidden');
+                bar1.classList.remove('rotate-45', 'translate-y-1.5');
+                bar2.classList.remove('opacity-0');
+                bar3.classList.remove('-rotate-45', '-translate-y-1.5');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+
             menuToggle.addEventListener('click', function() {
+                const isOpen = !mobileMenu.classList.contains('hidden');
                 mobileMenu.classList.toggle('hidden');
                 bar1.classList.toggle('rotate-45');
                 bar1.classList.toggle('translate-y-1.5');
                 bar2.classList.toggle('opacity-0');
                 bar3.classList.toggle('-rotate-45');
                 bar3.classList.toggle('-translate-y-1.5');
+                menuToggle.setAttribute('aria-expanded', String(!isOpen));
             });
+
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            const nav = document.getElementById('main-nav');
+            const hero = document.getElementById('home');
+            const navObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    nav.classList.toggle('nav-solid', !entry.isIntersecting || entry.intersectionRatio < 0.92);
+                });
+            }, { threshold: [0, 0.92] });
+            navObserver.observe(hero);
+
+            // Dynamic Carousel Scripting
+            const slides = Array.from(document.querySelectorAll('.hero-slide'));
+            const titleEl = document.getElementById('hero-room-title');
+            const priceEl = document.getElementById('hero-room-price');
+            const dots = Array.from(document.querySelectorAll('.hero-dot'));
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            let current = 0;
+            let timer = null;
+
+            function goTo(index) {
+                slides[current].classList.remove('is-active');
+                dots[current].classList.remove('is-active');
+
+                const currentBar = dots[current].querySelector('.hero-progress-bar');
+                if (currentBar) {
+                    currentBar.style.transition = 'none';
+                    currentBar.style.width = '0%';
+                }
+
+                current = (index + slides.length) % slides.length;
+
+                slides[current].classList.add('is-active');
+                dots[current].classList.add('is-active');
+
+                const nextBar = dots[current].querySelector('.hero-progress-bar');
+                if (nextBar && !reduceMotion) {
+                    setTimeout(() => {
+                        nextBar.style.transition = 'width 5500ms linear';
+                        nextBar.style.width = '100%';
+                    }, 50);
+                }
+
+                // Smoothly fade captions out and in
+                const captionBox = document.getElementById('hero-caption-box');
+                captionBox.style.opacity = '0';
+                captionBox.style.transform = 'translateY(6px)';
+
+                window.setTimeout(() => {
+                    titleEl.textContent = slides[current].dataset.title;
+                    priceEl.textContent = slides[current].dataset.price;
+                    captionBox.style.opacity = '1';
+                    captionBox.style.transform = 'translateY(0px)';
+                }, 300);
+            }
+
+            function start() {
+                if (reduceMotion) return;
+                const nextBar = dots[current].querySelector('.hero-progress-bar');
+                if (nextBar) {
+                    nextBar.style.transition = 'width 5500ms linear';
+                    nextBar.style.width = '100%';
+                }
+                timer = window.setInterval(() => goTo(current + 1), 5500);
+            }
+
+            function stop() {
+                if (timer) window.clearInterval(timer);
+                const currentBar = dots[current].querySelector('.hero-progress-bar');
+                if (currentBar) {
+                    currentBar.style.transition = 'none';
+                    currentBar.style.width = '0%';
+                }
+            }
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => { stop(); goTo(i); start(); });
+            });
+
+            const heroCarousel = document.getElementById('hero-carousel');
+            heroCarousel.addEventListener('mouseenter', stop);
+            heroCarousel.addEventListener('mouseleave', start);
+
+            titleEl.textContent = slides[0].dataset.title;
+            priceEl.textContent = slides[0].dataset.price;
+            start();
         });
     </script>
 
-@include('components.devtools-protection')
-
-
+    @include('components.devtools-protection')
 </head>
 
-<body class="bg-white text-black font-sans">
+<body class="bg-ivory text-ink font-sans selection:bg-gold-400 selection:text-ink">
 
-    <nav class="fixed w-full top-0 bg-white shadow z-50 px-6 md:px-16 py-4">
-        <div class="flex justify-between items-center">
-            <a href="/">
-                <img src="{{ asset('assets/images/chlogo.png') }}" class="w-20">
+    <nav id="main-nav" class="fixed w-full top-0 z-50 px-6 md:px-16 py-4 transition-all duration-500">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center gap-2 group">
+                <img src="{{ asset('assets/images/chlogo.png') }}" class="w-16 transition-transform duration-300 group-hover:scale-105" alt="Caree Hotel Logo">
             </a>
 
             {{-- Desktop Menu --}}
-            <div class="hidden md:flex space-x-6 font-medium items-center">
-                <a href="#home" class="hover:text-primary">HOME</a>
-                <a href="#rooms" class="hover:text-primary">ROOMS</a>
-                <a href="#about-us" class="hover:text-primary">ABOUT US</a>
-                <a href="{{ route('login') }}" class="hover:text-primary ps-5">LOGIN</a>
+            <div class="hidden md:flex space-x-10 font-sans text-xs uppercase tracking-[0.15em] text-white/90 items-center nav-links font-medium">
+                <a href="#home" class="relative pb-1 hover:text-gold-400 transition-colors">Home</a>
+                <a href="#rooms" class="relative pb-1 hover:text-gold-400 transition-colors">Rooms</a>
+                <a href="#about-us" class="relative pb-1 hover:text-gold-400 transition-colors">About Us</a>
+                <a href="{{ route('login') }}"
+                    class="border border-white/40 rounded-full px-6 py-2.5 hover:border-gold-400 hover:text-gold-400 transition-all duration-300 backdrop-blur-sm">
+                    Log In
+                </a>
             </div>
 
             {{-- Hamburger Button (mobile only) --}}
             <button id="menu-toggle"
                 class="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 focus:outline-none"
-                aria-label="Toggle menu">
-                <span id="bar1" class="block w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
-                <span id="bar2" class="block w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
-                <span id="bar3" class="block w-6 h-0.5 bg-gray-800 transition-all duration-300"></span>
+                aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
+                <span id="bar1" class="block w-6 h-0.5 bg-white transition-all duration-300"></span>
+                <span id="bar2" class="block w-6 h-0.5 bg-white transition-all duration-300"></span>
+                <span id="bar3" class="block w-6 h-0.5 bg-white transition-all duration-300"></span>
             </button>
         </div>
 
         {{-- Mobile Menu --}}
         <div id="mobile-menu"
-            class="md:hidden hidden flex-col space-y-4 pt-4 pb-2 font-medium border-t border-gray-100 mt-3">
-            <a href="#home" class="block hover:text-primary">HOME</a>
-            <a href="#rooms" class="block hover:text-primary">ROOMS</a>
-            <a href="#about-us" class="block hover:text-primary">ABOUT US</a>
-            <a href="{{ route('login') }}" class="block hover:text-primary">LOGIN</a>
+            class="md:hidden hidden flex-col space-y-4 pt-6 pb-6 font-sans text-ink border-t border-ink/10 mt-3 bg-ivory/95 backdrop-blur-xl -mx-6 px-8 rounded-b-2xl shadow-xl">
+            <a href="#home" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">Home</a>
+            <a href="#rooms" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">Rooms</a>
+            <a href="#about-us" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">About Us</a>
+            <a href="{{ route('login') }}" class="block text-sm uppercase tracking-wider font-medium text-gold-600">Log In</a>
         </div>
     </nav>
 
+    <section class="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center scroll-mt-24"
+    id="home"
+    style="background-image: linear-gradient(rgba(15,26,34,0.65), rgba(15,26,34,0.88)), url('{{ asset('assets/images/ch2.png') }}')">
 
+    <div class="absolute inset-0 z-[5] pointer-events-none bg-gradient-to-r from-white from-0% via-white/55 via-35% to-transparent to-65%"></div>
 
-    <section class="h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white" id="home"
-        style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.716)), url('{{ asset('assets/images/ch2.png') }}')">
+    <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-16 py-32 md:py-20 flex flex-col md:flex-row items-center gap-14 md:gap-12 justify-between">
 
         <div class="max-w-xl">
-            <h1 class="text-4xl md:text-6xl font-bold mt-10">
-                FIND YOUR <span class="text-primary">PEACE</span> HERE.
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-400/10 border border-gold-400/30 mb-6 backdrop-blur-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse"></span>
+                <span class="text-gold-600 text-xs tracking-widest uppercase font-medium">Bulan, Sorsogon</span>
+            </div>
+
+            <h1 class="font-display text-5xl md:text-7xl font-light leading-[1.08] tracking-tight text-ink">
+                Find your <span class="italic text-amber-600 font-normal">peace</span> here
             </h1>
 
-            <p class="mt-4 text-sm md:text-lg leading-relaxed ">
-                Experience the perfect blend of modern comfort and serene ambiance.
-                Our micro-pricing ensures you only pay for the views and features you love.
+            <p class="mt-6 text-base md:text-lg leading-relaxed text-ink/70 max-w-md font-light">
+                A quiet retreat where modern luxury meets Bulan's slower pace — tailored by the room, the view, and the moments that matter.
             </p>
 
-            <div class="mt-6 flex flex-col md:flex-row md:items-left md:justify-left gap-3">
-                <button
-                    class="w-full md:w-auto md:min-w-[180px] bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:scale-105 hover:text-black transition text-center">
+            <div class="mt-10 flex flex-col sm:flex-row gap-4">
+                {{-- <button
+                    onclick="window.location.href = '{{ route('customize.booking') }}'"
+                    class="w-full sm:w-auto sm:min-w-[200px] bg-gold-400 hover:bg-gold-200 text-ink px-8 py-4 rounded-full font-medium transition-all duration-300 text-center shadow-[0_10px_25px_rgba(184,147,90,0.3)] hover:-translate-y-0.5">
                     Start Reservation
-                </button>
+                </button> --}}
                 <button
-                    class="w-full md:w-auto md:min-w-[180px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition text-center" onclick="document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })">
+                class="w-full sm:w-auto sm:min-w-[200px] bg-gold-400 hover:bg-gold-200 text-ink px-8 py-4 rounded-full font-medium transition-all duration-300 text-center shadow-[0_10px_25px_rgba(184,147,90,0.3)] hover:-translate-y-0.5"
+                    onclick="document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })">
                     Explore Rooms
                 </button>
             </div>
         </div>
-    </section>
 
-    <section class="py-20 px-6 md:px-16 bg-white" id="rooms">
+        {{-- Premium Glassmorphism Room Carousel Frame --}}
+        <div class="w-full max-w-[320px] md:max-w-[380px] lg:max-w-[420px] shrink-0">
+            <div id="hero-carousel" class="relative rounded-[2rem] p-3 glass-panel shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
+                <div class="relative rounded-[1.5rem] overflow-hidden aspect-[3/4]">
 
-    <div class="text-center mb-14">
-        <span
-            class="inline-block bg-yellow-400 text-yellow-900 text-xs font-semibold tracking-widest uppercase px-4 py-1.5 rounded-full mb-4">
-            Our Accommodations
-        </span>
-        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-            Explore & Book Your Room
-        </h2>
-        <p class="mt-4 text-gray-500 text-lg max-w-xl mx-auto">
-            Discover our carefully curated rooms — each designed for comfort, style, and a stay you'll remember.
-        </p>
-    </div>
+                    <div class="hero-slide is-active absolute inset-0 bg-cover bg-center"
+                        data-title="Standard Suite"
+                        data-price="₱1,500 / night"
+                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/sRoom.png') }}')"></div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="hero-slide absolute inset-0 bg-cover bg-center"
+                        data-title="Standard Premium"
+                        data-price="₱1,900 / night"
+                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/pRoom.png') }}')"></div>
 
-        <!-- Standard Room -->
-        <div
-            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div class="relative overflow-hidden h-56 bg-yellow-50">
-                <img src="{{ asset('assets/images/sRoom.png') }}" alt="Standard Room"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <span
-                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
-                    Standard
-                </span>
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Standard Room</h3>
+                    <div class="hero-slide absolute inset-0 bg-cover bg-center"
+                        data-title="Family Residence"
+                        data-price="₱2,700 / night"
+                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/fRoom.png') }}')"></div>
 
-                <ul class="space-y-3 mb-5 text-sm text-gray-600">
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
-                        </svg>
-                        20 sqm
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
-                        </svg>
-                        1 Queen Bed
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Up to 2 guests
-                    </li>
-                </ul>
-
-                <hr class="border-gray-100 mb-5">
-
-                <div class="flex items-center justify-between mt-auto">
-                    <div>
-                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
-                        <span class="text-2xl font-bold text-gray-900">₱1,500</span>
-                        <span class="text-gray-400 text-sm block">per night</span>
+                    {{-- Top Badge overlay --}}
+                    <div class="absolute top-4 right-4 z-10">
+                        <span class="bg-dark/60 backdrop-blur-md border border-white/15 text-gold-200 text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full">
+                            Featured Accommodations
+                        </span>
                     </div>
-                    <a href="{{ route('customize.booking', ['roomType' => 'standard']) }}"
-                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                        View Details
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </a>
+
+                    {{-- Per-slide caption + indicators --}}
+                    <div class="absolute bottom-6 left-6 right-6 z-10">
+                        <div id="hero-caption-box" class="transition-all duration-300" aria-live="polite">
+                            <h4 id="hero-room-title" class="text-white font-display text-2xl font-light tracking-wide">Standard Suite</h4>
+                            <p id="hero-room-price" class="text-gold-400 font-sans text-sm font-medium mt-1">₱1,500 / night</p>
+                        </div>
+
+                        <div class="flex gap-2.5 mt-5">
+                            <button type="button" class="hero-dot is-active relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 1">
+                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                            </button>
+                            <button type="button" class="hero-dot relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 2">
+                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                            </button>
+                            <button type="button" class="hero-dot relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 3">
+                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
-
-        <!-- Standard Premium Room -->
-        <div
-            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div class="relative overflow-hidden h-56 bg-yellow-50">
-                <img src="{{ asset('assets/images/pRoom.png') }}" alt="Standard Premium Room"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <span
-                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
-                    Standard Premium
-                </span>
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Standard Premium Room</h3>
-
-                <ul class="space-y-3 mb-5 text-sm text-gray-600">
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
-                        </svg>
-                        25 sqm
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
-                        </svg>
-                        1 Queen Bed
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Up to 2 guests
-                    </li>
-                </ul>
-
-                <hr class="border-gray-100 mb-5">
-
-                <div class="flex items-center justify-between mt-auto">
-                    <div>
-                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
-                        <span class="text-2xl font-bold text-gray-900">₱1,900</span>
-                        <span class="text-gray-400 text-sm block">per night</span>
-                    </div>
-                    <a href="{{ route('customize.booking', ['roomType' => 'standard-premium']) }}"
-                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                        View Details
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Family Room -->
-        <div
-            class="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
-            <div class="relative overflow-hidden h-56 bg-yellow-50">
-                <img src="{{ asset('assets/images/fRoom.png') }}" alt="Family Room"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                <span
-                    class="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide shadow-sm">
-                    Family
-                </span>
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Family Room</h3>
-
-                <ul class="space-y-3 mb-5 text-sm text-gray-600">
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
-                        </svg>
-                        30 sqm
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
-                        </svg>
-                        2 Queen Beds
-                    </li>
-                    <li class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
-                        Up to 4 guests
-                    </li>
-                </ul>
-
-                <hr class="border-gray-100 mb-5">
-
-                <div class="flex items-center justify-between mt-auto">
-                    <div>
-                        <p class="text-xs text-gray-400 mb-0.5">Starting from</p>
-                        <span class="text-2xl font-bold text-gray-900">₱2,700</span>
-                        <span class="text-gray-400 text-sm block">per night</span>
-                    </div>
-                    <a href="{{ route('customize.booking', ['roomType' => 'family']) }}"
-                        class="inline-flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors duration-200">
-                        View Details
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-
     </div>
 </section>
 
-    <section class="flex flex-col md:flex-row items-center px-6 md:px-16 py-20 gap-10" id="about-us">
-
-        <div class="flex-1">
-            <h2 class="text-3xl md:text-4xl text-center md:text-left font-bold mb-6">
-                Why Choose <span class="text-primary">Caree Hotel?</span>
-            </h2>
-
-            <div class="flex gap-4 mb-8">
-                <div
-                    class="bg-primary w-12 h-12 flex items-center justify-center rounded-full text-black flex-shrink-0">
-                    <i class="fas fa-star"></i>
+    <section class="py-32 px-6 md:px-16 bg-ivory scroll-mt-24" id="rooms">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 max-w-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-10 h-px bg-gold-500"></span>
+                    <span class="text-gold-600 font-sans text-xs uppercase tracking-[0.2em] font-semibold">Accommodations</span>
                 </div>
-                <div>
-                    <h3 class="font-semibold text-lg">Micro Pricing Engine</h3>
-                    <p class="text-gray-600">
-                        Our innovative pricing model breaks down room rates by features like view, type, and ambiance.
-                    </p>
-                </div>
+                <h2 class="text-4xl md:text-5xl font-display font-light text-ink leading-tight">
+                    Explore &amp; book your sanctuary
+                </h2>
+                <p class="mt-4 text-neutral-600 text-base leading-relaxed max-w-xl font-light">
+                    Every detail designed with intent. Rates are curated by space, vista, and bespoke features so you pay only for what you desire.
+                </p>
             </div>
 
-            <div class="flex gap-4 mb-8">
-                <div
-                    class="bg-primary w-12 h-12 flex items-center justify-center rounded-full text-black flex-shrink-0">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-lg">Secure Identity Verification</h3>
-                    <p class="text-gray-600">
-                        Two-step identity verification ensures safe and legitimate bookings.
-                    </p>
-                </div>
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-            <div class="flex gap-4">
-                <div
-                    class="bg-primary w-12 h-12 flex items-center justify-center rounded-full text-black flex-shrink-0">
-                    <i class="fas fa-bed"></i>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-lg">Bulan's Finest Comfort</h3>
-                    <p class="text-gray-600">
-                        High-speed internet, premium bedding, and peaceful ambiance in Sorsogon.
-                    </p>
-                </div>
-            </div>
-        </div>
+                <div class="group bg-white rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(15,26,34,0.05)] hover:shadow-[0_25px_60px_rgba(15,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col border border-ink/5">
+                    <div class="relative overflow-hidden h-64 bg-gold-50">
+                        <img src="{{ asset('assets/images/sRoom.png') }}" alt="Standard Room" loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <span class="absolute top-5 right-5 bg-ink/80 backdrop-blur-md text-ivory text-[11px] font-medium px-4 py-1.5 rounded-full tracking-wider uppercase">
+                            Standard
+                        </span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <h3 class="text-2xl font-display font-normal text-ink mb-6">Standard Room</h3>
 
-        <div class="flex-1">
-            <img src="{{ asset('assets/images/ch1.png') }}"
-                class="rounded-3xl w-full max-h-[80vh] object-cover hover:scale-105 transition-transform shadow-lg">
+                        <ul class="space-y-4 mb-8 text-sm text-neutral-600">
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">20 sqm space</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">1 Queen Bed</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">Up to 2 guests</span>
+                            </li>
+                        </ul>
+
+                        <div class="pt-6 border-t border-ink/5 flex items-center justify-between mt-auto">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">Starting from</p>
+                                <div class="flex items-baseline gap-1 mt-0.5">
+                                    <span class="text-3xl font-display font-light text-ink">₱1,500</span>
+                                    <span class="text-neutral-400 text-xs">/ night</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('customize.booking', ['roomType' => 'standard']) }}"
+                                class="inline-flex items-center gap-2 bg-ink hover:bg-gold-500 text-white font-medium text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-all duration-300">
+                                Reserve
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(15,26,34,0.05)] hover:shadow-[0_25px_60px_rgba(15,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col border border-gold-400/20 relative">
+                    <div class="relative overflow-hidden h-64 bg-gold-50">
+                        <img src="{{ asset('assets/images/pRoom.png') }}" alt="Standard Premium Room" loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <span class="absolute top-5 right-5 bg-gold-500 text-ink text-[11px] font-semibold px-4 py-1.5 rounded-full tracking-wider uppercase shadow-sm">
+                            Premium
+                        </span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <h3 class="text-2xl font-display font-normal text-ink mb-6">Standard Premium</h3>
+
+                        <ul class="space-y-4 mb-8 text-sm text-neutral-600">
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">25 sqm space</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">1 Queen Bed</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">Up to 2 guests</span>
+                            </li>
+                        </ul>
+
+                        <div class="pt-6 border-t border-ink/5 flex items-center justify-between mt-auto">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">Starting from</p>
+                                <div class="flex items-baseline gap-1 mt-0.5">
+                                    <span class="text-3xl font-display font-light text-ink">₱1,900</span>
+                                    <span class="text-neutral-400 text-xs">/ night</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('customize.booking', ['roomType' => 'standard-premium']) }}"
+                                class="inline-flex items-center gap-2 bg-ink hover:bg-gold-500 text-white font-medium text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-all duration-300">
+                                Reserve
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="group bg-white rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(15,26,34,0.05)] hover:shadow-[0_25px_60px_rgba(15,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col border border-ink/5">
+                    <div class="relative overflow-hidden h-64 bg-gold-50">
+                        <img src="{{ asset('assets/images/fRoom.png') }}" alt="Family Room" loading="lazy"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                        <span class="absolute top-5 right-5 bg-ink/80 backdrop-blur-md text-ivory text-[11px] font-medium px-4 py-1.5 rounded-full tracking-wider uppercase">
+                            Family Suite
+                        </span>
+                    </div>
+                    <div class="p-8 flex flex-col flex-1">
+                        <h3 class="text-2xl font-display font-normal text-ink mb-6">Family Room</h3>
+
+                        <ul class="space-y-4 mb-8 text-sm text-neutral-600">
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">30 sqm space</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 18v-6a2 2 0 012-2h14a2 2 0 012 2v6M3 18h18M3 18v2M21 18v2M7 10V7a2 2 0 012-2h6a2 2 0 012 2v3"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">2 Queen Beds</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-8 h-8 rounded-full bg-gold-50 flex items-center justify-center text-gold-600 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                </span>
+                                <span class="font-light">Up to 4 guests</span>
+                            </li>
+                        </ul>
+
+                        <div class="pt-6 border-t border-ink/5 flex items-center justify-between mt-auto">
+                            <div>
+                                <p class="text-[11px] uppercase tracking-wider text-neutral-400 font-medium">Starting from</p>
+                                <div class="flex items-baseline gap-1 mt-0.5">
+                                    <span class="text-3xl font-display font-light text-ink">₱2,700</span>
+                                    <span class="text-neutral-400 text-xs">/ night</span>
+                                </div>
+                            </div>
+                            <a href="{{ route('customize.booking', ['roomType' => 'family']) }}"
+                                class="inline-flex items-center gap-2 bg-ink hover:bg-gold-500 text-white font-medium text-xs uppercase tracking-wider px-5 py-3 rounded-full transition-all duration-300">
+                                Reserve
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </section>
 
-    <section class="min-h-screen bg-cover bg-center flex items-center px-6 md:px-16 text-white"
-        style="background-image: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('{{ asset('assets/images/ch1.png') }}')">
+    <section class="py-32 px-6 md:px-16 bg-white scroll-mt-24 border-t border-b border-ink/5" id="about-us">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
 
-        <div class="max-w-3xl">
-            <p class="uppercase tracking-[0.3em] text-primary font-semibold mb-3">
-                Our Story
-            </p>
-
-            <h1 class="text-4xl md:text-6xl font-bold leading-tight">
-                A Sanctuary of Serenity in
-                <span class="text-primary">Bulan, Sorsogon</span>
-            </h1>
-
-            <p class="mt-6 text-sm md:text-lg leading-relaxed text-gray-200">
-                Founded in 2016, Caree Hotel was established with a singular vision:
-                to bring international standards of hospitality to the heart of Bulan.
-                We provide a peaceful and comfortable environment where every guest
-                can experience rest, relaxation, and peace of mind.
-            </p>
-
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-                    <h3 class="text-xl font-bold text-primary">2016</h3>
-                    <p class="text-sm text-gray-200 mt-2">
-                        Established to deliver quality hospitality and comfort.
-                    </p>
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-10 h-px bg-gold-500"></span>
+                    <span class="text-gold-600 font-sans text-xs uppercase tracking-[0.2em] font-semibold">Why Caree</span>
                 </div>
+                <h2 class="text-3xl md:text-5xl font-display font-light text-ink mb-12 leading-tight">
+                    What makes a stay here extraordinary
+                </h2>
 
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-                    <h3 class="text-xl font-bold text-primary">Mission</h3>
-                    <p class="text-sm text-gray-200 mt-2">
-                        Promoting excellence in the local hospitality industry.
-                    </p>
-                </div>
+                <div class="space-y-8">
+                    <div class="flex gap-6 items-start">
+                        <div class="bg-gold-50 border border-gold-200/50 w-14 h-14 flex items-center justify-center rounded-2xl text-gold-600 flex-shrink-0">
+                            <i class="fas fa-star text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl text-ink font-normal">Micro pricing</h3>
+                            <p class="text-neutral-600 mt-2 leading-relaxed text-sm font-light">
+                                Room rates are broken down by view, layout, and ambiance — you choose what matters and skip what doesn't.
+                            </p>
+                        </div>
+                    </div>
 
-                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10">
-                    <h3 class="text-xl font-bold text-primary">Innovation</h3>
-                    <p class="text-sm text-gray-200 mt-2">
-                        Micro Pricing lets guests customize their stay experience.
-                    </p>
+                    <div class="flex gap-6 items-start">
+                        <div class="bg-gold-50 border border-gold-200/50 w-14 h-14 flex items-center justify-center rounded-2xl text-gold-600 flex-shrink-0">
+                            <i class="fas fa-shield-alt text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl text-ink font-normal">Verified bookings</h3>
+                            <p class="text-neutral-600 mt-2 leading-relaxed text-sm font-light">
+                                Two-step identity verification keeps every reservation protected and completely seamless.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-6 items-start">
+                        <div class="bg-gold-50 border border-gold-200/50 w-14 h-14 flex items-center justify-center rounded-2xl text-gold-600 flex-shrink-0">
+                            <i class="fas fa-bed text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-display text-xl text-ink font-normal">Considered comfort</h3>
+                            <p class="text-neutral-600 mt-2 leading-relaxed text-sm font-light">
+                                High-speed internet, premium bedding, and a tranquil atmosphere situated right in the heart of Sorsogon.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {{-- <div class="mt-8 flex flex-col md:flex-row gap-4">
-                <button
-                    class="w-full md:w-auto md:min-w-[190px] bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-secondary hover:text-black hover:scale-105 transition duration-300">
-                    Read More About Us
-                </button>
-
-                <button
-                    class="w-full md:w-auto md:min-w-[190px] border border-white px-6 py-3 rounded-full font-bold hover:bg-white hover:text-black hover:scale-105 transition duration-300">
-                    Contact Us
-                </button>
-            </div> --}}
+            <div class="flex-1 w-full">
+                <div class="relative rounded-3xl overflow-hidden shadow-[0_30px_70px_rgba(15,26,34,0.1)] p-2 bg-ivory border border-ink/5">
+                    <img src="{{ asset('assets/images/ch1.png') }}" loading="lazy"
+                        class="rounded-2xl w-full max-h-[70vh] object-cover">
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer class="bg-black text-white px-6 md:px-16 py-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-            <a href="/">
-                <img src="{{ asset('assets/images/chlogo.png') }}" class="w-28">
+    <section class="min-h-screen bg-cover bg-center flex items-center px-6 md:px-16 py-24 text-white relative"
+        style="background-image: linear-gradient(rgba(15,26,34,0.8), rgba(15,26,34,0.9)), url('{{ asset('assets/images/ch1.png') }}')">
+
+        <div class="max-w-7xl mx-auto w-full">
+            <div class="max-w-3xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="w-10 h-px bg-gold-400"></span>
+                    <span class="text-gold-400 font-sans text-xs uppercase tracking-[0.2em] font-semibold">Our story</span>
+                </div>
+
+                <h2 class="text-4xl md:text-6xl font-display font-light leading-tight">
+                    A sanctuary of serenity in
+                    <span class="text-gold-200 italic font-normal">Bulan, Sorsogon</span>
+                </h2>
+
+                <p class="mt-8 text-base md:text-lg leading-relaxed text-white/80 max-w-xl font-light">
+                    Founded in 2016, Caree Hotel was established to bring international standards of hospitality to the heart of Bulan — a quiet, refined sanctuary where every guest can rest and unwind.
+                </p>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-white/10 pt-8">
+                    <div>
+                        <h3 class="text-2xl font-display text-gold-400 font-light">2016</h3>
+                        <p class="text-xs text-white/70 mt-2 leading-relaxed uppercase tracking-wider">
+                            Established to deliver quality hospitality and comfort.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-display text-gold-400 font-light">Mission</h3>
+                        <p class="text-xs text-white/70 mt-2 leading-relaxed uppercase tracking-wider">
+                            Promoting excellence in the local hospitality industry.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-display text-gold-400 font-light">Innovation</h3>
+                        <p class="text-xs text-white/70 mt-2 leading-relaxed uppercase tracking-wider">
+                            Micro pricing lets guests shape their own stay.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-ink text-white px-6 md:px-16 py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <a href="/" class="opacity-90 hover:opacity-100 transition-opacity">
+                <img src="{{ asset('assets/images/chlogo.png') }}" class="w-24" alt="Caree Hotel Logo">
             </a>
 
-            <p class="text-xs">&copy; 2026 Caree Hotel. All rights reserved.</p>
+            <p class="text-xs text-white/50 tracking-wide">&copy; 2026 Caree Hotel. All rights reserved.</p>
 
-            <div class="space-x-4">
-                <a href="#" class="hover:text-primary text-sm">Privacy Policy</a>
-                <a href="#" class="hover:text-primary text-sm">Terms of Service</a>
+            <div class="space-x-6 text-xs uppercase tracking-widest text-white/70">
+                <a href="#" class="hover:text-gold-400 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-gold-400 transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>
 
 </body>
-
-<script>
-    function smoothScrollTo(targetY, duration = 800) {
-    const startY = window.scrollY;
-    const diff = targetY - startY;
-    let start;
-
-    function step(timestamp) {
-        if (!start) start = timestamp;
-        const progress = Math.min((timestamp - start) / duration, 1);
-        // Ease in-out cubic
-        const ease = progress < 0.5
-        ? 4 * progress ** 3
-        : 1 - (-2 * progress + 2) ** 3 / 2;
-
-        window.scrollTo(0, startY + diff * ease);
-        if (progress < 1) requestAnimationFrame(step);
-    }
-
-    requestAnimationFrame(step);
-    }
-
-    document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (!target) return;
-
-        const navHeight = document.querySelector('nav').offsetHeight;
-        const top = target.getBoundingClientRect().top + window.scrollY - navHeight;
-
-        smoothScrollTo(top, 800); // 800ms duration
-    });
-    });
-</script>
 
 </html>
