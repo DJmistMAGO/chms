@@ -146,256 +146,240 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800" id="bookings-tbody">
-                        @forelse ($bookings as $b)
-                            @php
-                                $nights = $b->check_in->diffInDays($b->check_out);
-                                $initials =
-                                    strtoupper(substr($b->user->name ?? 'G', 0, 1)) .
-                                    strtoupper(substr(strstr($b->user->name ?? ' G', ' '), 1, 1));
+    @forelse ($bookings as $b)
+        @php
+            $nights = $b->check_in->diffInDays($b->check_out);
 
-                                $bookingPayload = "{
-                                    reference_number: '{$b->reference_number}',
-                                    room_type: '{$b->room_type}',
-                                    check_in: '" . $b->check_in->format('M j, Y') . "',
-                                    check_out: '" . $b->check_out->format('M j, Y') . "',
-                                    number_of_guests: '{$b->number_of_guests}',
-                                    floor_level: '{$b->floor_level}',
-                                    ambiance: '{$b->ambiance}',
-                                    food_package: '{$b->food_package}',
-                                    room_price: '" . number_format($b->room_price, 2) . "',
-                                    micro_pricing_amount: '" . number_format($b->micro_pricing_amount ?? 0, 2) . "',
-                                    total_price: '" . number_format($b->total_price, 2) . "',
-                                    status: '" . ucfirst($b->status ?? 'pending') . "',
-                                    nights: '{$nights}',
-                                    booked_at: '" . $b->created_at->format('M j, Y, g:i A') . "'
-                                }";
-                            @endphp
-                            <tr class="booking-row group transition-colors hover:bg-yellow-50/40 dark:hover:bg-yellow-400/5"
-                                data-status="{{ $b->status }}"
-                                data-search="{{ strtolower($b->user->name ?? '') }}
-                                    {{ strtolower($b->reference_number) }}
-                                    {{ strtolower($b->room_type) }}">
+            // Determine Guest Name and Contact Info across dynamic booking types
+            $guestName = $b->user->name ?? $b->fullname ?? 'Walk-in Guest';
+            $guestContact = $b->user->email ?? $b->phone_number ?? '—';
 
-                                {{-- Guest --}}
-                                <td class="px-5 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-yellow-100 text-xs font-bold text-yellow-700 dark:bg-yellow-400/20 dark:text-yellow-300">
-                                            {{ $initials }}
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-800 dark:text-white">
-                                                {{ $b->user->name ?? '—' }}</p>
-                                            <p class="text-xs text-gray-400">{{ $b->user->email ?? '—' }}</p>
-                                        </div>
-                                    </div>
-                                </td>
+            // Generate Initials cleanly
+            $nameParts = array_filter(explode(' ', trim($guestName)));
+            $firstInitial = substr($nameParts[0] ?? 'G', 0, 1);
+            $lastInitial = count($nameParts) > 1 ? substr(end($nameParts), 0, 1) : '';
+            $initials = strtoupper($firstInitial . $lastInitial);
 
-                                {{-- Reference --}}
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $b->reference_number }}</span>
-                                </td>
+            $bookingPayload = "{
+                reference_number: '{$b->reference_number}',
+                room_type: '" . addslashes($b->room_type ?? ($b->room->room_type ?? 'N/A')) . "',
+                check_in: '" . $b->check_in->format('M j, Y') . "',
+                check_out: '" . $b->check_out->format('M j, Y') . "',
+                number_of_guests: '{$b->number_of_guests}',
+                floor_level: '" . addslashes($b->floor_level ?? '') . "',
+                ambiance: '" . addslashes($b->ambiance ?? '') . "',
+                food_package: '" . addslashes($b->food_package ?? '') . "',
+                room_price: '" . number_format($b->room_price, 2) . "',
+                micro_pricing_amount: '" . number_format($b->micro_pricing_amount ?? 0, 2) . "',
+                total_price: '" . number_format($b->total_price, 2) . "',
+                status: '" . ucfirst($b->status ?? 'pending') . "',
+                nights: '{$nights}',
+                booked_at: '" . $b->created_at->format('M j, Y, g:i A') . "'
+            }";
+        @endphp
+        <tr class="booking-row group transition-colors hover:bg-yellow-50/40 dark:hover:bg-yellow-400/5"
+            data-status="{{ $b->status }}"
+            data-search="{{ strtolower($guestName) }} {{ strtolower($b->reference_number) }} {{ strtolower($b->room_type ?? '') }}">
 
-                                {{-- Room Type --}}
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $b->room_type }}</span>
-                                </td>
+            {{-- Guest --}}
+            <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-yellow-100 text-xs font-bold text-yellow-700 dark:bg-yellow-400/20 dark:text-yellow-300">
+                        {{ $initials }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <p class="font-semibold text-gray-800 dark:text-white">
+                                {{ $guestName }}
+                            </p>
+                            @if (($b->booking_type ?? '') === 'Walk-in')
+                                <span class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                    Walk-in
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-gray-400">{{ $guestContact }}</p>
+                    </div>
+                </div>
+            </td>
 
-                                {{-- Stay --}}
-                                <td class="px-5 py-4">
-                                    <p class="font-medium text-gray-700 dark:text-gray-300">
-                                        {{ $b->check_in->format('M j') }} – {{ $b->check_out->format('M j, Y') }}</p>
-                                    <p class="mt-0.5 text-xs text-gray-400">{{ $nights }}
-                                        night{{ $nights == 1 ? '' : 's' }}</p>
-                                </td>
+            {{-- Reference --}}
+            <td class="px-5 py-4">
+                <span
+                    class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $b->reference_number }}</span>
+            </td>
 
-                                {{-- Total --}}
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="font-semibold text-gray-800 dark:text-white">₱{{ number_format($b->total_price, 2) }}</span>
-                                </td>
+            {{-- Room Type --}}
+            <td class="px-5 py-4">
+                <span
+                    class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">
+                    {{ $b->room_type ?? $b->room->room_type ?? 'N/A' }}
+                </span>
+            </td>
 
-                                {{-- Status --}}
-                                <td class="px-5 py-4">
-                                    @php
-                                        $bookingStatus = $b->status ?? 'Pending';
-                                        $bookingStatusClasses = [
-                                            'Pending' => 'bg-yellow-50 text-yellow-700 ring-yellow-200 dark:bg-yellow-400/10 dark:text-yellow-400 dark:ring-yellow-400/20',
-                                            'Confirmed' => 'bg-green-50 text-green-700 ring-green-200 dark:bg-green-400/10 dark:text-green-400 dark:ring-green-400/20',
-                                            'Checked In' => 'bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/20',
-                                        ];
-                                        $bookingDotClasses = ['Pending' => 'bg-yellow-500', 'Confirmed' => 'bg-green-500', 'Checked In' => 'bg-blue-500'];
-                                    @endphp
-                                    <span
-                                        class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $bookingStatusClasses[$bookingStatus] ?? 'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700' }}">
-                                        <span
-                                            class="h-1.5 w-1.5 rounded-full {{ $bookingDotClasses[$bookingStatus] ?? 'bg-gray-400' }}">
-                                        </span> {{ $bookingStatus }}
-                                    </span>
-                                </td>
+            {{-- Stay --}}
+            <td class="px-5 py-4">
+                <p class="font-medium text-gray-700 dark:text-gray-300">
+                    {{ $b->check_in->format('M j') }} – {{ $b->check_out->format('M j, Y') }}</p>
+                <p class="mt-0.5 text-xs text-gray-400">{{ $nights }}
+                    night{{ $nights == 1 ? '' : 's' }}</p>
+            </td>
 
-                                {{-- ID Status --}}
-                                @php
-                                    $idStatus = strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
+            {{-- Total --}}
+            <td class="px-5 py-4">
+                <span
+                    class="font-semibold text-gray-800 dark:text-white">₱{{ number_format($b->total_price, 2) }}</span>
+            </td>
 
-                                    $statusClasses = [
-                                        'verified' =>
-                                            'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:ring-emerald-800',
-                                        'pending' =>
-                                            'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800',
-                                        'rejected' =>
-                                            'bg-red-50 text-red-700 ring-red-200 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-800',
-                                        'unverified' =>
-                                            'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700',
-                                    ];
+            {{-- Status --}}
+            <td class="px-5 py-4">
+                @php
+                    $bookingStatus = $b->status ?? 'Pending';
+                    $bookingStatusClasses = [
+                        'Pending' => 'bg-yellow-50 text-yellow-700 ring-yellow-200 dark:bg-yellow-400/10 dark:text-yellow-400 dark:ring-yellow-400/20',
+                        'Confirmed' => 'bg-green-50 text-green-700 ring-green-200 dark:bg-green-400/10 dark:text-green-400 dark:ring-green-400/20',
+                        'Checked In' => 'bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/20',
+                    ];
+                    $bookingDotClasses = ['Pending' => 'bg-yellow-500', 'Confirmed' => 'bg-green-500', 'Checked In' => 'bg-blue-500'];
+                @endphp
+                <span
+                    class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $bookingStatusClasses[$bookingStatus] ?? 'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700' }}">
+                    <span
+                        class="h-1.5 w-1.5 rounded-full {{ $bookingDotClasses[$bookingStatus] ?? 'bg-gray-400' }}">
+                    </span> {{ $bookingStatus }}
+                </span>
+            </td>
 
-                                    $dotClasses = [
-                                        'verified' => 'bg-emerald-500',
-                                        'pending' => 'bg-amber-500',
-                                        'rejected' => 'bg-red-500',
-                                        'unverified' => 'bg-gray-400',
-                                    ];
-                                @endphp
+            {{-- ID Status --}}
+            @php
+                $isWalkIn = ($b->booking_type ?? '') === 'Walk-in';
+                $idStatus = $isWalkIn ? 'verified' : strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
 
-                                <td class="px-5 py-4">
-                                    <span
-                                        class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $statusClasses[$idStatus] ?? $statusClasses['unverified'] }}">
-                                        <span
-                                            class="h-1.5 w-1.5 rounded-full {{ $dotClasses[$idStatus] ?? $dotClasses['unverified'] }}"></span>
-                                        {{ ucfirst($idStatus) }}
-                                    </span>
-                                </td>
+                $statusClasses = [
+                    'verified' => 'bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:ring-emerald-800',
+                    'pending' => 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:ring-amber-800',
+                    'rejected' => 'bg-red-50 text-red-700 ring-red-200 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-800',
+                    'unverified' => 'bg-gray-50 text-gray-700 ring-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:ring-gray-700',
+                ];
 
-                                {{-- Actions --}}
-                                @if ($b->status === 'Pending')
-                                    {{-- Pending: View, Confirm (assign room, if ID verified), Cancel --}}
-                                    <td class="px-5 py-4">
-                                        <div class="flex items-center justify-center gap-1.5">
+                $dotClasses = [
+                    'verified' => 'bg-emerald-500',
+                    'pending' => 'bg-amber-500',
+                    'rejected' => 'bg-red-500',
+                    'unverified' => 'bg-gray-400',
+                ];
+            @endphp
 
-                                            {{-- View --}}
-                                            <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z" />
-                                                </svg>
-                                            </button>
+            <td class="px-5 py-4">
+                <span
+                    class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 {{ $statusClasses[$idStatus] ?? $statusClasses['unverified'] }}">
+                    <span
+                        class="h-1.5 w-1.5 rounded-full {{ $dotClasses[$idStatus] ?? $dotClasses['unverified'] }}"></span>
+                    {{ $isWalkIn ? 'Verified (In-Person)' : ucfirst($idStatus) }}
+                </span>
+            </td>
 
-                                            @if ($b->user?->idVerification?->valid_id_status === 'verified')
-                                                {{-- Confirm booking (assign room) --}}
-                                                <button title="Confirm booking"
-                                                    @click="open('confirmModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type }}' })"
-                                                    class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </button>
-                                            @endif
+            {{-- Actions --}}
+            @if ($b->status === 'Pending')
+                <td class="px-5 py-4">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button title="View booking details"
+                            @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:scale-105 hover:bg-blue-100 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z" />
+                            </svg>
+                        </button>
 
-                                            {{-- Cancel --}}
-                                            <button title="Cancel booking"
-                                                @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
+                        @if ($idStatus === 'verified')
+                            <button title="Confirm booking"
+                                @click="open('confirmModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type ?? ($b->room->room_type ?? '') }}' })"
+                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:scale-105 hover:bg-green-100 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        @endif
 
-                                        </div>
-                                    </td>
-                                @elseif ($b->status === 'Confirmed')
-                                    {{-- Confirmed: View, Check-in guest, Cancel --}}
-                                    <td class="px-5 py-4">
-                                        <div class="flex items-center justify-center gap-1.5">
+                        <button title="Cancel booking"
+                            @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:scale-105 hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            @elseif ($b->status === 'Confirmed')
+                <td class="px-5 py-4">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button title="View booking details"
+                            @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:scale-105 hover:bg-blue-100 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"/>
+                            </svg>
+                        </button>
 
-                                            {{-- View --}}
-                                            <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"/>
-                                                </svg>
-                                            </button>
+                        <button title="Check in guest"
+                            @click="open('checkinModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type ?? ($b->room->room_type ?? '') }}' })"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:scale-105 hover:bg-green-100 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </button>
 
-                                            {{-- Check-in --}}
-                                            <button title="Check in guest"
-                                                @click="open('checkinModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type }}' })"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                            </button>
+                        <button title="Cancel booking"
+                            @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:scale-105 hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            @elseif ($b->status === 'Checked In')
+                <td class="px-5 py-4">
+                    <div class="flex items-center justify-center gap-1.5">
+                        <button title="View booking details"
+                            @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:scale-105 hover:bg-blue-100 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"/>
+                            </svg>
+                        </button>
 
-                                            {{-- Cancel --}}
-                                            <button title="Cancel booking"
-                                                @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-                                    </td>
-                                @elseif ($b->status === 'Checked In')
-                                    {{-- Checked In: View, Complete stay / check-out (no cancel — guest is already on-site) --}}
-                                    <td class="px-5 py-4">
-                                        <div class="flex items-center justify-center gap-1.5">
-
-                                            {{-- View --}}
-                                            <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"/>
-                                                </svg>
-                                            </button>
-
-                                            {{-- Complete stay / check-out --}}
-                                            <button title="Complete stay (check out)"
-                                                @click="open('checkoutModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
-                                                class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 transition hover:bg-purple-100 hover:scale-105 dark:bg-purple-400/10 dark:text-purple-400 dark:hover:bg-purple-400/20">
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                                                </svg>
-                                            </button>
-
-                                        </div>
-                                    </td>
-                                @endif
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="py-16 text-center">
-                                    <div class="flex flex-col items-center gap-2">
-                                        <span
-                                            class="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-400/10">
-                                            <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor"
-                                                stroke-width="1.8" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                                            </svg>
-                                        </span>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No bookings in
-                                            this status</p>
-                                        <p class="text-xs text-gray-400">All caught up! No reservations need attention.</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
+                        <button title="Complete stay (check out)"
+                            @click="open('checkoutModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                            class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 transition hover:scale-105 hover:bg-purple-100 dark:bg-purple-400/10 dark:text-purple-400 dark:hover:bg-purple-400/20">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            @endif
+        </tr>
+    @empty
+        <tr>
+            <td colspan="8" class="py-16 text-center">
+                <div class="flex flex-col items-center gap-2">
+                    <span class="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-400/10">
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                        </svg>
+                    </span>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">No bookings in this status</p>
+                    <p class="text-xs text-gray-400">All caught up! No reservations need attention.</p>
+                </div>
+            </td>
+        </tr>
+    @endforelse
+</tbody>
                 </table>
             </div>
 

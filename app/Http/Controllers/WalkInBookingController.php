@@ -48,7 +48,7 @@ class WalkInBookingController extends Controller
         ]);
 
         $data['status'] = 'Checked In';
-        $data['reference_number'] = 'CH-' . strtoupper(Str::random(8));
+        $data['reference_number'] = 'WB-' . strtoupper(Str::random(8));
 
         WalkInBooking::create($data);
 
@@ -57,7 +57,7 @@ class WalkInBookingController extends Controller
         $room->status = 'Occupied';
         $room->save();
 
-        return redirect()->route('booking.checkin')->with('success', 'Walk-in booking created successfully.');
+        return redirect()->route('booking.pending')->with('success', 'Walk-in booking created successfully.');
     }
 
 
