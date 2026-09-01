@@ -113,7 +113,7 @@ class MicroPricingController extends Controller
         $totalRooms = $room->total_rooms;
 
         $bookings = Booking::where('room_type', $roomName)
-            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereIn('status', ['Pending', 'Confirmed'])
             ->get();
 
         $dateCounts = [];

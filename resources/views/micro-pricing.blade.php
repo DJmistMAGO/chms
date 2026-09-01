@@ -361,7 +361,7 @@
                                         <div class="section-label mb-3"><span class="text-xs font-medium tracking-widest uppercase text-charcoal">Food Package</span></div>
                                         <div class="space-y-2">
                                             @php $selectedFood = old('food_package', 'No Food'); @endphp
-                                            @foreach ([['label' => 'No Food', 'price' => 0], ['label' => 'Cozy Dinner for Family', 'price' => 1500], ['label' => 'Romantic Dinner', 'price' => 1500]] as $food)
+                                            @foreach ([['label' => 'No Food', 'price' => 0], ['label' => 'Cozy Dinner for Family', 'price' => 1500], ['label' => 'Romantic Dinner', 'price' => 1700]] as $food)
                                                 <div class="option-row {{ $selectedFood === $food['label'] ? 'selected' : '' }} flex items-center justify-between border rounded-xl px-4 py-3" style="border-color:{{ $selectedFood === $food['label'] ? '#D4A800' : '#FFE566' }};" data-group="food_package" data-price="{{ $food['price'] }}">
                                                     <div class="flex items-center gap-3"><span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span><span class="text-sm {{ $selectedFood === $food['label'] ? 'font-medium' : '' }} text-warm">{{ $food['label'] }}</span></div>
                                                     <span class="badge text-xs font-medium px-3 py-1 rounded-full" style="background:{{ $selectedFood === $food['label'] ? '#FFF3A3' : '#FFF8D6' }}; color:{{ $selectedFood === $food['label'] ? '#B89200' : '#7A6E68' }};">{{ $food['price'] == 0 ? 'Free' : '+ ₱' . number_format($food['price']) }}</span>
@@ -1033,7 +1033,7 @@
             const foodPrices = {
                 'No Food': 0,
                 'Cozy Dinner for Family': 1500,
-                'Romantic Dinner': 1500
+                'Romantic Dinner': 1700
             };
 
             groupAddons.ambiance = ambiancePrices[oldAmbiance] ?? 0;

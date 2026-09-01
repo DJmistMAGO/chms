@@ -85,11 +85,14 @@ Route::middleware(['web', 'auth'])->group(function () {
         });
 
     Route::controller(RoomController::class)
-        ->prefix('room-management')
-        ->group(function () {
-            Route::get('/index', 'index')->name('room.index');
-            Route::put('/{room}', 'updateStatus')->name('room.updateStatus');
-        });
+    ->prefix('room-management')
+    ->group(function () {
+        Route::get('/index', 'index')->name('room.index');
+        Route::post('/store', 'store')->name('room.store');
+        Route::put('/{room}', 'update')->name('room.update');
+        Route::put('/{room}/status', 'updateStatus')->name('room.updateStatus');
+        Route::delete('/{room}', 'destroy')->name('room.destroy');
+    });
 
     Route::controller(WalkInBookingController::class)
         ->prefix('walk-in-booking')
