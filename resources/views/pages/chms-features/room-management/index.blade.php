@@ -3,7 +3,7 @@
 @section('title', 'Room Management')
 
 @section('content')
-    <x-common.page-breadcrumb pageTitle="Room Management" />
+    {{-- <x-common.page-breadcrumb pageTitle="Room Management" /> --}}
 
     @php
         $floorLabels = [

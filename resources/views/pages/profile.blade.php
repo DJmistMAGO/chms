@@ -5,9 +5,9 @@
 @endpush
 
 @section('content')
-    @php($canEditValidId = strtolower($valid_id_status ?? 'pending') === 'pending')
+    @php($canEditValidId = in_array(strtolower($valid_id_status ?? 'pending'), ['pending', 'rejected']))
 
-    <x-common.page-breadcrumb pageTitle="User Profile" />
+    {{-- <x-common.page-breadcrumb pageTitle="User Profile" /> --}}
 
 
     @if(session('success'))
@@ -80,17 +80,29 @@
                         <div>
                             <h4 class="text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Valid ID</h4>
                             <p class="mt-1 text-xs text-gray-400 dark:text-gray-600">
-                                @if($canEditValidId)
+                                @if(strtolower($valid_id_status ?? 'pending') === 'rejected')
+                                    Your previous ID submission was rejected. Please upload a new, clear image of your valid ID.
+                                @elseif($canEditValidId)
                                     Upload a clear image of your government-issued ID while it is still pending review.
                                 @else
                                     Your valid ID is already {{ $valid_id_status }} and cannot be changed right now.
                                 @endif
                             </p>
                         </div>
-                        <span class="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                        <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide
+                            @if(strtolower($valid_id_status ?? 'pending') === 'rejected') bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300
+                            @elseif(strtolower($valid_id_status ?? 'pending') === 'verified') bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-300
+                            @else bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400
+                            @endif">
                             {{ ucfirst($valid_id_status ?? 'pending') }}
                         </span>
                     </div>
+
+                    @if(strtolower($valid_id_status ?? 'pending') === 'rejected' && !empty($idVerificationRemarks))
+                        <div class="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300">
+                            <span class="font-semibold">Reason:</span> {{ $idVerificationRemarks }}
+                        </div>
+                    @endif
 
                     <div class="space-y-3">
                         <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-800/50">

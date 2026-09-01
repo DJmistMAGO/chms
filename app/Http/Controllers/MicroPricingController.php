@@ -81,7 +81,6 @@ class MicroPricingController extends Controller
         ];
     }
 
-    /** Canonical add-on pricing — also the single source of truth for repricing. */
     protected function ambiancePrices(): array
     {
         return [
@@ -261,11 +260,7 @@ class MicroPricingController extends Controller
 
             report($e);
 
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'general' => 'Something went wrong while processing your booking. Please try again.',
-                ]);
+            return back()->withInput()->withErrors(['general' => 'Something went wrong while processing your booking. Please try again.',]);
         }
 
         try {

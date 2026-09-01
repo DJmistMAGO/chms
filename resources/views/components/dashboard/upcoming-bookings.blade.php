@@ -28,7 +28,25 @@
             @php
                 $status = $booking->status ?? 'Pending';
                 $statusClass = $statusClasses[$status] ?? 'bg-gray-500/10 text-gray-500';
-                $label = $status === 'Pending' ? 'Tomorrow' : ($status === 'Confirmed' ? 'In 2 days' : 'Soon');
+
+                $label = 'Soon';
+                if ($booking->check_in) {
+                    $checkIn = \Carbon\Carbon::parse($booking->check_in)->startOfDay();
+                    $today = \Carbon\Carbon::today();
+                    $diffDays = $today->diffInDays($checkIn, false); // false = signed, negative if past
+
+                    if ($diffDays < 0) {
+                        $label = 'Past';
+                    } elseif ($diffDays === 0) {
+                        $label = 'Today';
+                    } elseif ($diffDays === 1) {
+                        $label = 'Tomorrow';
+                    } elseif ($diffDays <= 7) {
+                        $label = 'In ' . $diffDays . ' days';
+                    } else {
+                        $label = $checkIn->format('M j');
+                    }
+                }
             @endphp
             <div class="flex flex-col gap-3 rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>

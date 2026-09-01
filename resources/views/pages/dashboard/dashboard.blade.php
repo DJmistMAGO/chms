@@ -33,7 +33,7 @@
             </div>
 
             <div class="col-span-12 md:col-span-6">
-                <x-dashboard.booking-history :bookings="$bookings" />
+                <x-dashboard.booking-history :bookings="$bookingHistory" />
             </div>
             <div class="col-span-12">
                 <x-dashboard.booking-confirmation-modal :referenceNumber="$referenceNumber" />
