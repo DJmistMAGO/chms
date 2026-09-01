@@ -7,6 +7,7 @@ use App\Models\IdVerification;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -14,31 +15,55 @@ class GuestManagementController extends Controller
 {
     public function index()
     {
+        $activeBookingStatuses = ['pending', 'confirmed', 'booked', 'checked in', 'checked_in', 'verified'];
+
         $guests = User::role('client')
             ->with([
                 'idVerification',
-                'bookings' => fn ($query) => $query->latest('created_at'),
+                'bookings' => fn ($query) => $query->latest('check_in'),
             ])
-            ->paginate(6)
-            ->through(function ($guest) {
-                $bookings = $guest->bookings->map(fn ($booking) => [
+            ->get()
+            ->filter(function ($guest) use ($activeBookingStatuses) {
+                return $guest->bookings->filter(function ($booking) use ($activeBookingStatuses) {
+                    $status = strtolower(trim((string) ($booking->status ?? '')));
+
+                    if ($status === '' || in_array($status, ['completed', 'cancelled', 'archived'], true)) {
+                        return false;
+                    }
+
+                    return in_array($status, $activeBookingStatuses, true);
+                })->isNotEmpty();
+            })
+            ->map(function ($guest) use ($activeBookingStatuses) {
+                $visibleBookings = $guest->bookings->filter(function ($booking) use ($activeBookingStatuses) {
+                    $status = strtolower(trim((string) ($booking->status ?? '')));
+
+                    if ($status === '' || in_array($status, ['completed', 'cancelled', 'archived'], true)) {
+                        return false;
+                    }
+
+                    return in_array($status, $activeBookingStatuses, true);
+                });
+
+                $bookings = $visibleBookings->map(fn ($booking) => [
                     'id' => $booking->id,
                     'reference' => $booking->reference_number
                         ?? ('BK-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT)),
                     'room' => $booking->room?->name ?? $booking->room_type ?? 'N/A',
-                    'check_in' => optional($booking->check_in_date)->format('M d, Y'),
-                    'check_out' => optional($booking->check_out_date)->format('M d, Y'),
+                    'check_in' => optional($booking->check_in)->format('M d, Y'),
+                    'check_out' => optional($booking->check_out)->format('M d, Y'),
                     'status' => $booking->status,
                     'total_amount' => $booking->total_amount,
                 ]);
 
-                $upcoming = $guest->bookings
-                    ->whereIn('status', ['Confirmed', 'Booked', 'Pending'])
+                $upcoming = $visibleBookings
                     ->filter(function ($booking) {
-                        return $booking->check_in_date &&
-                            $booking->check_in_date->gte(Carbon::today());
+                        $status = strtolower(trim((string) ($booking->status ?? '')));
+                        return in_array($status, ['confirmed', 'booked', 'pending', 'checked in', 'checked_in', 'verified'], true)
+                            && $booking->check_in
+                            && $booking->check_in->gte(Carbon::today());
                     })
-                    ->sortBy('check_in_date')
+                    ->sortBy('check_in')
                     ->first();
 
                 return [
@@ -54,23 +79,34 @@ class GuestManagementController extends Controller
                     'valid_id_status' => $guest->idVerification?->valid_id_status ?? 'pending',
                     'bookings_count' => $bookings->count(),
                     'upcoming_booking' => $upcoming ? [
-                        'reference' => $upcoming->reference_number ?? ('BK-' . str_pad($upcoming->id, 5, '0', STR_PAD_LEFT)),
-                        'check_in' => optional($upcoming->check_in_date)->format('M d, Y'),
-                        'check_out' => optional($upcoming->check_in_date)->format('M d, Y'),
+                        'reference' => $upcoming->reference_number ?? ('CH-' . str_pad($upcoming->id, 5, '0', STR_PAD_LEFT)),
+                        'check_in' => optional($upcoming->check_in)->format('M d, Y'),
+                        'check_out' => optional($upcoming->check_out)->format('M d, Y'),
                         'status' => $upcoming->status,
                     ] : null,
                     'bookings' => $bookings->values(),
                 ];
-            });
+            })
+            ->values();
 
-            $totalGuests = User::role('client')->count();
-            $activeGuests = User::role('client')->where('status', 'active')->count();
-            $totalBookings = User::role('client')->withCount('bookings')->get()->sum('bookings_count');
-            $totalRevenue = User::role('client')->with('bookings')->get()->sum(function ($guest) {
-                return $guest->bookings->where('status', 'Completed')->sum('total_price');
-            });
+        $perPage = 6;
+        $currentPage = max(1, (int) request('page', 1));
+        $pageItems = $guests->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
-            // dd($totalRevenue, $totalBookings, $activeGuests, $totalGuests);
+        $guests = new LengthAwarePaginator(
+            $pageItems,
+            $guests->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        $totalGuests = $guests->total();
+        $activeGuests = $guests->getCollection()->filter(fn ($guest) => strtolower((string) ($guest['status'] ?? '')) === 'active')->count();
+        $totalBookings = $guests->getCollection()->sum(fn ($guest) => (int) ($guest['bookings_count'] ?? 0));
+        $totalRevenue = $guests->getCollection()->sum(function ($guest) {
+            return collect($guest['bookings'])->sum(fn ($booking) => (float) ($booking['total_amount'] ?? 0));
+        });
 
         return view('pages.guest-management.guest-management', compact('guests', 'totalGuests', 'activeGuests', 'totalBookings', 'totalRevenue'));
     }
