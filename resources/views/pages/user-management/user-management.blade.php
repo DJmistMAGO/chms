@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <x-common.page-breadcrumb pageTitle="User Management" />
+    {{-- <x-common.page-breadcrumb pageTitle="User Management" /> --}}
 
     @if (session('success'))
         <div id="flash-success"
