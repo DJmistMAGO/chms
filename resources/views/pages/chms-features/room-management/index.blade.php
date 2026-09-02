@@ -56,6 +56,8 @@
             /* status modal state */
             modalRoomNo: '',
             modalRoomMeta: '',
+            modalGuestName: '',
+            modalStayDates: '',
             modalStatus: 'Available',
             statusFormAction: '',
 
@@ -79,9 +81,11 @@
 
             baseUrl: '{{ url('room-management') }}',
 
-            openStatusModal(no, type, price, status, id) {
+            openStatusModal(no, type, price, status, id, guestName, stayDates) {
                 this.modalRoomNo = no;
                 this.modalRoomMeta = type + ' · ₱' + Number(price).toLocaleString();
+                this.modalGuestName = guestName;
+                this.modalStayDates = stayDates;
                 this.modalStatus = status;
                 this.statusFormAction = this.baseUrl + '/' + id + '/status';
                 this.statusModalOpen = true;
@@ -171,6 +175,11 @@
 
                         <p class="text-2xl font-bold text-gray-900 dark:text-white" x-text="modalRoomNo">—</p>
                         <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400" x-text="modalRoomMeta">—</p>
+
+                        <div class="mt-4 rounded-xl bg-gray-50 px-3 py-2.5 dark:bg-gray-800">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-gray-200" x-text="modalGuestName"></p>
+                            <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400" x-text="modalStayDates"></p>
+                        </div>
                     </div>
 
                     <div class="mb-6">
@@ -927,6 +936,16 @@
 
                                     @php
                                         $cfg = $statusConfig[$room->status] ?? $statusConfig['Available'];
+                                        $currentBooking = $room->currentBooking ?? $room->currentWalkInBooking;
+                                        $guestName = $currentBooking
+                                            ? ($currentBooking instanceof \App\Models\WalkInBooking
+                                                ? ($currentBooking->fullname ?: 'Guest name unavailable')
+                                                : (optional($currentBooking->user)->name ?: 'Guest name unavailable'))
+                                            : 'No guest assigned';
+                                        $stayDates = $currentBooking
+                                            ? (optional($currentBooking->check_in)->format('M j, Y') ?? 'Date unavailable')
+                                                . ' - ' . (optional($currentBooking->check_out)->format('M j, Y') ?? 'Date unavailable')
+                                            : 'No stay details available';
                                     @endphp
 
                                     <div
@@ -938,7 +957,9 @@
                                             @js($room->room_type),
                                             @js($room->base_price),
                                             @js($room->status),
-                                            @js($room->id)
+                                            @js($room->id),
+                                            @js($guestName),
+                                            @js($stayDates)
                                         )"
                                         role="button"
                                         tabindex="0"
@@ -947,7 +968,9 @@
                                             @js($room->room_type),
                                             @js($room->base_price),
                                             @js($room->status),
-                                            @js($room->id)
+                                            @js($room->id),
+                                            @js($guestName),
+                                            @js($stayDates)
                                         )"
                                         title="Click to update status"
                                     >
@@ -961,6 +984,18 @@
                                         <p class="mt-0.5 text-xs leading-tight text-gray-400 dark:text-gray-500">
                                             {{ $room->room_type }}
                                         </p>
+
+                                        @if ($currentBooking && $guestName)
+                                            <p class="mt-2 truncate text-sm font-semibold text-gray-700 dark:text-gray-300" title="{{ $guestName }}">
+                                                {{ $guestName }}
+                                            </p>
+
+                                            <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+                                                {{ optional($currentBooking->check_in)->format('M j, Y') ?? '—' }}
+                                                -
+                                                {{ optional($currentBooking->check_out)->format('M j, Y') ?? '—' }}
+                                            </p>
+                                        @endif
 
                                         <p class="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
                                             ₱{{ number_format($room->base_price) }}

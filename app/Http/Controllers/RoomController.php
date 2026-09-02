@@ -9,7 +9,7 @@ class RoomController extends Controller
 {
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = Room::with(['currentBooking.user', 'currentWalkInBooking'])->get();
 
         return view('pages.chms-features.room-management.index', compact('rooms'));
     }
