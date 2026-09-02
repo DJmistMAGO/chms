@@ -3,7 +3,7 @@
 
 @section('content')
     <div x-data="{
-        activeTab: 'Pending',
+        activeTab: @js($activeTab ?? 'Pending'),
         confirmModal: false,
         checkinModal: false,
         checkoutModal: false,
@@ -155,9 +155,10 @@
                                 $checkIn = $b->check_in;
                                 $checkOut = $b->check_out;
                                 $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : null;
-                                $guest = $b->user;
-                                $guestName = optional($guest)->name ?? '—';
-                                $guestEmail = optional($guest)->email ?? '—';
+                                $isWalkIn = ($b->booking_type ?? 'Online') === 'Walk-in';
+                                $guest = $b->user ?? null;
+                                $guestName = $isWalkIn ? ($b->fullname ?? '—') : (optional($guest)->name ?? '—');
+                                $guestEmail = $isWalkIn ? ($b->phone_number ?? '—') : (optional($guest)->email ?? '—');
                                 $referenceNumber = $b->reference_number ?? '—';
                                 $roomType = $b->room_type ?? 'Room not assigned';
                                 $floorLevel = $b->floor_level ?? '—';
@@ -263,7 +264,9 @@
 
                                 {{-- ID Status --}}
                                 @php
-                                    $idStatus = strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
+                                    $idStatus = $isWalkIn
+                                        ? 'verified'
+                                        : strtolower($b->user?->idVerification?->valid_id_status ?? 'unverified');
 
                                     $statusClasses = [
                                         'verified' =>

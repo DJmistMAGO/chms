@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\IdVerificationStatusEmail;
 use App\Models\IdVerification;
 use App\Models\User;
+use App\Models\WalkInBooking;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -89,6 +90,54 @@ class GuestManagementController extends Controller
                 ];
             })
             // sort guests so whoever has the most recently created booking is first
+            ->sortByDesc(fn ($guest) => $guest['latest_booking_at'])
+            ->values();
+
+        $walkInGuests = WalkInBooking::with('room')
+            ->whereIn('status', ['Confirmed', 'Checked In'])
+            ->latest('created_at')
+            ->get()
+            ->map(function ($booking) {
+                $guestName = $booking->fullname ?: 'Walk-in Guest';
+                $roomType = optional($booking->room)->room_type ?? 'Room not assigned';
+                $reference = $booking->reference_number
+                    ?? ('CH-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT));
+
+                return [
+                    'id' => null,
+                    'name' => $guestName,
+                    'email' => 'Walk-in guest',
+                    'roles' => [],
+                    'phone' => $booking->phone_number,
+                    'address' => null,
+                    'avatar' => null,
+                    'status' => 'active',
+                    'valid_id' => null,
+                    'valid_id_status' => 'walk-in',
+                    'is_walk_in' => true,
+                    'bookings_count' => 1,
+                    'upcoming_booking' => [
+                        'reference' => $reference,
+                        'check_in' => optional($booking->check_in)->format('M d, Y'),
+                        'check_out' => optional($booking->check_out)->format('M d, Y'),
+                        'status' => $booking->status,
+                    ],
+                    'bookings' => [[
+                        'id' => $booking->id,
+                        'reference' => $reference,
+                        'room' => $roomType,
+                        'check_in' => optional($booking->check_in)->format('M d, Y'),
+                        'check_out' => optional($booking->check_out)->format('M d, Y'),
+                        'status' => $booking->status,
+                        'booking_type' => 'Walk-in',
+                        'total_amount' => $booking->total_price,
+                    ]],
+                    'latest_booking_at' => $booking->created_at,
+                ];
+            });
+
+        $guests = $guests
+            ->concat($walkInGuests)
             ->sortByDesc(fn ($guest) => $guest['latest_booking_at'])
             ->values();
 

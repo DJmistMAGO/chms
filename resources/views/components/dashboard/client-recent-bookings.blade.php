@@ -4,7 +4,7 @@
     <div class="mb-4 flex items-start justify-between">
         <div>
             <h3 class="font-semibold text-gray-600 dark:text-white">Recent Bookings</h3>
-            <p class="mt-1 text-sm text-gray-500">Latest confirmed reservations.</p>
+            <p class="mt-1 text-sm text-gray-500">Latest guest reservations.</p>
         </div>
         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
             <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">

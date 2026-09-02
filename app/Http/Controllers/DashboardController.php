@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\WalkInBooking;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -35,6 +36,13 @@ class DashboardController extends Controller
             ->orderBy('room_no')
             ->paginate(7);
         $allBookings = Booking::all();
+        $recentBookings = Booking::with('user')
+            ->whereIn('status', ['Confirmed', 'Checked In', 'Completed'])
+            ->latest('created_at')
+            ->take(3)
+            ->get();
+        $bookingsToday = Booking::whereDate('created_at', today())->count()
+            + WalkInBooking::whereDate('created_at', today())->count();
         $pendingBookings = Booking::where('status', 'Pending')->get();
         $totalRooms = Room::count();
         $availableRooms = Room::where('status', 'Available')->count();
@@ -52,6 +60,8 @@ class DashboardController extends Controller
             'bookingHistory' => $bookingHistory,
             'rooms' => $rooms,
             'allBookings' => $allBookings,
+            'recentBookings' => $recentBookings,
+            'bookingsToday' => $bookingsToday,
             'pendingBookings' => $pendingBookings,
             'totalRooms' => $totalRooms,
             'bookingStats' => $bookingStats,

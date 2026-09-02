@@ -57,7 +57,8 @@ class WalkInBookingController extends Controller
         $room->status = 'Occupied';
         $room->save();
 
-        return redirect()->route('booking.checkin')->with('success', 'Walk-in booking created successfully.');
+        return redirect()->route('booking.pending', ['tab' => 'Checked In'])
+            ->with('success', 'Walk-in booking created successfully.');
     }
 
 

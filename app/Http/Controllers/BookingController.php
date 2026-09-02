@@ -50,10 +50,36 @@ class BookingController extends Controller
 
     public function pending()
 {
-    $bookings = Booking::with('user.idVerification')
+        $onlineBookings = Booking::with('user.idVerification')
         ->whereIn('status', ['Pending', 'Confirmed', 'Checked In'])
-        ->latest('check_in')
-        ->paginate(15);
+            ->get()
+            ->map(function ($booking) {
+                $booking->booking_type = 'Online';
+                return $booking;
+            });
+
+        $walkInBookings = WalkInBooking::with('room')
+            ->where('status', 'Checked In')
+            ->get()
+            ->map(function ($booking) {
+                $booking->booking_type = 'Walk-in';
+                $booking->room_type = optional($booking->room)->room_type;
+                $booking->floor_level = optional($booking->room)->floor;
+                return $booking;
+            });
+
+        $items = $onlineBookings
+            ->concat($walkInBookings)
+            ->sortByDesc('check_in')
+            ->values();
+
+        $perPage = 15;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        $bookings = new LengthAwarePaginator($currentItems, $items->count(), $perPage, $currentPage, [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]);
 
     $availableRooms = Room::where('status', 'Available')
         ->orderBy('room_type')
@@ -61,7 +87,9 @@ class BookingController extends Controller
         ->orderBy('room_no')
         ->get();
 
-    return view('pages.chms-features.booking-management.pending-booking', compact('bookings', 'availableRooms'));
+    $activeTab = request('tab', 'Pending');
+
+    return view('pages.chms-features.booking-management.pending-booking', compact('bookings', 'availableRooms', 'activeTab'));
 }
     public function confirmBooking(Request $request, $selectedRef)
     {
