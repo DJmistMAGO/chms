@@ -30,7 +30,7 @@ class WalkInBookingController extends Controller
         return view('pages.chms-features.booking-management.create-booking', compact('rooms', 'ambiance', 'food_package'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $data = $request->validate([
             'room_id' => 'required|exists:rooms,id',
@@ -48,7 +48,7 @@ class WalkInBookingController extends Controller
         ]);
 
         $data['status'] = 'Checked In';
-        $data['reference_number'] = 'CH-' . strtoupper(Str::random(8));
+        $data['reference_number'] = 'WB-' . strtoupper(Str::random(8));
 
         WalkInBooking::create($data);
 
@@ -57,8 +57,7 @@ class WalkInBookingController extends Controller
         $room->status = 'Occupied';
         $room->save();
 
-        return redirect()->route('booking.pending', ['tab' => 'Checked In'])
-            ->with('success', 'Walk-in booking created successfully.');
+        return redirect()->route('booking.pending')->with('success', 'Walk-in booking created successfully.');
     }
 
 
