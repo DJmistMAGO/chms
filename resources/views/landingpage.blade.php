@@ -223,6 +223,18 @@
                 dot.addEventListener('click', () => { stop(); goTo(i); start(); });
             });
 
+            document.getElementById('hero-prev').addEventListener('click', () => {
+                stop();
+                goTo(current - 1);
+                start();
+            });
+
+            document.getElementById('hero-next').addEventListener('click', () => {
+                stop();
+                goTo(current + 1);
+                start();
+            });
+
             const heroCarousel = document.getElementById('hero-carousel');
             heroCarousel.addEventListener('mouseenter', stop);
             heroCarousel.addEventListener('mouseleave', start);
@@ -304,7 +316,14 @@
         </div>
 
         <div class="w-full max-w-[320px] md:max-w-[380px] lg:max-w-[420px] shrink-0">
-            <div id="hero-carousel" class="relative rounded-[2rem] p-3 glass-panel shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
+            <div class="relative flex items-center gap-3">
+                <button id="hero-prev" type="button"
+                    class="shrink-0 w-10 h-10 rounded-full border border-white/30 bg-ink/45 text-white backdrop-blur-md flex items-center justify-center hover:bg-gold-500 hover:text-ink hover:border-gold-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-300"
+                    aria-label="Previous room">
+                    <i class="fas fa-chevron-left text-xs" aria-hidden="true"></i>
+                </button>
+
+                <div id="hero-carousel" class="relative min-w-0 flex-1 rounded-[2rem] p-3 glass-panel shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
                 <div class="relative rounded-[1.5rem] overflow-hidden aspect-[3/4]">
 
                     <div class="hero-slide is-active absolute inset-0 bg-cover bg-center"
@@ -348,6 +367,13 @@
                     </div>
 
                 </div>
+                </div>
+
+                <button id="hero-next" type="button"
+                    class="shrink-0 w-10 h-10 rounded-full border border-white/30 bg-ink/45 text-white backdrop-blur-md flex items-center justify-center hover:bg-gold-500 hover:text-ink hover:border-gold-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-300"
+                    aria-label="Next room">
+                    <i class="fas fa-chevron-right text-xs" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </div>
