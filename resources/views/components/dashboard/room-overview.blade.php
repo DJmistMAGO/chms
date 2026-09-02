@@ -20,6 +20,7 @@
                 <tr class="border-b border-white/[0.06] text-left text-xs font-semibold uppercase tracking-widest text-gray-500">
                     <th class="pb-3 pr-4">Room</th>
                     <th class="pb-3 pr-4">Room Type</th>
+                    <th class="pb-3 pr-4">Floor</th>
                     <th class="pb-3 pr-4">Status</th>
                     <th class="pb-3 pr-4">Current Guest</th>
                     <th class="pb-3 pr-4">Check-in</th>
@@ -39,19 +40,24 @@
                     @php
                         $status = $room->status ?? 'Available';
                         $styles = $statusColors[$status] ?? ['class' => 'bg-gray-400/20 text-gray-600', 'dot' => 'bg-gray-600', 'hover' => 'hover:bg-gray-200/30'];
+                        $currentBooking = $room->currentBooking ?? $room->currentWalkInBooking;
+                        $guestName = $currentBooking instanceof \App\Models\WalkInBooking
+                            ? ($currentBooking->fullname ?? '—')
+                            : (optional($currentBooking?->user)->name ?? '—');
                     @endphp
                     <tr class="group transition {{ $styles['hover'] }} dark:hover:bg-white/[0.02]">
                         <td class="py-4 px-4 font-semibold text-gray-800 dark:text-white">{{ $room->room_no }}</td>
                         <td class="py-4 pr-4 text-gray-400">{{ $room->room_type }}</td>
+                        <td class="py-4 pr-4 text-gray-400">{{ $room->floor ? 'Floor ' . $room->floor : '—' }}</td>
                         <td class="py-4 pr-4">
                             <span class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium {{ $styles['class'] }}">
                                 <span class="h-1.5 w-1.5 rounded-full {{ $styles['dot'] }}"></span>
                                 {{ $status }}
                             </span>
                         </td>
-                        <td class="py-4 pr-4 text-gray-400">{{ optional($room->currentBooking->user ?? null)->name ?? '—' }}</td>
-                        <td class="py-4 pr-4 text-gray-400">{{ optional($room->currentBooking->check_in_date ?? null)->format('M j, Y') ?? '—' }}</td>
-                        <td class="py-4 text-gray-400">{{ optional($room->currentBooking->check_out_date ?? null)->format('M j, Y') ?? '—' }}</td>
+                        <td class="py-4 pr-4 text-gray-400">{{ $guestName }}</td>
+                        <td class="py-4 pr-4 text-gray-400">{{ optional($currentBooking?->check_in)->format('M j, Y') ?? '—' }}</td>
+                        <td class="py-4 text-gray-400">{{ optional($currentBooking?->check_out)->format('M j, Y') ?? '—' }}</td>
                     </tr>
                 @endforeach
             </tbody>

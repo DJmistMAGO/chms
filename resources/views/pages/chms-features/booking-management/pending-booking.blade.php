@@ -13,6 +13,8 @@
         selectedId: null,
         selectedRef: null,
         selectedRoomType: null,
+        selectedFloorLevel: null,
+        requestedFloorHasRooms: false,
         selectedBooking: {},
 
         filterTable() {
@@ -33,6 +35,8 @@
             this.selectedId = booking.id;
             this.selectedRef = booking.ref;
             this.selectedRoomType = booking.roomType ?? null;
+            this.selectedFloorLevel = booking.floorLevel ?? null;
+            this.requestedFloorHasRooms = booking.requestedFloorHasRooms ?? false;
             this[modal] = true;
         },
 
@@ -165,6 +169,11 @@
                                 $totalPrice = $b->total_price !== null ? number_format($b->total_price, 2) : '—';
                                 $bookingStatus = ucfirst($b->status ?? 'pending');
                                 $bookedAt = optional($b->created_at)->format('M j, Y, g:i A') ?? '—';
+                                $requestedFloor = is_numeric($floorLevel) ? (string) $floorLevel : '';
+                                $requestedFloorHasRooms = $requestedFloor !== '' && collect($availableRooms ?? [])->contains(
+                                    fn($room) => (string) optional($room)->floor === $requestedFloor
+                                        && optional($room)->room_type === $roomType,
+                                );
                                 $initials =
                                     strtoupper(substr($guestName, 0, 1)) .
                                     strtoupper(substr(strstr($guestName . ' ', ' '), 1, 1));
@@ -306,7 +315,7 @@
                                             @if ($b->user?->idVerification?->valid_id_status === 'verified')
                                                 {{-- Confirm booking (assign room) --}}
                                                 <button title="Confirm booking"
-                                                    @click="open('confirmModal', { id: @js($b->id), ref: @js($referenceNumber), roomType: @js($roomType) })"
+                                                    @click="open('confirmModal', { id: @js($b->id), ref: @js($referenceNumber), roomType: @js($roomType), floorLevel: @js($requestedFloor), requestedFloorHasRooms: @js($requestedFloorHasRooms) })"
                                                     class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
                                                         viewBox="0 0 24 24">
@@ -633,6 +642,12 @@
                     <div class="px-6 py-5">
                         <label class="mb-1.5 block text-xs font-medium uppercase tracking-widest text-gray-400">Assign
                             Room</label>
+                        <p x-show="selectedFloorLevel && requestedFloorHasRooms"
+                            class="mb-2 text-xs text-green-600 dark:text-green-400"
+                            x-text="'Showing available ' + selectedRoomType + ' rooms on Floor ' + selectedFloorLevel + '.'"></p>
+                        <p x-show="selectedFloorLevel && !requestedFloorHasRooms"
+                            class="mb-2 text-xs text-amber-600 dark:text-amber-400"
+                            x-text="'No available ' + selectedRoomType + ' rooms on Floor ' + selectedFloorLevel + '. Showing other available floors.'"></p>
                         <select name="room_id"
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
                             <option value="">Select a room…</option>
@@ -644,7 +659,7 @@
                             @foreach ($roomsByFloor as $floor => $floorRooms)
                                 <optgroup label="{{ is_numeric($floor) ? 'Floor ' . $floor : $floor }}">
                                     @foreach ($floorRooms as $room)
-                                        <template x-if="@js(optional($room)->room_type) === selectedRoomType">
+                                        <template x-if="@js(optional($room)->room_type) === selectedRoomType && (!selectedFloorLevel || !requestedFloorHasRooms || @js((string) optional($room)->floor) === selectedFloorLevel)">
                                             <option value="{{ optional($room)->id }}">{{ optional($room)->room_no ?? 'Unknown room' }} — {{ optional($room)->room_type ?? 'Unknown type' }}
                                             </option>
                                         </template>

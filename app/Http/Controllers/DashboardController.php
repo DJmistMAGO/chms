@@ -23,7 +23,17 @@ class DashboardController extends Controller
             ->orderByDesc('check_out')
             ->get();
 
-        $rooms = Room::paginate(7);
+        $rooms = Room::with(['currentBooking.user', 'currentWalkInBooking'])
+            ->orderByRaw("CASE status
+                WHEN 'Occupied' THEN 1
+                WHEN 'Available' THEN 2
+                WHEN 'Maintenance' THEN 3
+                WHEN 'Reserved' THEN 4
+                ELSE 5
+            END")
+            ->orderBy('floor')
+            ->orderBy('room_no')
+            ->paginate(7);
         $allBookings = Booking::all();
         $pendingBookings = Booking::where('status', 'Pending')->get();
         $totalRooms = Room::count();

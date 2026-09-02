@@ -70,6 +70,22 @@ class BookingController extends Controller
         ]);
 
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+        $room = Room::whereKey($request->input('room_id'))
+            ->where('status', 'Available')
+            ->where('room_type', $booking->room_type)
+            ->firstOrFail();
+
+        $requestedFloor = trim((string) $booking->floor_level);
+        $hasRequestedFloorRoom = $requestedFloor !== '' && Room::where('status', 'Available')
+            ->where('room_type', $booking->room_type)
+            ->where('floor', $requestedFloor)
+            ->exists();
+
+        if ($hasRequestedFloorRoom && (string) $room->floor !== $requestedFloor) {
+            return back()->withErrors([
+                'room_id' => 'Please assign an available room on the guest\'s requested floor.',
+            ])->withInput();
+        }
 
         // Update the booking status to confirmed and assign the selected room
         $booking->status = 'Confirmed';
@@ -77,7 +93,6 @@ class BookingController extends Controller
         $booking->save();
 
         // Update the room status to occupied
-        $room = Room::find($request->input('room_id'));
         $room->status = 'Occupied';
         $room->save();
 
