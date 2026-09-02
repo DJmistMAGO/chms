@@ -292,7 +292,7 @@
 
                                             {{-- View --}}
                                             <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                                                @click="selectedBooking = @js($bookingPayload); detailModal=true"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
                                                     viewBox="0 0 24 24">
@@ -336,7 +336,7 @@
 
                                             {{-- View --}}
                                             <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                                                @click="selectedBooking = @js($bookingPayload); detailModal=true"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
@@ -371,7 +371,7 @@
 
                                             {{-- View --}}
                                             <button title="View booking details"
-                                                @click="selectedBooking = {{ $bookingPayload }}; detailModal=true"
+                                                @click="selectedBooking = @js($bookingPayload); detailModal=true"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/>
@@ -636,11 +636,20 @@
                         <select name="room_id"
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
                             <option value="">Select a room…</option>
-                            @foreach ($availableRooms ?? [] as $room)
-                                <template x-if="@js(optional($room)->room_type) === selectedRoomType">
-                                    <option value="{{ optional($room)->id }}">{{ optional($room)->room_no ?? 'Unknown room' }} — {{ optional($room)->room_type ?? 'Unknown type' }}
-                                    </option>
-                                </template>
+                            @php
+                                $roomsByFloor = collect($availableRooms ?? [])->groupBy(
+                                    fn($room) => optional($room)->floor ?? optional($room)->floor_level ?? 'Unassigned',
+                                );
+                            @endphp
+                            @foreach ($roomsByFloor as $floor => $floorRooms)
+                                <optgroup label="{{ is_numeric($floor) ? 'Floor ' . $floor : $floor }}">
+                                    @foreach ($floorRooms as $room)
+                                        <template x-if="@js(optional($room)->room_type) === selectedRoomType">
+                                            <option value="{{ optional($room)->id }}">{{ optional($room)->room_no ?? 'Unknown room' }} — {{ optional($room)->room_type ?? 'Unknown type' }}
+                                            </option>
+                                        </template>
+                                    @endforeach
+                                </optgroup>
                             @endforeach
                         </select>
                     </div>
