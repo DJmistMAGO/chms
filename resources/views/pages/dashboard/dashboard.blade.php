@@ -44,7 +44,7 @@
     @unlessrole('client')
         <div class="grid grid-cols-12 gap-6">
             <div class="col-span-12">
-                <x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms" />
+                <x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms" :bookingsToday="$bookingsToday" />
             </div>
 
             <div class="col-span-12">
@@ -55,7 +55,7 @@
 
             <div class="col-span-12 md:col-span-6 space-y-6">
                 {{-- <x-dashboard.client-quick-actions /> --}}
-                <x-dashboard.client-recent-bookings :bookings="$bookings" />
+                <x-dashboard.client-recent-bookings :bookings="$recentBookings" />
             </div>
         </div>
     @endunlessrole

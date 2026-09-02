@@ -1,4 +1,4 @@
-@props(['rooms', 'allBookings', 'totalRooms', 'availableRooms'])
+@props(['rooms', 'allBookings', 'totalRooms', 'availableRooms', 'bookingsToday'])
 
 <div class="rounded-3xl border border-white/10 bg-white/[0.03] p-6 shadow-sm backdrop-blur-sm">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -29,7 +29,7 @@
         </div>
         <div class="rounded-2xl border border-blue-500/10 bg-blue-500/10 px-4 py-4 text-center">
             <p class="text-[11px] font-semibold uppercase tracking-widest text-blue-400">Bookings Today</p>
-            <h4 class="mt-2 text-2xl font-bold text-blue-600 dark:text-blue-300">{{ $allBookings->where('verified_at', today())->count() }}</h4>
+            <h4 class="mt-2 text-2xl font-bold text-blue-600 dark:text-blue-300">{{ $bookingsToday }}</h4>
         </div>
         <div class="rounded-2xl border border-yellow-500/10 bg-yellow-500/10 px-4 py-4 text-center">
             <p class="text-[11px] font-semibold uppercase tracking-widest text-yellow-400">Pending</p>
@@ -37,7 +37,7 @@
         </div>
         <div class="rounded-2xl border border-indigo-500/10 bg-indigo-500/10 px-4 py-4 text-center">
             <p class="text-[11px] font-semibold uppercase tracking-widest text-indigo-400">Checked-in</p>
-            <h4 class="mt-2 text-2xl font-bold text-indigo-600 dark:text-indigo-300">{{ $allBookings->where('status', 'Confirmed')->count() }}</h4>
+            <h4 class="mt-2 text-2xl font-bold text-indigo-600 dark:text-indigo-300">{{ $allBookings->where('status', 'Checked In')->count() }}</h4>
         </div>
     </div>
 </div>

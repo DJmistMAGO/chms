@@ -15,7 +15,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -24,36 +24,38 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        display: ['"Fraunces"', 'serif'],
-                        sans: ['"Inter"', 'sans-serif']
+                        display: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"DM Sans"', 'sans-serif']
                     },
                     colors: {
-                        primary: '#B8935A',
-                        secondary: '#9C7B41',
-                        light: '#EFDDBA',
-                        dark: '#0F1A22',
-                        ink: '#14202B',
-                        ivory: '#FAF7F2',
-                        gold: {
-                            50: '#FBF3E4',
-                            100: '#F3E4C2',
-                            200: '#E6CB93',
-                            400: '#C6A15B',
-                            500: '#B8935A',
-                            600: '#9C7B41',
-                            900: '#3B2E1A'
+                        primary: '#c9960c',
+                        secondary: '#b8860b',
+                        accent: '#f6d98c',
+                        dark: '#1d120d',
+                        ink: '#21160e',
+                        ivory: '#f8f2ea',
+                        stone: {
+                            50: '#fffdf9',
+                            100: '#f9f3ea',
+                            200: '#e8dcc3',
+                            300: '#d7c7a2',
+                            400: '#b99b5a',
+                            500: '#9e7a31',
+                            600: '#72581d',
+                            700: '#423214',
+                            800: '#241c12',
+                            900: '#120d09'
                         },
-                        neutral: {
-                            50: '#FFFFFF',
-                            100: '#F8F9FA',
-                            200: '#E5E7EB',
-                            300: '#D1D5DB',
-                            400: '#9CA3AF',
-                            500: '#6B7280',
-                            600: '#4B5563',
-                            700: '#374151',
-                            800: '#1F2937',
-                            900: '#111827'
+                        gold: {
+                            50: '#fff9ee',
+                            100: '#fef0d1',
+                            200: '#f7d884',
+                            300: '#efc75d',
+                            400: '#dca81c',
+                            500: '#c9960c',
+                            600: '#b8860b',
+                            700: '#8b6508',
+                            900: '#3b2a0f'
                         }
                     }
                 }
@@ -62,16 +64,21 @@
     </script>
 
     <style>
-        .nav-solid {
-            background-color: rgba(250, 247, 242, 0.92);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 4px 30px rgba(15, 26, 34, 0.05);
-            border-bottom: 1px solid rgba(184, 147, 90, 0.15);
+        body {
+            background: #f8f2ea;
+            color: #21160e;
         }
 
-        .nav-solid .nav-links a:not(.rounded-full) { color: #14202B; }
-        .nav-solid #bar1, .nav-solid #bar2, .nav-solid #bar3 { background-color: #14202B; }
-        .nav-solid .rounded-full { border-color: rgba(20,32,43,0.3); color: #14202B; }
+        .nav-solid {
+            background-color: rgba(255, 252, 248, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(32, 20, 10, 0.12);
+            border-bottom: 1px solid rgba(201, 150, 12, 0.18);
+        }
+
+        .nav-solid .nav-links a:not(.rounded-full) { color: #21160e; }
+        .nav-solid #bar1, .nav-solid #bar2, .nav-solid #bar3 { background-color: #21160e; }
+        .nav-solid .rounded-full { border-color: rgba(33,22,14,0.3); color: #21160e; }
 
         .hero-slide {
             opacity: 0;
@@ -93,12 +100,17 @@
             width: 100%;
         }
 
-        /* Glassmorphism utility */
         .glass-panel {
-            background: rgba(15, 26, 34, 0.45);
+            background: rgba(27, 18, 13, 0.52);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 25px 60px rgba(20, 13, 8, 0.45);
+        }
+
+        .warm-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(249,243,234,0.98));
+            border: 1px solid rgba(201, 150, 12, 0.12);
         }
     </style>
 
@@ -211,6 +223,18 @@
                 dot.addEventListener('click', () => { stop(); goTo(i); start(); });
             });
 
+            document.getElementById('hero-prev').addEventListener('click', () => {
+                stop();
+                goTo(current - 1);
+                start();
+            });
+
+            document.getElementById('hero-next').addEventListener('click', () => {
+                stop();
+                goTo(current + 1);
+                start();
+            });
+
             const heroCarousel = document.getElementById('hero-carousel');
             heroCarousel.addEventListener('mouseenter', stop);
             heroCarousel.addEventListener('mouseleave', start);
@@ -232,18 +256,16 @@
                 <img src="{{ asset('assets/images/chlogo.png') }}" class="w-16 transition-transform duration-300 group-hover:scale-105" alt="Caree Hotel Logo">
             </a>
 
-            {{-- Desktop Menu --}}
-            <div class="hidden md:flex space-x-10 font-sans text-xs uppercase tracking-[0.15em] text-white/90 items-center nav-links font-medium">
-                <a href="#home" class="relative pb-1 hover:text-gold-400 transition-colors">Home</a>
-                <a href="#rooms" class="relative pb-1 hover:text-gold-400 transition-colors">Rooms</a>
-                <a href="#about-us" class="relative pb-1 hover:text-gold-400 transition-colors">About Us</a>
+            <div class="hidden md:flex space-x-10 font-sans text-xs uppercase tracking-[0.18em] text-white/90 items-center nav-links font-medium">
+                <a href="#home" class="relative pb-1 hover:text-gold-300 transition-colors">Home</a>
+                <a href="#rooms" class="relative pb-1 hover:text-gold-300 transition-colors">Rooms</a>
+                <a href="#about-us" class="relative pb-1 hover:text-gold-300 transition-colors">About Us</a>
                 <a href="{{ route('login') }}"
-                    class="border border-white/40 rounded-full px-6 py-2.5 hover:border-gold-400 hover:text-gold-400 transition-all duration-300 backdrop-blur-sm">
+                    class="border border-white/40 rounded-full px-6 py-2.5 hover:border-gold-300 hover:text-gold-300 transition-all duration-300 backdrop-blur-sm">
                     Log In
                 </a>
             </div>
 
-            {{-- Hamburger Button (mobile only) --}}
             <button id="menu-toggle"
                 class="md:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 focus:outline-none"
                 aria-label="Toggle menu" aria-expanded="false" aria-controls="mobile-menu">
@@ -253,7 +275,6 @@
             </button>
         </div>
 
-        {{-- Mobile Menu --}}
         <div id="mobile-menu"
             class="md:hidden hidden flex-col space-y-4 pt-6 pb-6 font-sans text-ink border-t border-ink/10 mt-3 bg-ivory/95 backdrop-blur-xl -mx-6 px-8 rounded-b-2xl shadow-xl">
             <a href="#home" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">Home</a>
@@ -265,111 +286,117 @@
 
     <section class="relative min-h-screen flex items-center overflow-hidden bg-cover bg-center scroll-mt-24"
     id="home"
-    style="background-image: linear-gradient(rgba(15,26,34,0.65), rgba(15,26,34,0.88)), url('{{ asset('assets/images/ch2.png') }}')">
+    style="background-image: linear-gradient(135deg, rgba(18,13,9,0.82), rgba(44,32,16,0.72), rgba(201,150,12,0.38)), url('{{ asset('assets/images/ch2.png') }}')">
 
-    <div class="absolute inset-0 z-[5] pointer-events-none bg-gradient-to-r from-white from-0% via-white/55 via-35% to-transparent to-65%"></div>
+    <div class="absolute inset-0 z-[5] pointer-events-none bg-[radial-gradient(circle_at_top_left,_rgba(255,223,130,0.25),transparent_30%),linear-gradient(90deg,_rgba(248,242,234,0.08)_0%,_rgba(248,242,234,0.15)_25%,_transparent_60%)]"></div>
 
     <div class="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-16 py-32 md:py-20 flex flex-col md:flex-row items-center gap-14 md:gap-12 justify-between">
 
         <div class="max-w-xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold-400/10 border border-gold-400/30 mb-6 backdrop-blur-sm">
-                <span class="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse"></span>
-                <span class="text-gold-600 text-xs tracking-widest uppercase font-medium">Bulan, Sorsogon</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/8 border border-gold-300/40 mb-6 backdrop-blur-sm shadow-[0_0_30px_rgba(201,150,12,0.15)]">
+                <span class="w-1.5 h-1.5 rounded-full bg-gold-300 animate-pulse"></span>
+                <span class="text-gold-200 text-[11px] tracking-[0.22em] uppercase font-medium">Bulan, Sorsogon</span>
             </div>
 
-            <h1 class="font-display text-5xl md:text-7xl font-light leading-[1.08] tracking-tight text-ink">
-                Find your <span class="italic text-amber-600 font-normal">peace</span> here
+            <h1 class="font-display text-5xl md:text-7xl font-semibold leading-[0.92] tracking-[-0.03em] text-white">
+                Find your <span class="italic text-gold-300 font-normal">peace</span> here
             </h1>
 
-            <p class="mt-6 text-base md:text-lg leading-relaxed text-ink/70 max-w-md font-light">
+            <p class="mt-6 text-base md:text-lg leading-relaxed text-white/75 max-w-md font-light">
                 A quiet retreat where modern luxury meets Bulan's slower pace — tailored by the room, the view, and the moments that matter.
             </p>
 
             <div class="mt-10 flex flex-col sm:flex-row gap-4">
-                {{-- <button
-                    onclick="window.location.href = '{{ route('customize.booking') }}'"
-                    class="w-full sm:w-auto sm:min-w-[200px] bg-gold-400 hover:bg-gold-200 text-ink px-8 py-4 rounded-full font-medium transition-all duration-300 text-center shadow-[0_10px_25px_rgba(184,147,90,0.3)] hover:-translate-y-0.5">
-                    Start Reservation
-                </button> --}}
                 <button
-                class="w-full sm:w-auto sm:min-w-[200px] bg-gold-400 hover:bg-gold-200 text-ink px-8 py-4 rounded-full font-medium transition-all duration-300 text-center shadow-[0_10px_25px_rgba(184,147,90,0.3)] hover:-translate-y-0.5"
+                    class="w-full sm:w-auto sm:min-w-[210px] bg-gradient-to-r from-gold-400 to-gold-300 hover:brightness-110 text-ink px-8 py-4 rounded-full font-medium transition-all duration-300 text-center shadow-[0_12px_28px_rgba(201,150,12,0.35)] hover:-translate-y-0.5"
                     onclick="document.getElementById('rooms').scrollIntoView({ behavior: 'smooth' })">
                     Explore Rooms
                 </button>
             </div>
         </div>
 
-        {{-- Premium Glassmorphism Room Carousel Frame --}}
         <div class="w-full max-w-[320px] md:max-w-[380px] lg:max-w-[420px] shrink-0">
-            <div id="hero-carousel" class="relative rounded-[2rem] p-3 glass-panel shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
+            <div class="relative flex items-center gap-3">
+                <button id="hero-prev" type="button"
+                    class="shrink-0 w-10 h-10 rounded-full border border-white/30 bg-ink/45 text-white backdrop-blur-md flex items-center justify-center hover:bg-gold-500 hover:text-ink hover:border-gold-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-300"
+                    aria-label="Previous room">
+                    <i class="fas fa-chevron-left text-xs" aria-hidden="true"></i>
+                </button>
+
+                <div id="hero-carousel" class="relative min-w-0 flex-1 rounded-[2rem] p-3 glass-panel shadow-[0_25px_60px_rgba(0,0,0,0.5)]">
                 <div class="relative rounded-[1.5rem] overflow-hidden aspect-[3/4]">
 
                     <div class="hero-slide is-active absolute inset-0 bg-cover bg-center"
                         data-title="Standard Suite"
                         data-price="₱1,500 / night"
-                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/sRoom.png') }}')"></div>
+                        style="background-image: linear-gradient(to top, rgba(17,12,10,0.9) 0%, rgba(17,12,10,0.2) 60%, rgba(17,12,10,0) 100%), url('{{ asset('assets/images/sRoom.png') }}')"></div>
 
                     <div class="hero-slide absolute inset-0 bg-cover bg-center"
                         data-title="Standard Premium"
                         data-price="₱1,900 / night"
-                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/pRoom.png') }}')"></div>
+                        style="background-image: linear-gradient(to top, rgba(17,12,10,0.9) 0%, rgba(17,12,10,0.2) 60%, rgba(17,12,10,0) 100%), url('{{ asset('assets/images/pRoom.png') }}')"></div>
 
                     <div class="hero-slide absolute inset-0 bg-cover bg-center"
                         data-title="Family Residence"
                         data-price="₱2,700 / night"
-                        style="background-image: linear-gradient(to top, rgba(15,26,34,0.92) 0%, rgba(15,26,34,0.2) 60%, rgba(15,26,34,0) 100%), url('{{ asset('assets/images/fRoom.png') }}')"></div>
+                        style="background-image: linear-gradient(to top, rgba(17,12,10,0.9) 0%, rgba(17,12,10,0.2) 60%, rgba(17,12,10,0) 100%), url('{{ asset('assets/images/fRoom.png') }}')"></div>
 
-                    {{-- Top Badge overlay --}}
                     <div class="absolute top-4 right-4 z-10">
-                        <span class="bg-dark/60 backdrop-blur-md border border-white/15 text-gold-200 text-[10px] font-semibold uppercase tracking-widest px-3 py-1.5 rounded-full">
+                        <span class="bg-[#1d120d]/65 backdrop-blur-md border border-gold-300/25 text-gold-200 text-[10px] font-semibold uppercase tracking-[0.22em] px-3 py-1.5 rounded-full">
                             Featured Accommodations
                         </span>
                     </div>
 
-                    {{-- Per-slide caption + indicators --}}
                     <div class="absolute bottom-6 left-6 right-6 z-10">
                         <div id="hero-caption-box" class="transition-all duration-300" aria-live="polite">
-                            <h4 id="hero-room-title" class="text-white font-display text-2xl font-light tracking-wide">Standard Suite</h4>
-                            <p id="hero-room-price" class="text-gold-400 font-sans text-sm font-medium mt-1">₱1,500 / night</p>
+                            <h4 id="hero-room-title" class="text-white font-display text-3xl font-medium tracking-wide">Standard Suite</h4>
+                            <p id="hero-room-price" class="text-gold-300 font-sans text-sm font-medium mt-1">₱1,500 / night</p>
                         </div>
 
                         <div class="flex gap-2.5 mt-5">
                             <button type="button" class="hero-dot is-active relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 1">
-                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                                <div class="hero-progress-bar h-full bg-gold-300 rounded-full"></div>
                             </button>
                             <button type="button" class="hero-dot relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 2">
-                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                                <div class="hero-progress-bar h-full bg-gold-300 rounded-full"></div>
                             </button>
                             <button type="button" class="hero-dot relative h-1 flex-1 rounded-full bg-white/20 overflow-hidden" aria-label="Slide 3">
-                                <div class="hero-progress-bar h-full bg-gold-400 rounded-full"></div>
+                                <div class="hero-progress-bar h-full bg-gold-300 rounded-full"></div>
                             </button>
                         </div>
                     </div>
 
                 </div>
+                </div>
+
+                <button id="hero-next" type="button"
+                    class="shrink-0 w-10 h-10 rounded-full border border-white/30 bg-ink/45 text-white backdrop-blur-md flex items-center justify-center hover:bg-gold-500 hover:text-ink hover:border-gold-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-300"
+                    aria-label="Next room">
+                    <i class="fas fa-chevron-right text-xs" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
     </div>
 </section>
 
-    <section class="py-32 px-6 md:px-16 bg-ivory scroll-mt-24" id="rooms">
+    <section class="py-32 px-6 md:px-16 bg-[#f6efe7] scroll-mt-24" id="rooms">
         <div class="max-w-7xl mx-auto">
             <div class="mb-20 max-w-2xl">
                 <div class="flex items-center gap-3 mb-4">
                     <span class="w-10 h-px bg-gold-500"></span>
                     <span class="text-gold-600 font-sans text-xs uppercase tracking-[0.2em] font-semibold">Accommodations</span>
                 </div>
-                <h2 class="text-4xl md:text-5xl font-display font-light text-ink leading-tight">
+                <h2 class="text-4xl md:text-5xl font-display font-semibold text-ink leading-tight">
                     Explore &amp; book your sanctuary
                 </h2>
-                <p class="mt-4 text-neutral-600 text-base leading-relaxed max-w-xl font-light">
+                <p class="mt-4 text-[#5d4c3d] text-base leading-relaxed max-w-xl font-light">
                     Every detail designed with intent. Rates are curated by space, vista, and bespoke features so you pay only for what you desire.
                 </p>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
-                <div class="group bg-white rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(15,26,34,0.05)] hover:shadow-[0_25px_60px_rgba(15,26,34,0.12)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col border border-ink/5">
+                <div class="group warm-card rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(35,24,14,0.08)] hover:shadow-[0_25px_60px_rgba(35,24,14,0.14)] hover:-translate-y-1.5 transition-all duration-500 flex flex-col">
                     <div class="relative overflow-hidden h-64 bg-gold-50">
                         <img src="{{ asset('assets/images/sRoom.png') }}" alt="Standard Room" loading="lazy"
                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
@@ -544,7 +571,7 @@
         </div>
     </section>
 
-    <section class="py-32 px-6 md:px-16 bg-white scroll-mt-24 border-t border-b border-ink/5" id="about-us">
+    <section class="py-32 px-6 md:px-16 bg-[#fffdf9] scroll-mt-24 border-t border-b border-[#e7d8b5]" id="about-us">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16">
 
             <div class="flex-1">
@@ -605,7 +632,7 @@
     </section>
 
     <section class="min-h-screen bg-cover bg-center flex items-center px-6 md:px-16 py-24 text-white relative"
-        style="background-image: linear-gradient(rgba(15,26,34,0.8), rgba(15,26,34,0.9)), url('{{ asset('assets/images/ch1.png') }}')">
+        style="background-image: linear-gradient(135deg, rgba(18,13,9,0.88), rgba(45,34,17,0.82), rgba(201,150,12,0.35)), url('{{ asset('assets/images/ch1.png') }}')">
 
         <div class="max-w-7xl mx-auto w-full">
             <div class="max-w-3xl">
@@ -658,8 +685,8 @@
             <p class="text-xs text-white/50 tracking-wide">&copy; 2026 Caree Hotel. All rights reserved.</p>
 
             <div class="space-x-6 text-xs uppercase tracking-widest text-white/70">
-                <a href="#" class="hover:text-gold-400 transition-colors">Privacy Policy</a>
-                <a href="#" class="hover:text-gold-400 transition-colors">Terms of Service</a>
+                <a href="{{ route('privacy.policy') }}" class="hover:text-gold-400 transition-colors">Privacy Policy</a>
+                <a href="{{ route('terms.of.service') }}" class="hover:text-gold-400 transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>

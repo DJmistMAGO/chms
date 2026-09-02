@@ -95,7 +95,7 @@ class MicroPricingController extends Controller
         return [
             'No Food' => 0,
             'Cozy Dinner for Family' => 1500,
-            'Romantic Dinner' => 1500,
+            'Romantic Dinner' => 1700,
         ];
     }
 

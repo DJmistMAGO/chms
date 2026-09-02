@@ -65,12 +65,26 @@
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800" id="bookings-tbody">
                         @forelse ($checkedInBookings as $b)
                             @php
-                                $nights = $b->check_in->diffInDays($b->check_out);
+                                $checkIn = $b->check_in;
+                                $checkOut = $b->check_out;
+                                $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : null;
                                 $isOnline = $b->booking_type === 'Online';
+                                $guest = $b->user;
+                                $room = $b->room;
+                                $guestName = $isOnline ? optional($guest)->name ?? 'Registered Guest' : $b->fullname ?? '—';
+                                $guestEmail = $isOnline ? optional($guest)->email ?? '—' : $b->phone_number ?? '—';
+                                $referenceNumber = $b->reference_number ?? '—';
+                                $roomType = optional($room)->room_type ?? $b->room_type ?? 'Room not assigned';
+                                $floorLevel = optional($room)->floor_level ?? $b->floor_level ?? optional($room)->floor ?? '—';
+                                $bookingType = $b->booking_type ?? '—';
+                                $numberOfGuests = $b->number_of_guests ?? '—';
+                                $ambiance = $b->ambiance ?? '—';
+                                $foodPackage = $b->food_package ?? '—';
+                                $roomPrice = $b->room_price !== null ? number_format($b->room_price, 2) : '—';
+                                $microPricingAmount = number_format($b->micro_pricing_amount ?? 0, 2);
+                                $totalPrice = $b->total_price !== null ? number_format($b->total_price, 2) : '—';
+                                $bookedAt = optional($b->created_at)->format('M j, Y, g:i A') ?? '—';
 
-                                // Name: online guests use user relationship, walk-in use fullname column
-                                $guestName = $isOnline ? $b->user->name ?? 'Registered Guest' : $b->fullname ?? '—';
-                                $guestEmail = $isOnline ? $b->user->email ?? '—' : $b->phone_number ?? '—';
                                 $guestSub = $isOnline ? 'email' : 'phone';
 
                                 // Initials from whichever name we have
@@ -81,7 +95,7 @@
                             @endphp
 
                             <tr class="booking-row group transition-colors hover:bg-orange-50/40 dark:hover:bg-orange-400/5"
-                                data-search="{{ strtolower($guestName) }} {{ strtolower($b->reference_number) }} {{ strtolower($b->room_type) }} {{ strtolower($b->booking_type) }}">
+                                data-search="{{ strtolower($guestName) }} {{ strtolower($referenceNumber) }} {{ strtolower($roomType) }} {{ strtolower($bookingType) }}">
 
                                 {{-- Booking Type --}}
                                 <td class="px-5 py-4">
@@ -136,7 +150,7 @@
                                 <td class="px-5 py-4">
                                     <span
                                         class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">
-                                        {{ $b->reference_number }}
+                                        {{ $referenceNumber }}
                                     </span>
                                 </td>
 
@@ -144,24 +158,24 @@
                                 <td class="px-5 py-4">
                                     <span
                                         class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">
-                                        {{ $b->room->room_type }}
+                                        {{ $roomType }}
                                     </span>
                                 </td>
 
                                 {{-- Stay --}}
                                 <td class="px-5 py-4">
                                     <p class="font-medium text-gray-700 dark:text-gray-300">
-                                        {{ $b->check_in->format('M j') }} – {{ $b->check_out->format('M j, Y') }}
+                                        {{ optional($checkIn)->format('M j') ?? '—' }} – {{ optional($checkOut)->format('M j, Y') ?? '—' }}
                                     </p>
                                     <p class="mt-0.5 text-xs text-gray-400">
-                                        {{ $nights }} night{{ $nights == 1 ? '' : 's' }}
+                                        {{ $nights ?? '—' }} night{{ $nights === 1 ? '' : 's' }}
                                     </p>
                                 </td>
 
                                 {{-- Total --}}
                                 <td class="px-5 py-4">
                                     <span class="font-semibold text-gray-800 dark:text-white text-xs">
-                                        ₱{{ number_format($b->total_price, 2) }}
+                                        {{ $totalPrice === '—' ? '—' : '₱' . $totalPrice }}
                                     </span>
                                 </td>
 
@@ -181,23 +195,23 @@
                                         {{-- View --}}
                                         <button title="View booking details"
                                             @click="selectedBooking = {
-                                    reference_number:      '{{ $b->reference_number }}',
-                                    booking_type:          '{{ $b->booking_type }}',
-                                    guest_name:            '{{ addslashes($guestName) }}',
-                                    guest_contact:         '{{ $isOnline ? $b->user->email ?? '—' : $b->phone_number ?? '—' }}',
-                                    room_type:             '{{ $b->room->room_type }}',
-                                    check_in:              '{{ $b->check_in->format('M j, Y') }}',
-                                    check_out:             '{{ $b->check_out->format('M j, Y') }}',
-                                    number_of_guests:      '{{ $b->number_of_guests }}',
-                                    floor_level:           '{{ $b->room->floor_level }}',
-                                    ambiance:              '{{ $b->ambiance }}',
-                                    food_package:          '{{ $b->food_package }}',
-                                    room_price:            '{{ number_format($b->room_price, 2) }}',
-                                    micro_pricing_amount:  '{{ number_format($b->micro_pricing_amount ?? 0, 2) }}',
-                                    total_price:           '{{ number_format($b->total_price, 2) }}',
+                                    reference_number:      @js($referenceNumber),
+                                    booking_type:          @js($bookingType),
+                                    guest_name:            @js($guestName),
+                                    guest_contact:         @js($guestEmail),
+                                    room_type:             @js($roomType),
+                                    check_in:              @js(optional($checkIn)->format('M j, Y') ?? '—'),
+                                    check_out:             @js(optional($checkOut)->format('M j, Y') ?? '—'),
+                                    number_of_guests:      @js($numberOfGuests),
+                                    floor_level:           @js($floorLevel),
+                                    ambiance:              @js($ambiance),
+                                    food_package:          @js($foodPackage),
+                                    room_price:            @js($roomPrice),
+                                    micro_pricing_amount:  @js($microPricingAmount),
+                                    total_price:           @js($totalPrice),
                                     status:                'Checked In',
-                                    nights:                '{{ $nights }}',
-                                    booked_at:             '{{ $b->created_at->format('M j, Y, g:i A') }}'
+                                    nights:                @js($nights ?? '—'),
+                                    booked_at:             @js($bookedAt)
                                 }; detailModal=true"
                                             class="flex h-8 w-8 items-center justify-center rounded-xl bg-gray-50 text-gray-500 transition hover:bg-gray-100 hover:scale-105 dark:bg-white/5 dark:text-gray-400 dark:hover:bg-white/10">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -211,7 +225,7 @@
 
                                         {{-- Checkout / Complete --}}
                                         <button title="Mark as Checked Out"
-                                            @click="selectedId='{{ $b->id }}'; selectedBookingType='{{ $b->booking_type }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room->room_type }}'; assignModal=true"
+                                            @click="selectedId=@js($b->id); selectedBookingType=@js($bookingType); selectedRef=@js($referenceNumber); selectedRoomType=@js($roomType); assignModal=true"
                                             class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
                                                 viewBox="0 0 24 24">

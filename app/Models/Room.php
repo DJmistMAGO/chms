@@ -27,6 +27,13 @@ class Room extends Model
             ->orderBy('check_in');
     }
 
+    public function currentWalkInBooking()
+    {
+        return $this->hasOne(WalkInBooking::class, 'room_id')
+            ->whereIn('status', ['Confirmed', 'Checked In'])
+            ->orderBy('check_in');
+    }
+
     public function roomType()
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');

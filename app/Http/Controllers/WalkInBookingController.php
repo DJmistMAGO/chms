@@ -23,14 +23,14 @@ class WalkInBookingController extends Controller
 
         $food_package = [
             'No Food Package' => 0,
-            'Cozy Dinner for Family' => 1500,
-            'Romantic Dinner' => 1500,
+            'Cozy Dinner for Family' => 1700,
+            'Romantic Dinner' => 1700,
         ];
 
         return view('pages.chms-features.booking-management.create-booking', compact('rooms', 'ambiance', 'food_package'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $data = $request->validate([
             'room_id' => 'required|exists:rooms,id',
