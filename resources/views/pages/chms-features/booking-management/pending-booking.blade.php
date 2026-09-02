@@ -148,33 +148,49 @@
                     <tbody class="divide-y divide-gray-50 dark:divide-gray-800" id="bookings-tbody">
                         @forelse ($bookings as $b)
                             @php
-                                $nights = $b->check_in->diffInDays($b->check_out);
+                                $checkIn = $b->check_in;
+                                $checkOut = $b->check_out;
+                                $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : null;
+                                $guest = $b->user;
+                                $guestName = optional($guest)->name ?? '—';
+                                $guestEmail = optional($guest)->email ?? '—';
+                                $referenceNumber = $b->reference_number ?? '—';
+                                $roomType = $b->room_type ?? 'Room not assigned';
+                                $floorLevel = $b->floor_level ?? '—';
+                                $ambiance = $b->ambiance ?? '—';
+                                $foodPackage = $b->food_package ?? '—';
+                                $numberOfGuests = $b->number_of_guests ?? '—';
+                                $roomPrice = $b->room_price !== null ? number_format($b->room_price, 2) : '—';
+                                $microPricingAmount = number_format($b->micro_pricing_amount ?? 0, 2);
+                                $totalPrice = $b->total_price !== null ? number_format($b->total_price, 2) : '—';
+                                $bookingStatus = ucfirst($b->status ?? 'pending');
+                                $bookedAt = optional($b->created_at)->format('M j, Y, g:i A') ?? '—';
                                 $initials =
-                                    strtoupper(substr($b->user->name ?? 'G', 0, 1)) .
-                                    strtoupper(substr(strstr($b->user->name ?? ' G', ' '), 1, 1));
+                                    strtoupper(substr($guestName, 0, 1)) .
+                                    strtoupper(substr(strstr($guestName . ' ', ' '), 1, 1));
 
-                                $bookingPayload = "{
-                                    reference_number: '{$b->reference_number}',
-                                    room_type: '{$b->room_type}',
-                                    check_in: '" . $b->check_in->format('M j, Y') . "',
-                                    check_out: '" . $b->check_out->format('M j, Y') . "',
-                                    number_of_guests: '{$b->number_of_guests}',
-                                    floor_level: '{$b->floor_level}',
-                                    ambiance: '{$b->ambiance}',
-                                    food_package: '{$b->food_package}',
-                                    room_price: '" . number_format($b->room_price, 2) . "',
-                                    micro_pricing_amount: '" . number_format($b->micro_pricing_amount ?? 0, 2) . "',
-                                    total_price: '" . number_format($b->total_price, 2) . "',
-                                    status: '" . ucfirst($b->status ?? 'pending') . "',
-                                    nights: '{$nights}',
-                                    booked_at: '" . $b->created_at->format('M j, Y, g:i A') . "'
-                                }";
+                                $bookingPayload = [
+                                    'reference_number' => $referenceNumber,
+                                    'room_type' => $roomType,
+                                    'check_in' => optional($checkIn)->format('M j, Y') ?? '—',
+                                    'check_out' => optional($checkOut)->format('M j, Y') ?? '—',
+                                    'number_of_guests' => $numberOfGuests,
+                                    'floor_level' => $floorLevel,
+                                    'ambiance' => $ambiance,
+                                    'food_package' => $foodPackage,
+                                    'room_price' => $roomPrice,
+                                    'micro_pricing_amount' => $microPricingAmount,
+                                    'total_price' => $totalPrice,
+                                    'status' => $bookingStatus,
+                                    'nights' => $nights ?? '—',
+                                    'booked_at' => $bookedAt,
+                                ];
                             @endphp
                             <tr class="booking-row group transition-colors hover:bg-yellow-50/40 dark:hover:bg-yellow-400/5"
-                                data-status="{{ $b->status }}"
-                                data-search="{{ strtolower($b->user->name ?? '') }}
-                                    {{ strtolower($b->reference_number) }}
-                                    {{ strtolower($b->room_type) }}">
+                                data-status="{{ $b->status ?? '' }}"
+                                data-search="{{ strtolower($guestName) }}
+                                    {{ strtolower($referenceNumber) }}
+                                    {{ strtolower($roomType) }}">
 
                                 {{-- Guest --}}
                                 <td class="px-5 py-4">
@@ -185,8 +201,8 @@
                                         </div>
                                         <div>
                                             <p class="font-semibold text-gray-800 dark:text-white">
-                                                {{ $b->user->name ?? '—' }}</p>
-                                            <p class="text-xs text-gray-400">{{ $b->user->email ?? '—' }}</p>
+                                                {{ $guestName }}</p>
+                                            <p class="text-xs text-gray-400">{{ $guestEmail }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -194,27 +210,27 @@
                                 {{-- Reference --}}
                                 <td class="px-5 py-4">
                                     <span
-                                        class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $b->reference_number }}</span>
+                                        class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $referenceNumber }}</span>
                                 </td>
 
                                 {{-- Room Type --}}
                                 <td class="px-5 py-4">
                                     <span
-                                        class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $b->room_type }}</span>
+                                        class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $roomType }}</span>
                                 </td>
 
                                 {{-- Stay --}}
                                 <td class="px-5 py-4">
                                     <p class="font-medium text-gray-700 dark:text-gray-300">
-                                        {{ $b->check_in->format('M j') }} – {{ $b->check_out->format('M j, Y') }}</p>
-                                    <p class="mt-0.5 text-xs text-gray-400">{{ $nights }}
-                                        night{{ $nights == 1 ? '' : 's' }}</p>
+                                        {{ optional($checkIn)->format('M j') ?? '—' }} – {{ optional($checkOut)->format('M j, Y') ?? '—' }}</p>
+                                    <p class="mt-0.5 text-xs text-gray-400">{{ $nights ?? '—' }}
+                                        night{{ $nights === 1 ? '' : 's' }}</p>
                                 </td>
 
                                 {{-- Total --}}
                                 <td class="px-5 py-4">
                                     <span
-                                        class="font-semibold text-gray-800 dark:text-white">₱{{ number_format($b->total_price, 2) }}</span>
+                                        class="font-semibold text-gray-800 dark:text-white">{{ $totalPrice === '—' ? '—' : '₱' . $totalPrice }}</span>
                                 </td>
 
                                 {{-- Status --}}
@@ -290,7 +306,7 @@
                                             @if ($b->user?->idVerification?->valid_id_status === 'verified')
                                                 {{-- Confirm booking (assign room) --}}
                                                 <button title="Confirm booking"
-                                                    @click="open('confirmModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type }}' })"
+                                                    @click="open('confirmModal', { id: @js($b->id), ref: @js($referenceNumber), roomType: @js($roomType) })"
                                                     class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
                                                         viewBox="0 0 24 24">
@@ -302,7 +318,7 @@
 
                                             {{-- Cancel --}}
                                             <button title="Cancel booking"
-                                                @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                                                @click="open('cancelModal', { id: @js($b->id), ref: @js($referenceNumber) })"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5"
                                                     viewBox="0 0 24 24">
@@ -330,7 +346,7 @@
 
                                             {{-- Check-in --}}
                                             <button title="Check in guest"
-                                                @click="open('checkinModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type }}' })"
+                                                @click="open('checkinModal', { id: @js($b->id), ref: @js($referenceNumber), roomType: @js($roomType) })"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -339,7 +355,7 @@
 
                                             {{-- Cancel --}}
                                             <button title="Cancel booking"
-                                                @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                                                @click="open('cancelModal', { id: @js($b->id), ref: @js($referenceNumber) })"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -365,7 +381,7 @@
 
                                             {{-- Complete stay / check-out --}}
                                             <button title="Complete stay (check out)"
-                                                @click="open('checkoutModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                                                @click="open('checkoutModal', { id: @js($b->id), ref: @js($referenceNumber) })"
                                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 text-purple-600 transition hover:bg-purple-100 hover:scale-105 dark:bg-purple-400/10 dark:text-purple-400 dark:hover:bg-purple-400/20">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
@@ -621,8 +637,8 @@
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
                             <option value="">Select a room…</option>
                             @foreach ($availableRooms ?? [] as $room)
-                                <template x-if="'{{ $room->room_type }}' === selectedRoomType">
-                                    <option value="{{ $room->id }}">{{ $room->room_no }} — {{ $room->room_type }}
+                                <template x-if="@js(optional($room)->room_type) === selectedRoomType">
+                                    <option value="{{ optional($room)->id }}">{{ optional($room)->room_no ?? 'Unknown room' }} — {{ optional($room)->room_type ?? 'Unknown type' }}
                                     </option>
                                 </template>
                             @endforeach

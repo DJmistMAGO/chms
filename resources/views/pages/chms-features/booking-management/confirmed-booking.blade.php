@@ -71,12 +71,27 @@
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-800" id="bookings-tbody">
                     @forelse ($confirmedBookings as $b)
                         @php
-                            $nights = $b->check_in->diffInDays($b->check_out);
-                            $initials = strtoupper(substr($b->user->name ?? 'G', 0, 1))
-                                      . strtoupper(substr(strstr($b->user->name ?? ' G', ' '), 1, 1));
+                            $checkIn = $b->check_in;
+                            $checkOut = $b->check_out;
+                            $nights = $checkIn && $checkOut ? $checkIn->diffInDays($checkOut) : null;
+                            $guest = $b->user;
+                            $guestName = optional($guest)->name ?? '—';
+                            $guestEmail = optional($guest)->email ?? '—';
+                            $referenceNumber = $b->reference_number ?? '—';
+                            $roomType = $b->room_type ?? 'Room not assigned';
+                            $floorLevel = $b->floor_level ?? '—';
+                            $ambiance = $b->ambiance ?? '—';
+                            $foodPackage = $b->food_package ?? '—';
+                            $numberOfGuests = $b->number_of_guests ?? '—';
+                            $roomPrice = $b->room_price !== null ? number_format($b->room_price, 2) : '—';
+                            $microPricingAmount = number_format($b->micro_pricing_amount ?? 0, 2);
+                            $totalPrice = $b->total_price !== null ? number_format($b->total_price, 2) : '—';
+                            $bookedAt = optional($b->created_at)->format('M j, Y, g:i A') ?? '—';
+                            $initials = strtoupper(substr($guestName, 0, 1))
+                                      . strtoupper(substr(strstr($guestName . ' ', ' '), 1, 1));
                         @endphp
                         <tr class="booking-row group transition-colors hover:bg-green-50/40 dark:hover:bg-green-400/5"
-                            data-search="{{ strtolower($b->user->name ?? '') }} {{ strtolower($b->reference_number) }} {{ strtolower($b->room_type) }}">
+                            data-search="{{ strtolower($guestName) }} {{ strtolower($referenceNumber) }} {{ strtolower($roomType) }}">
 
                             {{-- Guest --}}
                             <td class="px-5 py-4">
@@ -85,31 +100,31 @@
                                         {{ $initials }}
                                     </div>
                                     <div>
-                                        <p class="font-semibold text-gray-800 dark:text-white">{{ $b->user->name ?? '—' }}</p>
-                                        <p class="text-xs text-gray-400">{{ $b->user->email ?? '—' }}</p>
+                                        <p class="font-semibold text-gray-800 dark:text-white">{{ $guestName }}</p>
+                                        <p class="text-xs text-gray-400">{{ $guestEmail }}</p>
                                     </div>
                                 </div>
                             </td>
 
                             {{-- Reference --}}
                             <td class="px-5 py-4">
-                                <span class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $b->reference_number }}</span>
+                                <span class="font-mono text-xs font-semibold tracking-widest text-gray-700 dark:text-gray-300">{{ $referenceNumber }}</span>
                             </td>
 
                             {{-- Room Type --}}
                             <td class="px-5 py-4">
-                                <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $b->room_type }}</span>
+                                <span class="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700 dark:bg-white/10 dark:text-gray-300">{{ $roomType }}</span>
                             </td>
 
                             {{-- Stay --}}
                             <td class="px-5 py-4">
-                                <p class="font-medium text-gray-700 dark:text-gray-300">{{ $b->check_in->format('M j') }} – {{ $b->check_out->format('M j, Y') }}</p>
-                                <p class="mt-0.5 text-xs text-gray-400">{{ $nights }} night{{ $nights == 1 ? '' : 's' }}</p>
+                                <p class="font-medium text-gray-700 dark:text-gray-300">{{ optional($checkIn)->format('M j') ?? '—' }} – {{ optional($checkOut)->format('M j, Y') ?? '—' }}</p>
+                                <p class="mt-0.5 text-xs text-gray-400">{{ $nights ?? '—' }} night{{ $nights === 1 ? '' : 's' }}</p>
                             </td>
 
                             {{-- Total --}}
                             <td class="px-5 py-4">
-                                <span class="font-semibold text-gray-800 dark:text-white">₱{{ number_format($b->total_price, 2) }}</span>
+                                <span class="font-semibold text-gray-800 dark:text-white">{{ $totalPrice === '—' ? '—' : '₱' . $totalPrice }}</span>
                             </td>
 
                             {{-- Status --}}
@@ -126,20 +141,20 @@
                                     {{-- View --}}
                                     <button title="View booking details"
                                         @click="selectedBooking = {
-                                            reference_number: '{{ $b->reference_number }}',
-                                            room_type: '{{ $b->room_type }}',
-                                            check_in: '{{ $b->check_in->format('M j, Y') }}',
-                                            check_out: '{{ $b->check_out->format('M j, Y') }}',
-                                            number_of_guests: '{{ $b->number_of_guests }}',
-                                            floor_level: '{{ $b->floor_level }}',
-                                            ambiance: '{{ $b->ambiance }}',
-                                            food_package: '{{ $b->food_package }}',
-                                            room_price: '{{ number_format($b->room_price, 2) }}',
-                                            micro_pricing_amount: '{{ number_format($b->micro_pricing_amount ?? 0, 2) }}',
-                                            total_price: '{{ number_format($b->total_price, 2) }}',
-                                            status: '{{ ucfirst($b->status ?? 'pending') }}',
-                                            nights: '{{ $nights }}',
-                                            booked_at: '{{ $b->created_at->format('M j, Y, g:i A') }}'
+                                            reference_number: @js($referenceNumber),
+                                            room_type: @js($roomType),
+                                            check_in: @js(optional($checkIn)->format('M j, Y') ?? '—'),
+                                            check_out: @js(optional($checkOut)->format('M j, Y') ?? '—'),
+                                            number_of_guests: @js($numberOfGuests),
+                                            floor_level: @js($floorLevel),
+                                            ambiance: @js($ambiance),
+                                            food_package: @js($foodPackage),
+                                            room_price: @js($roomPrice),
+                                            micro_pricing_amount: @js($microPricingAmount),
+                                            total_price: @js($totalPrice),
+                                            status: @js(ucfirst($b->status ?? 'pending')),
+                                            nights: @js($nights ?? '—'),
+                                            booked_at: @js($bookedAt)
                                         }; detailModal=true"
                                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:scale-105 dark:bg-blue-400/10 dark:text-blue-400 dark:hover:bg-blue-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
@@ -150,7 +165,7 @@
 
                                     {{-- Confirm --}}
                                     <button title="Check-in booking"
-                                        @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; selectedRoomType='{{ $b->room_type }}'; assignModal=true"
+                                        @click="selectedId=@js($b->id); selectedRef=@js($referenceNumber); selectedRoomType=@js($roomType); assignModal=true"
                                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:bg-green-100 hover:scale-105 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -159,7 +174,7 @@
 
                                     {{-- Cancel --}}
                                     <button title="Cancel booking"
-                                        @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; cancelModal=true"
+                                        @click="selectedId=@js($b->id); selectedRef=@js($referenceNumber); cancelModal=true"
                                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:bg-amber-100 hover:scale-105 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -168,7 +183,7 @@
 
                                     {{-- Delete --}}
                                     {{-- <button title="Delete booking"
-                                        @click="selectedId='{{ $b->id }}'; selectedRef='{{ $b->reference_number }}'; deleteModal=true"
+                                        @click="selectedId=@js($b->id); selectedRef=@js($referenceNumber); deleteModal=true"
                                         class="flex h-8 w-8 items-center justify-center rounded-xl bg-red-50 text-red-500 transition hover:bg-red-100 hover:scale-105 dark:bg-red-400/10 dark:text-red-400 dark:hover:bg-red-400/20">
                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 7L18 20H6L5 7M10 11v6M14 11v6M4 7h16M9 7V4h6v3"/>

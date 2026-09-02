@@ -20,7 +20,7 @@ class GuestManagementController extends Controller
         $guests = User::role('client')
             ->with([
                 'idVerification',
-                'bookings' => fn ($query) => $query->latest('check_in'),
+                'bookings' => fn ($query) => $query->latest('created_at'),
             ])
             ->get()
             ->filter(function ($guest) use ($activeBookingStatuses) {
@@ -85,8 +85,11 @@ class GuestManagementController extends Controller
                         'status' => $upcoming->status,
                     ] : null,
                     'bookings' => $bookings->values(),
+                    'latest_booking_at' => optional($visibleBookings->first())->created_at,
                 ];
             })
+            // sort guests so whoever has the most recently created booking is first
+            ->sortByDesc(fn ($guest) => $guest['latest_booking_at'])
             ->values();
 
         $perPage = 6;
