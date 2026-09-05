@@ -6,33 +6,18 @@
 
 @section('content')
     @php($canEditValidId = in_array(strtolower($valid_id_status ?? 'pending'), ['pending', 'rejected']))
+    @php($isAdmin = $isAdmin ?? $user->hasRole('admin'))
 
     {{-- <x-common.page-breadcrumb pageTitle="User Profile" /> --}}
 
 
-    @if(session('success'))
-        <div class="mb-5 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200">
-            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if($errors->any())
-        <div class="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-            <svg class="mt-0.5 h-4 w-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1-5a1 1 0 112 0v-4a1 1 0 10-2 0v4zm1-8a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/></svg>
-            <ul class="list-disc space-y-1 pl-4">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-common.toast-notification />
 
     <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-6" data-confirm-leave>
         @csrf
         @method('PUT')
 
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <fieldset @disabled($isAdmin) class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
             <div class="lg:col-span-1">
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
@@ -284,27 +269,34 @@
                 </div>
 
                 {{-- Form Actions --}}
-                <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-100" role="note">
-                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <p>
-                        Your profile and valid ID information are handled according to our
-                        <a href="{{ route('privacy.policy') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Privacy Policy</a>
-                        and
-                        <a href="{{ route('terms.of.service') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Terms of Service</a>.
-                    </p>
-                </div>
-                <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-transparent dark:text-gray-300 dark:hover:bg-gray-800">
-                        Cancel
-                    </a>
-                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-300/30 transition hover:from-amber-600 hover:to-amber-700 dark:shadow-amber-900/30">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                        Save Changes
-                    </button>
-                </div>
+                @if($isAdmin)
+                    <div class="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-900 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-100" role="status">
+                        <svg class="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <p>Admin profiles are protected and cannot be modified from this page. Contact another authorized administrator if a change is required.</p>
+                    </div>
+                @else
+                    <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-100" role="note">
+                        <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002-2h12zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <p>
+                            Your profile and valid ID information are handled according to our
+                            <a href="{{ route('privacy.policy') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Privacy Policy</a>
+                            and
+                            <a href="{{ route('terms.of.service') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Terms of Service</a>.
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-end gap-3">
+                        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-transparent dark:text-gray-300 dark:hover:bg-gray-800">
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-300/30 transition hover:from-amber-600 hover:to-amber-700 dark:shadow-amber-900/30">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                            Save Changes
+                        </button>
+                    </div>
+                @endif
 
             </div>{{-- /right column --}}
-        </div>{{-- /grid --}}
+        </fieldset>{{-- /grid --}}
     </form>
 @endsection
 

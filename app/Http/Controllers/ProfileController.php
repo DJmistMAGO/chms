@@ -15,17 +15,25 @@ class ProfileController extends Controller
         $user->load('idVerification');
         $valid_id_status = $user->idVerification?->valid_id_status ?? 'pending';
         $idVerificationRemarks = $user->idVerification?->remarks;
+        $isAdmin = $user->hasRole('admin');
 
         return view('pages.profile', [
             'title' => 'Profile',
             'user' => $user,
             'valid_id_status' => $valid_id_status,
             'idVerificationRemarks' => $idVerificationRemarks,
+            'isAdmin' => $isAdmin,
         ]);
     }
     public function update(Request $request)
     {
         $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return redirect()->route('profile')->withErrors([
+                'profile' => 'Admin profiles are protected and cannot be modified here.',
+            ]);
+        }
 
         $currentIdStatus = strtolower($user->idVerification?->valid_id_status ?? 'pending');
         $canUpdateValidId = in_array($currentIdStatus, ['pending', 'rejected']);

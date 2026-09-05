@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -98,4 +99,35 @@ it('updates profile columns and marks a changed password', function () {
         ->and($user->address)->toBe('Updated Address')
         ->and($user->has_changed_password)->toBe(1)
         ->and(Hash::check('NewPassword1!', $user->password))->toBeTrue();
+});
+
+it('prevents an admin from modifying their profile', function () {
+    Role::create(['name' => 'admin']);
+    $user = User::factory()->create([
+        'name' => 'Protected Admin',
+        'email' => 'admin@example.com',
+        'password' => Hash::make('OriginalPassword1!'),
+    ]);
+    $user->assignRole('admin');
+
+    $response = $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => 'Changed Admin',
+            'email' => 'changed-admin@example.com',
+            'phone' => '09170000000',
+            'address' => 'Changed Address',
+            'password' => 'ChangedPassword1!',
+            'password_confirmation' => 'ChangedPassword1!',
+        ]);
+
+    $response->assertRedirect(route('profile'))
+        ->assertSessionHasErrors('profile');
+
+    $user->refresh();
+
+    expect($user->name)->toBe('Protected Admin')
+        ->and($user->email)->toBe('admin@example.com')
+        ->and($user->phone)->not->toBe('09170000000')
+        ->and(Hash::check('OriginalPassword1!', $user->password))->toBeTrue()
+        ->and(Hash::check('ChangedPassword1!', $user->password))->toBeFalse();
 });

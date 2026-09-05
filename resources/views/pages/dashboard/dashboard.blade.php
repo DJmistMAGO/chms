@@ -10,7 +10,7 @@
     <x-dashboard.google-warning />
 
     {{-- add success and error message --}}
-    @if (session('success'))
+    {{-- @if (session('success'))
         <div class="mb-4 font-medium text-sm text-green-600">
             {{ session('success') }}
         </div>
@@ -19,7 +19,8 @@
         <div class="mb-4 font-medium text-sm text-red-600">
             {{ session('error') }}
         </div>
-    @endif
+    @endif --}}
+    <x-common.toast-notification />
 
 
     @role('client')

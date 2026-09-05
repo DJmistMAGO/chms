@@ -4,7 +4,8 @@
 
     {{-- <x-common.page-breadcrumb pageTitle="User Management" /> --}}
 
-    @if (session('success'))
+    <x-common.toast-notification />
+    {{-- @if (session('success'))
         <div id="flash-success"
             class="mb-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"
@@ -20,7 +21,7 @@
                 </svg>
             </button>
         </div>
-    @endif
+    @endif --}}
 
     <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
 
@@ -61,7 +62,7 @@
                     </button>
                 </div>
 
-                <form action="{{ route('user-management.addStaff') }}" method="POST" data-confirm-leave>
+                <form action="{{ route('user-management.addStaff') }}" method="POST" autocomplete="off">
                     @csrf
 
                     <div class="space-y-4">
@@ -72,12 +73,12 @@
 
                         <div>
                             <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"> Email </label>
-                            <input type="email"  name="email" required class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white" >
+                            <input type="email"  name="email" required class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white" autocomplete="off" >
                         </div>
 
                         <div>
                             <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"> Password </label>
-                            <input type="password" name="password"  required class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white" >
+                            <input type="password" name="password" required autocomplete="new-password" class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
                         </div>
 
                     </div>
@@ -261,7 +262,6 @@
         {{-- Edit Modal (styled like View modal) --}}
         <div id="editModal"
             class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm px-4 py-6"
-            onclick="if (event.target === this) closeEditModal()"
             role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
             <div class="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-900">
 
