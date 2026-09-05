@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="{{ asset('assets/images/chlogo.png') }}" type="image/x-icon">
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        /* h1, h2, h3, .font-display { font-family: 'Cormorant Garamond', serif; } */
 
         .card-enter {
             animation: cardSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -48,6 +47,15 @@
             transform: translateY(-1px);
         }
 
+        .btn-back {
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+        }
+        .btn-back:hover {
+            background: rgba(184, 134, 11, 0.12);
+            color: #b8860b;
+            transform: translateX(-2px);
+        }
+
         .overlay {
             background: linear-gradient(
                 160deg,
@@ -72,11 +80,23 @@
     <div class="relative z-10 w-full max-w-sm mx-4">
         <div class="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl px-8 py-9 card-enter">
 
-            {{-- Logo --}}
-            <div class="flex justify-center mb-2">
-                <a href="{{ route('landingpage') }}">
-                    <img src="{{ asset('assets/images/chlogo.png') }}" alt="Caree Hotel" class="h-14 object-contain drop-shadow hover:opacity-80 transition">
+            {{-- Header with Back Button and Logo --}}
+            <div class="flex items-center justify-between mb-4">
+                <button type="button"
+                        onclick="history.back()"
+                        class="btn-back flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-stone-600 bg-stone-100/80">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Back
+                </button>
+
+                <a href="{{ route('landingpage') }}" class="flex justify-center">
+                    <img src="{{ asset('assets/images/chlogo.png') }}" alt="Caree Hotel" class="h-12 object-contain drop-shadow hover:opacity-80 transition">
                 </a>
+
+                {{-- Spacer to maintain symmetry --}}
+                <div class="w-16"></div>
             </div>
 
             <h2 class="font-display text-3xl font-semibold text-center text-stone-800 tracking-wide mb-1">Welcome Back</h2>

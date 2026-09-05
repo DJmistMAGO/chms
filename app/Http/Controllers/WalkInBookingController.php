@@ -23,7 +23,7 @@ class WalkInBookingController extends Controller
 
         $food_package = [
             'No Food Package' => 0,
-            'Cozy Dinner for Family' => 1700,
+            'Cozy Dinner for Family' => 1500,
             'Romantic Dinner' => 1700,
         ];
 

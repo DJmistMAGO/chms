@@ -104,7 +104,7 @@
                         <i class="fas fa-utensils text-[10px]"></i> Food Package
                     </label>
                     <div class="grid grid-cols-3 gap-2">
-                        @foreach ([['label' => 'No Food', 'price' => 0], ['label' => 'Cozy Dinner for Family', 'price' => 1700], ['label' => 'Romantic Dinner', 'price' => 1700]] as $i => $food)
+                        @foreach ([['label' => 'No Food', 'price' => 0], ['label' => 'Cozy Dinner for Family', 'price' => 1500], ['label' => 'Romantic Dinner', 'price' => 1700]] as $i => $food)
                             <div class="aw-option-row aw-chip {{ $i === 0 ? 'aw-selected' : '' }}"
                                 data-group="food_package" data-price="{{ $food['price'] }}" data-label="{{ $food['label'] }}">
                                 <span class="aw-chip-label dark:text-white text-gray-800">{{ $food['label'] }}</span>
