@@ -35,11 +35,29 @@
     $c = $colors[$statusColor] ?? $colors['yellow'];
 @endphp
 
-<div class="group relative flex flex-col rounded-2xl border {{ $c['border'] }} {{ $c['bg'] }} p-5
-            transition-all hover:shadow-md {{ $c['hover'] }}">
+<button type="button"
+    x-data
+    @click="$dispatch('open-booking-modal', {{ json_encode([
+        'reference_number'     => $booking->reference_number,
+        'room_id'              => $booking->room_no,
+        'room_type'            => $booking->room->room_no,
+        'floor_level'          => $booking->floor_level,
+        'ambiance'             => $booking->ambiance,
+        'food_package'         => $booking->food_package,
+        'check_in'             => is_a($booking->check_in, '\Carbon\Carbon') ? $booking->check_in->format('Y-m-d H:i') : $booking->check_in,
+        'check_out'            => is_a($booking->check_out, '\Carbon\Carbon') ? $booking->check_out->format('Y-m-d H:i') : $booking->check_out,
+        'number_of_guests'     => $booking->number_of_guests,
+        'room_price'           => $booking->room_price,
+        'micro_pricing_amount' => $booking->micro_pricing_amount,
+        'total_price'          => $booking->total_price,
+        'status'               => $booking->status,
+        'remarks'              => $booking->remarks,
+        'expires_at'           => is_a($booking->expires_at, '\Carbon\Carbon') ? $booking->expires_at->format('Y-m-d H:i') : $booking->expires_at,
+    ]) }})"
+    class="group relative text-left w-full flex flex-col rounded-2xl border {{ $c['border'] }} {{ $c['bg'] }} p-5 transition-all hover:shadow-md {{ $c['hover'] }} focus:outline-none focus:ring-2 focus:ring-amber-400">
 
     {{-- Top row: room type + status badge --}}
-    <div class="mb-4 flex items-start justify-between gap-3">
+    <div class="mb-4 flex items-start justify-between gap-3 w-full">
         <div class="flex items-center gap-2.5">
             <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl {{ $c['icon_bg'] }}">
                 <svg class="h-4 w-4 {{ $c['icon'] }}" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -61,7 +79,7 @@
     </div>
 
     {{-- Reference number --}}
-    <div class="mb-3 rounded-xl border border-dashed {{ $c['ref_bdr'] }} bg-white/70 px-3 py-2 dark:bg-white/5">
+    <div class="mb-3 w-full rounded-xl border border-dashed {{ $c['ref_bdr'] }} bg-white/70 px-3 py-2 dark:bg-white/5">
         <p class="text-xs text-gray-400 dark:text-gray-500">Reference No.</p>
         <p class="mt-0.5 font-mono text-sm font-bold tracking-widest text-gray-800 dark:text-white">
             {{ $booking->reference_number }}
@@ -69,26 +87,26 @@
     </div>
 
     {{-- Dates + nights --}}
-    <div class="mb-3 flex items-center gap-2">
+    <div class="mb-3 flex items-center gap-2 w-full">
         <svg class="h-3.5 w-3.5 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round"
                 d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
         </svg>
         <span class="text-xs text-gray-500 dark:text-gray-400">
-            {{ $booking->check_in->format('M j, Y') }}
+            {{ is_a($booking->check_in, '\Carbon\Carbon') ? $booking->check_in->format('M j, Y') : $booking->check_in }}
             <span class="mx-1 text-gray-300">→</span>
-            {{ $booking->check_out->format('M j, Y') }}
+            {{ is_a($booking->check_out, '\Carbon\Carbon') ? $booking->check_out->format('M j, Y') : $booking->check_out }}
         </span>
         <span class="ml-auto flex-shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-white/10 dark:text-gray-300">
-            {{ $booking->check_in->diffInDays($booking->check_out) }}N
+            {{ is_a($booking->check_in, '\Carbon\Carbon') && is_a($booking->check_out, '\Carbon\Carbon') ? $booking->check_in->diffInDays($booking->check_out) : '0' }}N
         </span>
     </div>
 
     {{-- Divider --}}
-    <div class="my-3 border-t {{ $c['divider'] }}"></div>
+    <div class="my-3 w-full border-t {{ $c['divider'] }}"></div>
 
     {{-- Total + booked at --}}
-    <div class="flex items-end justify-between">
+    <div class="flex items-end justify-between w-full">
         <div>
             <p class="text-xs text-gray-400">Total</p>
             <p class="text-lg font-bold text-gray-900 dark:text-white">
@@ -98,9 +116,9 @@
         <div class="text-right">
             <p class="text-xs text-gray-400">Booked</p>
             <p class="text-xs text-gray-500 dark:text-gray-400">
-                {{ $booking->created_at->format('M j, Y') }}
+                {{ is_a($booking->created_at, '\Carbon\Carbon') ? $booking->created_at->format('M j, Y') : $booking->created_at }}
             </p>
         </div>
     </div>
 
-</div>
+</button>

@@ -189,6 +189,108 @@
 
         </div>
 
+        {{-- ── Alpine.js Modal Component Container ── --}}
+<div x-data="bookingDetailsModal()"
+     x-show="isOpen"
+     x-cloak
+     @open-booking-modal.window="openModal($event.detail)"
+     @keydown.escape.window="closeModal()"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 py-6"
+     style="display: none;">
+
+    <div @click.away="closeModal()"
+         class="w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden rounded-3xl bg-white dark:bg-[#12172a] border border-gray-200 dark:border-white/10 shadow-2xl transition-all">
+
+        {{-- Header --}}
+        <div class="flex items-center justify-between border-b border-gray-100 dark:border-white/10 px-6 py-4">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Reservation Details</h3>
+                <p class="text-xs text-gray-400" x-text="'Ref: ' + (booking.reference_number || 'N/A')"></p>
+            </div>
+            <button type="button" @click="closeModal()"
+                class="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        {{-- Modal Body --}}
+        <div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+
+            {{-- Core Status & Pricing Summary --}}
+            <div class="flex items-center justify-between rounded-2xl bg-amber-500/10 dark:bg-amber-400/5 p-4 border border-amber-500/20">
+                <div>
+                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Status</span>
+                    <p class="text-sm font-bold capitalize text-amber-600 dark:text-amber-400" x-text="booking.status"></p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Total Price</span>
+                    <p class="text-lg font-black text-gray-900 dark:text-white" x-text="'₱' + formatNumber(booking.total_price)"></p>
+                </div>
+            </div>
+
+            {{-- Grid of Attributes --}}
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Room No.</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.room_id || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Room Type</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.room_type || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Floor Level</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.floor_level || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Ambiance</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.ambiance || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Food Package</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.food_package || 'None'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Guests</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="(booking.number_of_guests || 0) + ' Guest(s)'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Check In</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.check_in || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Check Out</p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.check_out || 'N/A'"></p>
+                </div>
+                <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
+                    <p class="text-xs text-gray-400">Expires At</p>
+                    <p class="font-semibold text-rose-500" x-text="booking.expires_at || 'N/A'"></p>
+                </div>
+            </div>
+
+            {{-- Breakdown Pricing --}}
+            <div class="rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-4 space-y-2 text-xs">
+                <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>Base Room Price</span>
+                    <span class="font-semibold text-gray-900 dark:text-white" x-text="'₱' + formatNumber(booking.room_price)"></span>
+                </div>
+                <div class="flex justify-between text-gray-600 dark:text-gray-400">
+                    <span>Micro Pricing Amount</span>
+                    <span class="font-semibold text-gray-900 dark:text-white" x-text="'₱' + formatNumber(booking.micro_pricing_amount)"></span>
+                </div>
+            </div>
+
+            {{-- Remarks --}}
+            <div class="rounded-2xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-4">
+                <p class="text-xs text-gray-400 mb-1">Remarks</p>
+                <p class="text-sm text-gray-700 dark:text-gray-300 italic" x-text="booking.remarks || 'No remarks provided.'"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
         {{-- ── PENDING PANEL ── --}}
         <div id="panel-pending">
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -222,6 +324,26 @@
         </div>
 
     </div>
+
+
+    <script>
+    function bookingDetailsModal() {
+        return {
+            isOpen: false,
+            booking: {},
+            openModal(data) {
+                this.booking = data;
+                this.isOpen = true;
+            },
+            closeModal() {
+                this.isOpen = false;
+            },
+            formatNumber(val) {
+                return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+        }
+    }
+</script>
 
     <script>
         function switchTab(tab) {
