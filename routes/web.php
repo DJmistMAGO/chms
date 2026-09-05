@@ -25,6 +25,9 @@ Route::controller(MicroPricingController::class)
         Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
     });
 
+    Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
+    Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms.of.service');
+
 Route::middleware('guest')->group(function () {
 
     Route::controller(ForgotPasswordController::class)->prefix('password')->group(function () {
@@ -54,8 +57,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/signup', [AuthenticationController::class, 'showSignupForm'])->name('signup');
     Route::post('/signup', [AuthenticationController::class, 'signup'])->name('signup.post')->middleware('web');
 
-    Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
-    Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms.of.service');
+
 
 });
 

@@ -3,7 +3,8 @@
 @section('content')
     {{-- <x-common.page-breadcrumb pageTitle="Guest Management" /> --}}
 
-    @if (session('success'))
+    <x-common.toast-notification />
+    {{-- @if (session('success'))
         <div id="flash-success"
             class="mb-4 flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="none"
@@ -19,7 +20,7 @@
                 </svg>
             </button>
         </div>
-    @endif
+    @endif --}}
 
         <x-dashboard.guest-summary
             :totalGuests="$totalGuests"

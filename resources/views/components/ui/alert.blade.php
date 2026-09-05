@@ -15,20 +15,20 @@
 @php
     $variantClasses = [
         'success' => [
-            'container' => 'border-green-500 bg-white dark:bg-gray-900 border-t-4 border-t-green-500',
-            'icon' => 'text-green-500 bg-green-100 dark:bg-green-500/20',
+            'container' => 'border border-green-200 bg-white dark:border-green-500/40 dark:bg-gray-800 border-t-4 border-t-green-500',
+            'icon' => 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-500/20',
         ],
         'error' => [
-            'container' => 'border-red-500 bg-white dark:bg-gray-900 border-t-4 border-t-red-500',
-            'icon' => 'text-red-500 bg-red-100 dark:bg-red-500/20',
+            'container' => 'border border-red-200 bg-white dark:border-red-500/40 dark:bg-gray-800 border-t-4 border-t-red-500',
+            'icon' => 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-500/20',
         ],
         'warning' => [
-            'container' => 'border-yellow-500 bg-white dark:bg-gray-900 border-t-4 border-t-yellow-500',
-            'icon' => 'text-yellow-500 bg-yellow-100 dark:bg-yellow-500/20',
+            'container' => 'border border-yellow-200 bg-white dark:border-yellow-500/40 dark:bg-gray-800 border-t-4 border-t-yellow-500',
+            'icon' => 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-500/20',
         ],
         'info' => [
-            'container' => 'border-blue-500 bg-white dark:bg-gray-900 border-t-4 border-t-blue-500',
-            'icon' => 'text-blue-500 bg-blue-100 dark:bg-blue-500/20',
+            'container' => 'border border-blue-200 bg-white dark:border-blue-500/40 dark:bg-gray-800 border-t-4 border-t-blue-500',
+            'icon' => 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/20',
         ],
     ];
 
@@ -80,7 +80,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
         x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-        class="relative w-full max-w-md p-6 text-center shadow-2xl rounded-2xl z-10 transform {{ $containerClass }}"
+        class="relative z-10 w-full max-w-md transform rounded-xl p-6 text-center shadow-xl {{ $containerClass }}"
     >
         {{-- Centered Icon Badge --}}
         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full {{ $iconClass }}">
@@ -120,7 +120,7 @@
                 <button
                     @click="show = false"
                     type="button"
-                    class="w-full inline-flex justify-center px-4 py-2.5 text-sm font-semibold text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-white rounded-xl shadow-sm transition-all duration-150 focus:outline-none"
+                    class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-150 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-offset-gray-800"
                 >
                     OK
                 </button>

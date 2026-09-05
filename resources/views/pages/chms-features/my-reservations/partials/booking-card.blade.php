@@ -1,8 +1,3 @@
-{{--
-    Partial: partials/booking-card.blade.php
-    Variables: $booking, $statusLabel, $statusColor (yellow|green), $pulse
---}}
-
 @php
     $colors = [
         'yellow' => [
@@ -17,6 +12,8 @@
             'dot'      => 'bg-yellow-500',
             'ref_bdr'  => 'border-yellow-300/60 dark:border-yellow-400/10',
             'divider'  => 'border-yellow-200/50 dark:border-yellow-400/10',
+            'tooltip'  => 'bg-yellow-500 text-white dark:bg-yellow-400 dark:text-gray-900',
+            'tooltip_arrow' => 'border-t-yellow-500 dark:border-t-yellow-400',
         ],
         'green' => [
             'border'   => 'border-green-200/60 dark:border-green-400/10',
@@ -30,6 +27,8 @@
             'dot'      => 'bg-green-500',
             'ref_bdr'  => 'border-green-300/60 dark:border-green-400/10',
             'divider'  => 'border-green-200/50 dark:border-green-400/10',
+            'tooltip'  => 'bg-green-500 text-white dark:bg-green-400 dark:text-gray-900',
+            'tooltip_arrow' => 'border-t-green-500 dark:border-t-green-400',
         ],
     ];
     $c = $colors[$statusColor] ?? $colors['yellow'];
@@ -39,8 +38,8 @@
     x-data
     @click="$dispatch('open-booking-modal', {{ json_encode([
         'reference_number'     => $booking->reference_number,
-        'room_id'              => $booking->room_no,
-        'room_type'            => $booking->room->room_no,
+        'room_id'              => $booking->room->room_no ?? null,
+        'room_type'            => $booking->room_type ?? null,
         'floor_level'          => $booking->floor_level,
         'ambiance'             => $booking->ambiance,
         'food_package'         => $booking->food_package,
@@ -54,7 +53,14 @@
         'remarks'              => $booking->remarks,
         'expires_at'           => is_a($booking->expires_at, '\Carbon\Carbon') ? $booking->expires_at->format('Y-m-d H:i') : $booking->expires_at,
     ]) }})"
+    aria-label="Click me to view details"
     class="group relative text-left w-full flex flex-col rounded-2xl border {{ $c['border'] }} {{ $c['bg'] }} p-5 transition-all hover:shadow-md {{ $c['hover'] }} focus:outline-none focus:ring-2 focus:ring-amber-400">
+
+    <span role="tooltip"
+        class="pointer-events-none absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-xl {{ $c['tooltip'] }} px-3 py-2 text-xs font-medium opacity-0 shadow-md transition-all duration-200 group-hover:-translate-y-[calc(100%+0.5rem)] group-hover:opacity-100 group-focus-visible:-translate-y-[calc(100%+0.5rem)] group-focus-visible:opacity-100">
+        Click me to view details
+        <span class="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent {{ $c['tooltip_arrow'] }}"></span>
+    </span>
 
     {{-- Top row: room type + status badge --}}
     <div class="mb-4 flex items-start justify-between gap-3 w-full">

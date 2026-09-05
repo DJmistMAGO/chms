@@ -15,17 +15,25 @@ class ProfileController extends Controller
         $user->load('idVerification');
         $valid_id_status = $user->idVerification?->valid_id_status ?? 'pending';
         $idVerificationRemarks = $user->idVerification?->remarks;
+        $isAdmin = $user->hasRole('admin');
 
         return view('pages.profile', [
             'title' => 'Profile',
             'user' => $user,
             'valid_id_status' => $valid_id_status,
             'idVerificationRemarks' => $idVerificationRemarks,
+            'isAdmin' => $isAdmin,
         ]);
     }
     public function update(Request $request)
     {
         $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return redirect()->route('profile')->withErrors([
+                'profile' => 'Admin profiles are protected and cannot be modified here.',
+            ]);
+        }
 
         $currentIdStatus = strtolower($user->idVerification?->valid_id_status ?? 'pending');
         $canUpdateValidId = in_array($currentIdStatus, ['pending', 'rejected']);
@@ -35,7 +43,7 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
             'avatar_cropped' => ['nullable', 'string'],
             'valid_id_upload' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
@@ -84,11 +92,18 @@ class ProfileController extends Controller
             $user->avatar = $filename;
         }
 
+        $user->fill($request->only([
+            'name',
+            'email',
+            'phone',
+            'address',
+        ]));
+
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
+            $user->has_changed_password = true;
         }
 
-        $user->fill(collect($validated)->except('password')->toArray());
         $user->save();
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully.');

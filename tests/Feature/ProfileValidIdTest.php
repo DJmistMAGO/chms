@@ -4,7 +4,9 @@ use App\Models\IdVerification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
@@ -69,4 +71,63 @@ it('does not replace a valid id when the verification status is verified', funct
     $user->refresh();
 
     expect($user->valid_id)->toBe('valid_ids/existing-id.jpg');
+});
+
+it('updates profile columns and marks a changed password', function () {
+    $user = User::factory()->create([
+        'email' => 'profile-fields@example.com',
+        'has_changed_password' => false,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+            'phone' => '09171234567',
+            'address' => 'Updated Address',
+            'password' => 'NewPassword1!',
+            'password_confirmation' => 'NewPassword1!',
+        ]);
+
+    $response->assertRedirect(route('profile'));
+
+    $user->refresh();
+
+    expect($user->name)->toBe('Updated Name')
+        ->and($user->email)->toBe('updated@example.com')
+        ->and($user->phone)->toBe('09171234567')
+        ->and($user->address)->toBe('Updated Address')
+        ->and($user->has_changed_password)->toBe(1)
+        ->and(Hash::check('NewPassword1!', $user->password))->toBeTrue();
+});
+
+it('prevents an admin from modifying their profile', function () {
+    Role::create(['name' => 'admin']);
+    $user = User::factory()->create([
+        'name' => 'Protected Admin',
+        'email' => 'admin@example.com',
+        'password' => Hash::make('OriginalPassword1!'),
+    ]);
+    $user->assignRole('admin');
+
+    $response = $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => 'Changed Admin',
+            'email' => 'changed-admin@example.com',
+            'phone' => '09170000000',
+            'address' => 'Changed Address',
+            'password' => 'ChangedPassword1!',
+            'password_confirmation' => 'ChangedPassword1!',
+        ]);
+
+    $response->assertRedirect(route('profile'))
+        ->assertSessionHasErrors('profile');
+
+    $user->refresh();
+
+    expect($user->name)->toBe('Protected Admin')
+        ->and($user->email)->toBe('admin@example.com')
+        ->and($user->phone)->not->toBe('09170000000')
+        ->and(Hash::check('OriginalPassword1!', $user->password))->toBeTrue()
+        ->and(Hash::check('ChangedPassword1!', $user->password))->toBeFalse();
 });
