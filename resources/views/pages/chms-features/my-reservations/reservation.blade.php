@@ -260,15 +260,15 @@
                 </div>
                 <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
                     <p class="text-xs text-gray-400">Check In</p>
-                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.check_in || 'N/A'"></p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="formatDateTime(booking.check_in)"></p>
                 </div>
                 <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
                     <p class="text-xs text-gray-400">Check Out</p>
-                    <p class="font-semibold text-gray-800 dark:text-white" x-text="booking.check_out || 'N/A'"></p>
+                    <p class="font-semibold text-gray-800 dark:text-white" x-text="formatDateTime(booking.check_out)"></p>
                 </div>
                 <div class="rounded-xl border border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/5 p-3">
                     <p class="text-xs text-gray-400">Expires At</p>
-                    <p class="font-semibold text-rose-500" x-text="booking.expires_at || 'N/A'"></p>
+                    <p class="font-semibold text-rose-500" x-text="formatDateTime(booking.expires_at)"></p>
                 </div>
             </div>
 
@@ -342,6 +342,21 @@
             },
             formatNumber(val) {
                 return Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            },
+            formatDateTime(value) {
+                if (!value) return 'N/A';
+
+                const date = new Date(value.replace(' ', 'T'));
+                if (Number.isNaN(date.getTime())) return value;
+
+                return date.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                });
             }
         }
     }
