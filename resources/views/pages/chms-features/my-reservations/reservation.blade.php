@@ -5,6 +5,8 @@
 @section('content')
     {{-- <x-common.page-breadcrumb pageTitle="My Reservations" /> --}}
 
+    @php($hasValidId = auth()->user()->hasValidID() || auth()->user()->hasAnyRole(['admin', 'staff']))
+
     <div class="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
 
         {{-- ── Page Header ── --}}
@@ -13,12 +15,12 @@
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">My Reservations</h2>
                 <p class="mt-0.5 text-sm text-gray-400">Track and manage all your hotel bookings.</p>
             </div>
-            <button type="button" onclick="openNewBookingModal()"
-                class="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-amber-300 active:bg-amber-500">
+            <button type="button" onclick="openNewBookingModal()" {{ $hasValidId ? '' : 'disabled' }}
+                class="inline-flex items-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-amber-300 active:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-50">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                New Booking
+                {{ $hasValidId ? 'New Booking' : 'Upload ID to book' }}
             </button>
         </div>
 
