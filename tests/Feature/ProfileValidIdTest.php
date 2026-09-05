@@ -4,6 +4,7 @@ use App\Models\IdVerification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
@@ -69,4 +70,32 @@ it('does not replace a valid id when the verification status is verified', funct
     $user->refresh();
 
     expect($user->valid_id)->toBe('valid_ids/existing-id.jpg');
+});
+
+it('updates profile columns and marks a changed password', function () {
+    $user = User::factory()->create([
+        'email' => 'profile-fields@example.com',
+        'has_changed_password' => false,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => 'Updated Name',
+            'email' => 'updated@example.com',
+            'phone' => '09171234567',
+            'address' => 'Updated Address',
+            'password' => 'NewPassword1!',
+            'password_confirmation' => 'NewPassword1!',
+        ]);
+
+    $response->assertRedirect(route('profile'));
+
+    $user->refresh();
+
+    expect($user->name)->toBe('Updated Name')
+        ->and($user->email)->toBe('updated@example.com')
+        ->and($user->phone)->toBe('09171234567')
+        ->and($user->address)->toBe('Updated Address')
+        ->and($user->has_changed_password)->toBe(1)
+        ->and(Hash::check('NewPassword1!', $user->password))->toBeTrue();
 });

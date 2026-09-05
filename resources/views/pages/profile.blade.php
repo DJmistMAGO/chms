@@ -61,7 +61,6 @@
 
                         <div class="w-full">
                             <input id="avatar-upload" type="file" name="_avatar_raw" accept="image/*" class="hidden" />
-                            {{-- This hidden input carries the cropped base64 data on submit --}}
                             <input type="hidden" name="avatar_cropped" id="avatar-cropped" />
 
                             <label for="avatar-upload" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-600 transition hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-400 dark:hover:border-amber-600 dark:hover:bg-amber-900/10 dark:hover:text-amber-300">
@@ -83,7 +82,7 @@
                                 @if(strtolower($valid_id_status ?? 'pending') === 'rejected')
                                     Your previous ID submission was rejected. Please upload a new, clear image of your valid ID.
                                 @elseif($canEditValidId)
-                                    Upload a clear image of your government-issued ID while it is still pending review.
+                                    Upload a clear image of your valid ID while it is still pending review.
                                 @else
                                     Your valid ID is already {{ $valid_id_status }} and cannot be changed right now.
                                 @endif
@@ -167,14 +166,12 @@
                     <h4 class="mb-5 text-sm font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">Personal Information</h4>
 
                     <div class="grid gap-5 sm:grid-cols-2">
-                        {{-- Full Name --}}
                         <div class="sm:col-span-2">
                             <label for="name" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Full Name
                             </label>
                             <input id="name" type="text" name="name" value="{{ old('name', $user->name) }}"
-                                placeholder="John Doe"
-                                class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
+                                placeholder="John Doe" class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
                                 @error('name') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror" />
                             @error('name')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -189,9 +186,7 @@
                                 <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-gray-400 dark:text-gray-500">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 </span>
-                                <input id="email" type="email" name="email" value="{{ old('email', $user->email) }}"
-                                    placeholder="you@example.com"
-                                    class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
+                                <input id="email" type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="you@example.com" class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
                                     @error('email') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror" />
                             </div>
                             @error('email')
@@ -222,9 +217,7 @@
                             <label for="address" class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Address
                             </label>
-                            <textarea id="address" name="address" rows="3"
-                                placeholder="Street, City, Province, ZIP Code"
-                                class="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
+                            <textarea id="address" name="address" rows="3" placeholder="Street, Municipality, City/Province" class="block w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
                                 @error('address') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror">{{ old('address', $user->address) }}</textarea>
                             @error('address')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -252,10 +245,20 @@
                                 <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-gray-400 dark:text-gray-500">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                 </span>
-                                <input id="password" type="password" name="password"
-                                    placeholder="Min. 8 characters"
-                                    class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
+                                <input id="password" type="password" name="password" placeholder="Min. 8 characters" class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
                                     @error('password') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror" />
+                                <button type="button" class="password-toggle absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" data-target="password" aria-label="Show password">
+                                    <svg class="password-eye h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </button>
+                            </div>
+                            <div id="password-strength" class="mt-2 hidden" aria-live="polite">
+                                <div class="mb-1 flex items-center justify-between text-xs">
+                                    <span class="text-gray-500 dark:text-gray-400">Password strength</span>
+                                    <span id="password-strength-label" class="font-medium"></span>
+                                </div>
+                                <div class="h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div id="password-strength-bar" class="h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                                </div>
                             </div>
                             @error('password')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
@@ -271,22 +274,30 @@
                                 <span class="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-gray-400 dark:text-gray-500">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                 </span>
-                                <input id="password_confirmation" type="password" name="password_confirmation"
-                                    placeholder="Re-enter new password"
-                                    class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30" />
+                                <input id="password_confirmation" type="password" name="password_confirmation" placeholder="Re-enter new password" class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30" />
+                                <button type="button" class="password-toggle absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" data-target="password_confirmation" aria-label="Show password confirmation">
+                                    <svg class="password-eye h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {{-- Form Actions --}}
+                <div class="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-100" role="note">
+                    <svg class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-300" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    <p>
+                        Your profile and valid ID information are handled according to our
+                        <a href="{{ route('privacy.policy') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Privacy Policy</a>
+                        and
+                        <a href="{{ route('terms.of.service') }}" target="_blank" rel="noopener noreferrer" class="font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700 dark:hover:text-amber-200">Terms of Service</a>.
+                    </p>
+                </div>
                 <div class="flex items-center justify-end gap-3">
-                    <a href="{{ route('dashboard') }}"
-                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-transparent dark:text-gray-300 dark:hover:bg-gray-800">
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-transparent dark:text-gray-300 dark:hover:bg-gray-800">
                         Cancel
                     </a>
-                    <button type="submit"
-                        class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-300/30 transition hover:from-amber-600 hover:to-amber-700 dark:shadow-amber-900/30">
+                    <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-amber-300/30 transition hover:from-amber-600 hover:to-amber-700 dark:shadow-amber-900/30">
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                         Save Changes
                     </button>
@@ -316,6 +327,45 @@
             const validIdPlaceholder = document.getElementById('valid-id-placeholder');
 
             let cropper = null;
+
+            document.querySelectorAll('.password-toggle').forEach(function (toggle) {
+                toggle.addEventListener('click', function () {
+                    const input = document.getElementById(this.dataset.target);
+                    const showing = input.type === 'text';
+
+                    input.type = showing ? 'password' : 'text';
+                    this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+                });
+            });
+
+            const password = document.getElementById('password');
+            const strength = document.getElementById('password-strength');
+            const strengthBar = document.getElementById('password-strength-bar');
+            const strengthLabel = document.getElementById('password-strength-label');
+
+            password.addEventListener('input', function () {
+                const value = this.value;
+                let score = 0;
+                if (value.length >= 8) score++;
+                if (/[A-Z]/.test(value)) score++;
+                if (/[0-9]/.test(value)) score++;
+                if (/[^A-Za-z0-9]/.test(value)) score++;
+
+                const levels = [
+                    { width: '0%', color: 'bg-gray-200', label: '', textColor: 'text-gray-400' },
+                    { width: '33%', color: 'bg-red-400', label: 'Weak', textColor: 'text-red-400' },
+                    { width: '66%', color: 'bg-amber-400', label: 'Fair', textColor: 'text-amber-500' },
+                    { width: '85%', color: 'bg-lime-500', label: 'Good', textColor: 'text-green-600' },
+                    { width: '100%', color: 'bg-green-500', label: 'Strong', textColor: 'text-green-600' }
+                ];
+                const level = levels[score];
+
+                strength.classList.toggle('hidden', !value);
+                strengthBar.className = 'h-full rounded-full transition-all duration-300 ' + level.color;
+                strengthBar.style.width = level.width;
+                strengthLabel.className = 'font-medium ' + level.textColor;
+                strengthLabel.textContent = level.label;
+            });
 
             fileInput.addEventListener('change', function () {
                 const file = this.files[0];

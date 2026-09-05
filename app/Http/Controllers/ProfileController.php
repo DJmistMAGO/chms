@@ -35,7 +35,7 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
-            'password' => 'nullable|string|min:6|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
             'avatar_cropped' => ['nullable', 'string'],
             'valid_id_upload' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
@@ -84,11 +84,18 @@ class ProfileController extends Controller
             $user->avatar = $filename;
         }
 
+        $user->fill($request->only([
+            'name',
+            'email',
+            'phone',
+            'address',
+        ]));
+
         if (!empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
+            $user->has_changed_password = true;
         }
 
-        $user->fill(collect($validated)->except('password')->toArray());
         $user->save();
 
         return redirect()->route('profile')->with('success', 'Profile updated successfully.');
