@@ -35,18 +35,25 @@ class BookingReminderCommand extends Command
 
     protected function sendWarningsFor(int $hours, string $type, Carbon $now): void
     {
-        $threshold = $now->copy()->addHours($hours);
-
-        Booking::query()
+        $query = Booking::query()
             ->where('status', 'pending')
             ->where('expires_at', '>', $now)
-            ->where('expires_at', '<=', $threshold)
-            ->whereDoesntHave('reminders', fn ($q) => $q->where('type', $type))
-            ->chunkById(100, function ($bookings) use ($hours, $type) {
-                foreach ($bookings as $booking) {
-                    $this->sendWarning($booking, $hours, $type);
-                }
-            });
+            ->whereDoesntHave('reminders', fn ($q) => $q->where('type', $type));
+
+        if ($hours === 12) {
+            $query
+                ->where('expires_at', '>', $now->copy()->addHours(3))
+                ->where('expires_at', '<=', $now->copy()->addHours(12));
+        } else {
+            $query
+                ->where('expires_at', '<=', $now->copy()->addHours(3));
+        }
+
+        $query->chunkById(100, function ($bookings) use ($hours, $type) {
+            foreach ($bookings as $booking) {
+                $this->sendWarning($booking, $hours, $type);
+            }
+        });
     }
 
     protected function sendWarning(Booking $booking, int $hours, string $type): void
@@ -55,7 +62,7 @@ class BookingReminderCommand extends Command
             Mail::to($booking->user->email)
                 ->queue(new BookingExpirationWarning(
                     $booking,
-                    $hours === 1 ? '1 hour' : "{$hours} hours"
+                    $hours === 3 ? '3 hours' : "{$hours} hours"
                 ));
 
             // firstOrCreate guards against a race if two runs overlap

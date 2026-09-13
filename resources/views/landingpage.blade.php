@@ -260,10 +260,25 @@
                 <a href="#home" class="relative pb-1 hover:text-gold-300 transition-colors">Home</a>
                 <a href="#rooms" class="relative pb-1 hover:text-gold-300 transition-colors">Rooms</a>
                 <a href="#about-us" class="relative pb-1 hover:text-gold-300 transition-colors">About Us</a>
-                <a href="{{ route('login') }}"
-                    class="border border-white/40 rounded-full px-6 py-2.5 hover:border-gold-300 hover:text-gold-300 transition-all duration-300 backdrop-blur-sm">
-                    Log In
-                </a>
+                @auth
+                    <a href="{{ route('dashboard') }}"
+                        title="Go to dashboard"
+                        class="inline-flex items-center gap-3 rounded-full border border-white/40 bg-white/5 px-2.5 py-2 text-[10px] uppercase tracking-[0.18em] text-white/90 shadow-[0_0_20px_rgba(201,150,12,0.18)] backdrop-blur-sm transition-all duration-300 hover:border-gold-300 hover:text-gold-300 hover:bg-white/10">
+                        <span class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-white/40 bg-gradient-to-br from-gold-200/80 to-gold-500/70 text-[10px] font-bold text-ink shadow-inner">
+                            @if (auth()->user()->avatar)
+                                <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="h-full w-full object-cover">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            @endif
+                        </span>
+                        <span class="font-medium">{{ auth()->user()->name }}</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="border border-white/40 rounded-full px-6 py-2.5 hover:border-gold-300 hover:text-gold-300 transition-all duration-300 backdrop-blur-sm">
+                        Log In
+                    </a>
+                @endauth
             </div>
 
             <button id="menu-toggle"
@@ -280,7 +295,13 @@
             <a href="#home" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">Home</a>
             <a href="#rooms" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">Rooms</a>
             <a href="#about-us" class="block text-sm uppercase tracking-wider font-medium hover:text-gold-600">About Us</a>
-            <a href="{{ route('login') }}" class="block text-sm uppercase tracking-wider font-medium text-gold-600">Log In</a>
+            @auth
+                <a href="{{ route('dashboard') }}" class="block text-sm uppercase tracking-wider font-medium text-gold-600">
+                    {{ auth()->user()->name }}
+                </a>
+            @else
+                <a href="{{ route('login') }}" class="block text-sm uppercase tracking-wider font-medium text-gold-600">Log In</a>
+            @endauth
         </div>
     </nav>
 

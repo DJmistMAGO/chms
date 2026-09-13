@@ -29,6 +29,16 @@
                 </svg>
             </button>
 
+            <a href="{{ route('landingpage') }}"
+                class="hidden xl:flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 rounded-lg bg-white dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 lg:h-11 lg:w-11 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
+                aria-label="Go to landing page"
+                title="Go to landing page">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 10.5L12 4L20 10.5V18C20 18.55 19.55 19 19 19H5C4.45 19 4 18.55 4 18V10.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 19V12.5H15V19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+
             <!-- Mobile Menu Toggle Button (visible below xl) -->
             <button
                 class="flex xl:hidden items-center justify-center w-10 h-10 text-gray-500 rounded-lg dark:text-gray-400 lg:h-11 lg:w-11"

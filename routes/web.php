@@ -14,6 +14,10 @@ use App\Http\Controllers\WalkInBookingController;
 use Illuminate\Support\Facades\Route;
 
 
+Route::get('/', function () {
+    return view('landingpage');
+})->name('landingpage');
+
 // Routes accessible only to guests (not authenticated users)
 
 Route::controller(MicroPricingController::class)
@@ -36,10 +40,6 @@ Route::middleware('guest')->group(function () {
         Route::get('/reset-password/{token}', 'showResetForm')->name('password.reset');
         Route::post('/reset-password', 'reset')->name('password.update');
     });
-
-    Route::get('/', function () {
-        return view('landingpage');
-    })->name('landingpage');
 
     Route::get('/booking/google/redirect', function () {
         return redirect()->route('login.google');
