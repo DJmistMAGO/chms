@@ -28,9 +28,16 @@ Route::controller(MicroPricingController::class)
 Route::middleware('guest')->group(function () {
 
     Route::controller(ForgotPasswordController::class)->prefix('password')->group(function () {
+        // Step 1: Render forgot password page
         Route::get('/forgot-password', 'showLinkRequestForm')->name('password.request');
+
+        // Step 2: Handle emailing reset link
         Route::post('/forgot-password', 'sendResetLinkEmail')->name('password.email');
+
+        // Step 3: Render reset password form from email token link
         Route::get('/reset-password/{token}', 'showResetForm')->name('password.reset');
+
+        // Step 4: Handle actual password update submission
         Route::post('/reset-password', 'reset')->name('password.update');
     });
 
