@@ -3,13 +3,11 @@
 @section('title', 'Room Management')
 
 @section('content')
-    {{-- <x-common.page-breadcrumb pageTitle="Room Management" /> --}}
 
     @php
         $floorLabels = [
             '1' => 'First Floor',
             '2' => 'Second Floor',
-            '3' => 'Third Floor',
             '4' => 'Fourth Floor',
         ];
 
@@ -753,14 +751,11 @@
 
 
         <x-common.toast-notification />
-        {{-- @if (session('success'))
-            <x-ui.alert variant="success" title="Success" :message="session('success')" />
-        @endif --}}
+
 
         <div class="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
             <div class="mx-auto w-full">
 
-                {{-- HEADER --}}
                 <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-white">
