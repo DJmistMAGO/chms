@@ -10,22 +10,31 @@ class UserManagementController extends Controller
 {
     public function index()
     {
-
-        $users = User::all()
-            ->map(function ($user) {
+        $mapUser = function ($user) {
             return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'roles' => $user->getRoleNames()->toArray(),
-                'phone' => $user->phone,
+                'id'      => $user->id,
+                'name'    => $user->name,
+                'email'   => $user->email,
+                'roles'   => $user->getRoleNames()->toArray(),
+                'phone'   => $user->phone,
                 'address' => $user->address,
-                'avatar' => $user->avatar,
-                'status' => $user->status,
+                'avatar'  => $user->avatar,
+                'status'  => $user->status,
             ];
-        });
+        };
 
-        return view('pages.user-management.user-management', compact('users'));
+        $staffUsers = User::role('staff')
+            ->get()
+            ->map($mapUser);
+
+        $clientUsers = User::role('client')
+            ->get()
+            ->map($mapUser);
+
+        return view('pages.user-management.user-management', compact(
+            'staffUsers',
+            'clientUsers'
+        ));
     }
 
     public function update(Request $request, $id)
