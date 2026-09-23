@@ -47,11 +47,12 @@ class BookingController extends Controller
         return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }
 
+
     public function pending(Request $request)
     {
         $onlineBookings = Booking::with('user.idVerification')
             ->whereIn('status', ['Pending', 'Confirmed', 'Checked In'])
-            ->get() ->map(function ($booking) {
+            ->get()->map(function ($booking) {
                 $booking->booking_type = 'Online';
                 return $booking;
             });
@@ -63,13 +64,13 @@ class BookingController extends Controller
                 return $booking;
             });
 
-        $items = $onlineBookings ->concat($walkInBookings) ->map(function ($booking) {
-                $booking->sort_date = in_array($booking->status, ['Confirmed', 'Checked In'])
-                    ? $booking->updated_at
-                    : $booking->created_at;
+        $items = $onlineBookings->concat($walkInBookings)->map(function ($booking) {
+            $booking->sort_date = in_array($booking->status, ['Confirmed', 'Checked In'])
+                ? $booking->updated_at
+                : $booking->created_at;
 
-                    return $booking;
-            })->sortByDesc('sort_date') ->values();
+            return $booking;
+        })->sortByDesc('sort_date')->values();
 
 
         $perPage = 15;
@@ -81,10 +82,9 @@ class BookingController extends Controller
             'query' => $request->query(),
         ]);
 
-        $availableRooms = Room::where('status', 'Available') ->orderBy('room_type') ->orderBy('floor') ->orderBy('room_no') ->get();
+        $availableRooms = Room::where('status', 'Available')->orderBy('room_type')->orderBy('floor')->orderBy('room_no')->get();
 
         return view('pages.chms-features.booking-management.pending-booking', compact('bookings', 'availableRooms'));
-
     }
 
     public function confirmBooking(Request $request, $selectedRef)
@@ -186,27 +186,27 @@ class BookingController extends Controller
     }
 
     public function earlyCheckout(Request $request, $selectedRef)
-{
-    // Search Online bookings first; fall back to Walk-in if not found
-    $booking = Booking::where('reference_number', $selectedRef)->first()
-        ?? WalkInBooking::where('reference_number', $selectedRef)->firstOrFail();
+    {
+        // Search Online bookings first; fall back to Walk-in if not found
+        $booking = Booking::where('reference_number', $selectedRef)->first()
+            ?? WalkInBooking::where('reference_number', $selectedRef)->firstOrFail();
 
-    // Update booking status
-    $booking->status = 'Completed';
-    $booking->save();
+        // Update booking status
+        $booking->status = 'Completed';
+        $booking->save();
 
-    // Update assigned room status to available
-    if ($booking->room_id) {
-        $room = Room::find($booking->room_id);
+        // Update assigned room status to available
+        if ($booking->room_id) {
+            $room = Room::find($booking->room_id);
 
-        if ($room) {
-            $room->status = 'Available';
-            $room->save();
+            if ($room) {
+                $room->status = 'Available';
+                $room->save();
+            }
         }
-    }
 
-    return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
-}
+        return redirect()->route('booking.history')->with('success', 'Booking completed successfully.');
+    }
 
 
     public function bookingHistory()
