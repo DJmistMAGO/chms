@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\ServiceProvider;
 use App\Http\Middleware\LogoutIfDeactivated;
+use App\Models\Booking;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,9 @@ class AppServiceProvider extends ServiceProvider
             // Add to the 'web' middleware group so it runs on authenticated web requests
             $router->pushMiddlewareToGroup('web', LogoutIfDeactivated::class);
         }
+
+        View::composer('layouts.authenticated.sidebar', function ($view) {
+            $view->with('newReservationsCount', Booking::where('status', 'Pending')->count());
+        });
     }
 }
