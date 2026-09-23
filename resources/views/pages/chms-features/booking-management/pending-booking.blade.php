@@ -2,18 +2,20 @@
 @section('title', 'Booking List')
 
 @section('content')
-    <div x-data="{
-        activeTab: 'Pending',
-        confirmModal: false,
-        checkinModal: false,
-        checkoutModal: false,
-        cancelModal: false,
-        deleteModal: false,
-        detailModal: false,
-        selectedId: null,
-        selectedRef: null,
-        selectedRoomType: null,
-        selectedBooking: {},
+<div x-data="{
+    activeTab: 'Pending',
+    confirmModal: false,
+    checkinModal: false,
+    checkoutModal: false,
+    cancelModal: false,
+    deleteModal: false,
+    detailModal: false,
+    selectedId: null,
+    selectedRef: null,
+    selectedRoomType: null,
+    selectedFloorLevel: null,
+    availableRooms: @js($availableRooms ?? []),
+    selectedBooking: {},
 
         filterTable() {
             const search = document.getElementById('search-input')?.value.toLowerCase() || '';
@@ -33,6 +35,7 @@
             this.selectedId = booking.id;
             this.selectedRef = booking.ref;
             this.selectedRoomType = booking.roomType ?? null;
+            this.selectedFloorLevel = booking.floorLevel ?? null;
             this[modal] = true;
         },
 
@@ -42,10 +45,6 @@
             return '₱' + val.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
     }" x-init="filterTable()">
-
-
-        {{-- <x-common.page-breadcrumb pageTitle="Pending Bookings" /> --}}
-
 
         <div
             class="rounded-3xl border border-gray-200 bg-white px-6 py-8 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
@@ -294,8 +293,7 @@
                         </button>
 
                         @if ($idStatus === 'verified')
-                            <button title="Confirm booking"
-                                @click="open('confirmModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type ?? ($b->room->room_type ?? '') }}' })"
+                            <button title="Confirm booking" @click="open('confirmModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type ?? ($b->room->room_type ?? '') }}', floorLevel: '{{ $b->floor_level ?? '' }}' })"
                                 class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50 text-green-600 transition hover:scale-105 hover:bg-green-100 dark:bg-green-400/10 dark:text-green-400 dark:hover:bg-green-400/20">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
@@ -304,7 +302,7 @@
                         @endif
 
                         <button title="Cancel booking"
-                            @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}' })"
+                            @click="open('cancelModal', { id: '{{ $b->id }}', ref: '{{ $b->reference_number }}', roomType: '{{ $b->room_type ?? ($b->room->room_type ?? '') }}', floorLevel: '{{ $b->floor_level ?? '' }}' })"
                             class="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-50 text-amber-600 transition hover:scale-105 hover:bg-amber-100 dark:bg-amber-400/10 dark:text-amber-400 dark:hover:bg-amber-400/20">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -601,16 +599,42 @@
                     <div class="px-6 py-5">
                         <label class="mb-1.5 block text-xs font-medium uppercase tracking-widest text-gray-400">Assign
                             Room</label>
-                        <select name="room_id"
+
+                            <select name="room_id"
                             class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 transition focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-400/20 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
-                            <option value="">Select a room…</option>
+                        <option value="">Select a room…</option>
+
+                        <optgroup :label="selectedFloorLevel">
                             @foreach ($availableRooms ?? [] as $room)
-                                <template x-if="'{{ $room->room_type }}' === selectedRoomType">
-                                    <option value="{{ $room->id }}">{{ $room->room_no }} — {{ $room->room_type }}
+                                @if ($room->floor !== null)
+                                    <option
+                                        value="{{ $room->id }}"
+                                        x-show="'{{ $room->room_type }}' === selectedRoomType && '{{ $room->floor }}' == selectedFloorLevel.replace('Floor ', '')"
+                                    >
+                                        Room {{ $room->room_no }} — {{ $room->room_type }}
                                     </option>
-                                </template>
+                                @endif
                             @endforeach
-                        </select>
+                        </optgroup>
+
+                        @foreach (collect($availableRooms ?? [])->groupBy('floor') as $floor => $rooms)
+                            @if ($floor !== null)
+                                <optgroup
+                                    x-show="!availableRooms?.some(room => room.room_type === selectedRoomType && room.floor == selectedFloorLevel.replace('Floor ', ''))"
+                                    label="Suggested — Floor {{ $floor }}"
+                                >
+                                    @foreach ($rooms as $room)
+                                        <option
+                                            value="{{ $room->id }}"
+                                            x-show="'{{ $room->room_type }}' === selectedRoomType && selectedFloorLevel.replace('Floor ', '') != '{{ $floor }}'"
+                                        >
+                                            Floor {{ $floor }} — Room {{ $room->room_no }} — {{ $room->room_type }}
+                                        </option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
+                        @endforeach
+                    </select>
                     </div>
                     <div class="flex justify-end gap-3 border-t border-gray-100 px-6 py-4 dark:border-gray-800">
                         <button type="button" @click="confirmModal=false"

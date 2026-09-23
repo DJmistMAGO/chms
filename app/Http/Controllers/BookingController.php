@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\WalkInBooking;
-// use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Room;
 use Illuminate\Support\Facades\Mail;
@@ -48,12 +47,11 @@ class BookingController extends Controller
         return view('pages.chms-features.my-reservations.reservation', compact('pendingBookings', 'confirmedBookings'));
     }
 
-  public function pending(Request $request)
+    public function pending(Request $request)
     {
         $onlineBookings = Booking::with('user.idVerification')
             ->whereIn('status', ['Pending', 'Confirmed', 'Checked In'])
-            ->get()
-            ->map(function ($booking) {
+            ->get() ->map(function ($booking) {
                 $booking->booking_type = 'Online';
                 return $booking;
             });
@@ -65,13 +63,14 @@ class BookingController extends Controller
                 return $booking;
             });
 
-            $items = $onlineBookings
-            ->concat($walkInBookings)
-            ->sortBy([
-                ['check_in', 'asc'],
-                ['created_at', 'asc'],
-            ])
-            ->values();
+        $items = $onlineBookings ->concat($walkInBookings) ->map(function ($booking) {
+                $booking->sort_date = in_array($booking->status, ['Confirmed', 'Checked In'])
+                    ? $booking->updated_at
+                    : $booking->created_at;
+
+                    return $booking;
+            })->sortByDesc('sort_date') ->values();
+
 
         $perPage = 15;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
@@ -82,13 +81,10 @@ class BookingController extends Controller
             'query' => $request->query(),
         ]);
 
-        $availableRooms = Room::where('status', 'Available')
-            ->orderBy('room_type')
-            ->orderBy('floor')
-            ->orderBy('room_no')
-            ->get();
+        $availableRooms = Room::where('status', 'Available') ->orderBy('room_type') ->orderBy('floor') ->orderBy('room_no') ->get();
 
         return view('pages.chms-features.booking-management.pending-booking', compact('bookings', 'availableRooms'));
+
     }
 
     public function confirmBooking(Request $request, $selectedRef)
@@ -98,12 +94,14 @@ class BookingController extends Controller
         ]);
 
         $booking = Booking::where('reference_number', $selectedRef)->firstOrFail();
+
         $room = Room::whereKey($request->input('room_id'))
             ->where('status', 'Available')
             ->where('room_type', $booking->room_type)
             ->firstOrFail();
 
-        $requestedFloor = trim((string) $booking->floor_level);
+        $requestedFloor = trim(str_replace('Floor ', '', (string) $booking->floor_level));
+
         $hasRequestedFloorRoom = $requestedFloor !== '' && Room::where('status', 'Available')
             ->where('room_type', $booking->room_type)
             ->where('floor', $requestedFloor)
@@ -115,14 +113,19 @@ class BookingController extends Controller
             ])->withInput();
         }
 
-        // Update the booking status to confirmed and assign the selected room
         $booking->status = 'Confirmed';
         $booking->room_id = $request->input('room_id');
         $booking->save();
 
-        // Update the room status to occupied
         $room->status = 'Occupied';
         $room->save();
+
+        // dd('Everything before email works', [
+        //     'booking' => $booking->id,
+        //     'room' => $room->id,
+        //     'user' => $booking->user,
+        //     'email' => $booking->user?->email,
+        // ]);
 
         Mail::to($booking->user->email)->send(new StatusEmail($booking));
 
