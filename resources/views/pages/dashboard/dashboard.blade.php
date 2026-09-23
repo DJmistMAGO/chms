@@ -1,64 +1,47 @@
 @extends('layouts.authenticated.app')
 
 @push('styles')
-
 @endpush
 
-
 @section('content')
+	<x-dashboard.google-warning />
+	<x-common.toast-notification />
 
-    <x-dashboard.google-warning />
+	@role('client')
+		<div class="grid grid-cols-12 gap-6">
+			<div class="col-span-12">
+				<x-dashboard.welcome-card :bookingStats="$bookingStats" />
+			</div>
 
-    {{-- add success and error message --}}
-    {{-- @if (session('success'))
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ session('success') }}
-        </div>
-    @endif
-    @if (session('error'))
-        <div class="mb-4 font-medium text-sm text-red-600">
-            {{ session('error') }}
-        </div>
-    @endif --}}
-    <x-common.toast-notification />
+			<div class="col-span-12 md:col-span-6">
+				<x-dashboard.upcoming-bookings :bookings="$bookings" />
+			</div>
 
+			<div class="col-span-12 md:col-span-6">
+				<x-dashboard.booking-history :bookings="$bookingHistory" />
+			</div>
+			<div class="col-span-12">
+				<x-dashboard.booking-confirmation-modal :referenceNumber="$referenceNumber" />
+			</div>
+		</div>
+	@endrole
 
-    @role('client')
-        <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12">
-                <x-dashboard.welcome-card :bookingStats="$bookingStats"  />
-            </div>
+	@unlessrole('client')
+		<div class="grid grid-cols-12 gap-6">
+			<div class="col-span-12">
+				<x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms"
+					:bookingsToday="$bookingsToday" />
+			</div>
 
-            <div class="col-span-12 md:col-span-6">
-                <x-dashboard.upcoming-bookings :bookings="$bookings" />
-            </div>
+			<div class="col-span-12">
+				<x-dashboard.room-overview :rooms="$rooms" :totalRooms="$totalRooms" />
+			</div>
 
-            <div class="col-span-12 md:col-span-6">
-                <x-dashboard.booking-history :bookings="$bookingHistory" />
-            </div>
-            <div class="col-span-12">
-                <x-dashboard.booking-confirmation-modal :referenceNumber="$referenceNumber" />
-            </div>
-        </div>
-    @endrole
+			<x-dashboard.pending-approvals :pendingBookings="$pendingBookings" />
 
-    @unlessrole('client')
-        <div class="grid grid-cols-12 gap-6">
-            <div class="col-span-12">
-                <x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms" :bookingsToday="$bookingsToday" />
-            </div>
-
-            <div class="col-span-12">
-                <x-dashboard.room-overview :rooms="$rooms" :totalRooms="$totalRooms" />
-            </div>
-
-            <x-dashboard.pending-approvals :pendingBookings="$pendingBookings" />
-
-            <div class="col-span-12 md:col-span-6 space-y-6">
-                {{-- <x-dashboard.client-quick-actions /> --}}
-                <x-dashboard.client-recent-bookings :bookings="$recentBookings" />
-            </div>
-        </div>
-    @endunlessrole
-
+			<div class="col-span-12 md:col-span-6 space-y-6">
+				<x-dashboard.client-recent-bookings :bookings="$recentBookings" />
+			</div>
+		</div>
+	@endunlessrole
 @endsection
