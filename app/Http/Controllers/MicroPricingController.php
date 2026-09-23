@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\StatusEmail;
 use App\Models\Booking;
+use App\Models\Room;
 use App\Models\User;
 use App\Traits\HandlesBookingCreation;
 use Carbon\Carbon;
@@ -29,7 +30,7 @@ class MicroPricingController extends Controller
                 'price' => 1500,
                 'total_rooms' => 14,
                 'capacity' => 2,
-                'image' => 'assets/images/pRoom.png',
+                'image' => 'assets/images/sRoom.png',
                 'size' => 30,
                 'bed' => '1 King Bed',
                 'amenities' => [
@@ -65,7 +66,7 @@ class MicroPricingController extends Controller
                 'price' => 2700,
                 'total_rooms' => 4,
                 'capacity' => 6,
-                'image' => 'assets/images/pRoom.png',
+                'image' => 'assets/images/fRoom.png',
                 'size' => 50,
                 'bed' => '2 Queen Beds',
                 'amenities' => [
@@ -250,11 +251,9 @@ class MicroPricingController extends Controller
             $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
 
             DB::commit();
-
         } catch (ValidationException $e) {
             DB::rollBack();
             throw $e;
-
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -389,67 +388,162 @@ class MicroPricingController extends Controller
         $hasValidId = ! empty($user->valid_id);
 
         return view('components.common.booking-wizard-authenticated', compact(
-            'room', 'roomName', 'roomType', 'price', 'disabledDates', 'hasValidId'
+            'room',
+            'roomName',
+            'roomType',
+            'price',
+            'disabledDates',
+            'hasValidId'
         ));
     }
 
     public function storeAuthenticatedBooking(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if (! $user) {
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your session has expired. Please log in again.',
+            ], 401);
+        }
+
+        $request->validate(array_merge($this->bookingFieldRules(), [
+            'room_type_slug' => ['required', 'string'],
+        ]));
+
+        $validated = $this->validateBookingFields(
+            $request->only($this->bookingDataKeys())
+        );
+
+        $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
+
+        DB::beginTransaction();
+
+        try {
+            $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
+
+            DB::commit();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            report($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong while processing your booking. Please try again.',
+            ], 500);
+        }
+
+        $emailSent = false;
+
+        try {
+            Mail::to($booking->user->email)->send(new StatusEmail($booking));
+            $emailSent = true;
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         return response()->json([
-            'success' => false,
-            'message' => 'Your session has expired. Please log in again.',
-        ], 401);
+            'success'    => true,
+            'message'    => 'Booking submitted! We will verify your ID and confirm shortly.',
+            'redirect'   => route('dashboard', ['referenceNumber' => $booking->reference_number]),
+            'email_sent' => $emailSent,
+        ]);
     }
 
-    $request->validate(array_merge($this->bookingFieldRules(), [
-        'room_type_slug' => ['required', 'string'],
-    ]));
+    public function newAuthenticatedBookingWizard(Request $request, $roomType)
+    {
+        abort_unless(auth()->check(), 403);
 
-    $validated = $this->validateBookingFields(
-        $request->only($this->bookingDataKeys())
-    );
+        $user = auth()->user();
 
-    $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
+        $catalog = $this->roomCatalog();
 
-    DB::beginTransaction();
+        if (! isset($catalog[$roomType])) {
+            abort(404);
+        }
 
-    try {
-        $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
+        $room = (object) $catalog[$roomType];
 
-        DB::commit();
+        $roomName = $room->name;
+        $price = $room->price;
 
-    } catch (ValidationException $e) {
-        DB::rollBack();
-        throw $e;
+        $disabledDates = [];
 
-    } catch (\Throwable $e) {
-        DB::rollBack();
-
-        report($e);
-
-        return response()->json([
-            'success' => false,
-            'message' => 'Something went wrong while processing your booking. Please try again.',
-        ], 500);
+        return view('booking.new-wizard', compact(
+            'user',
+            'room',
+            'roomType',
+            'roomName',
+            'price',
+            'disabledDates'
+        ));
     }
 
-    $emailSent = false;
 
-    try {
-        Mail::to($booking->user->email)->send(new StatusEmail($booking));
-        $emailSent = true;
-    } catch (\Throwable $e) {
-        report($e);
+    public function storeNewBooking(Request $request)
+    {
+        $user = auth()->user();
+
+        abort_unless($user, 403);
+
+        $request->validate(array_merge($this->bookingFieldRules(), [
+            'room_type_slug' => ['required', 'string'],
+        ]));
+
+        $validated = $this->validateBookingFields(
+            $request->only($this->bookingDataKeys())
+        );
+
+        $validated = $this->repriceBooking(
+            $validated,
+            $request->input('room_type_slug')
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $booking = $this->persistBooking(
+                $validated,
+                $user->id,
+                $request->file('valid_id_path'),
+                $user
+            );
+
+            DB::commit();
+        } catch (ValidationException $e) {
+            DB::rollBack();
+            throw $e;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            report($e);
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'general' => 'Something went wrong while processing your booking. Please try again.',
+                ]);
+        }
+
+        try {
+            Mail::to($booking->user->email)
+                ->send(new StatusEmail($booking));
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
+        return redirect()
+            ->route('dashboard', [
+                'referenceNumber' => $booking->reference_number
+            ])
+            ->with(
+                'success',
+                'Booking submitted! We will verify your ID and confirm shortly.'
+            );
     }
-
-    return response()->json([
-        'success'    => true,
-        'message'    => 'Booking submitted! We will verify your ID and confirm shortly.',
-        'redirect'   => route('dashboard', ['referenceNumber' => $booking->reference_number]),
-        'email_sent' => $emailSent,
-    ]);
-}
 }
