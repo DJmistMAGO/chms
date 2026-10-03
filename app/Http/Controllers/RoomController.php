@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Room;
 
 class RoomController extends Controller
@@ -18,9 +19,9 @@ class RoomController extends Controller
     {
         $request->validate([
             'room_no'    => 'required|string|max:255|unique:rooms,room_no',
-            'floor'      => 'required',
-            'room_type'  => 'required|string|max:255',
-            'base_price' => 'required|numeric|min:0',
+            'floor'      => 'required|in:1,2,4',
+            'room_type'  => ['required', Rule::in(['Standard Room', 'Standard Premium Room', 'Family Room'])],
+            'base_price' => 'required|numeric|min:0|max:99999999.99|decimal:0,2',
             'status'     => 'required|in:Available,Occupied,Maintenance,Reserved',
         ]);
 
@@ -50,19 +51,18 @@ class RoomController extends Controller
 
     public function update(Request $request, $room)
     {
+        $room = Room::findOrFail($room);
+
         $request->validate([
-            'room_no'    => 'required|string|max:255',
-            'floor'      => 'required',
-            'room_type'  => 'required|string|max:255',
-            'base_price' => 'required|numeric|min:0',
+            'room_no'    => ['required', 'string', 'max:255', Rule::unique('rooms', 'room_no')->ignore($room->id)],
+            'floor'      => 'required|in:1,2,4',
+            'base_price' => 'required|numeric|min:0|max:99999999.99|decimal:0,2',
             'status'     => 'required|in:Available,Occupied,Maintenance,Reserved',
         ]);
 
-        $room = Room::findOrFail($room);
         $room->update($request->only([
             'room_no',
             'floor',
-            'room_type',
             'base_price',
             'status',
         ]));
