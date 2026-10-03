@@ -17,8 +17,21 @@
 			</div>
 
 			{{-- Form Card --}}
-			<form method="POST" action="{{ route('walk-in-booking.store') }}" class="space-y-6" data-confirm-leave>
+			<form id="walk-in-booking-form" method="POST" action="{{ route('walk-in-booking.store') }}" class="space-y-6"
+				data-confirm-leave>
 				@csrf
+				@if ($errors->any())
+					<div
+						class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+						role="alert">
+						<p class="font-semibold">Please correct the following before creating the booking:</p>
+						<ul class="mt-2 list-inside list-disc">
+							@foreach ($errors->all() as $error)
+								<li>{{ $error }}</li>
+							@endforeach
+						</ul>
+					</div>
+				@endif
 
 				{{-- ── SECTION 1: GUEST DETAILS ── --}}
 				<div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -37,7 +50,7 @@
 							</span>
 							<input type="text" id="fullname" name="fullname" value="{{ old('fullname') }}" placeholder="Juan Dela Cruz"
 								required
-								class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
+								class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500">
 						</div>
 					</div>
 
@@ -57,7 +70,7 @@
 							<input type="tel" id="phone_number" name="phone_number" value="{{ old('phone_number') }}"
 								placeholder="09XXXXXXXXX or +639XXXXXXXXX" required pattern="(09[0-9]{9}|\+63[0-9]{10})" maxlength="13"
 								title="Enter 09 followed by 9 digits or +63 followed by 10 digits"
-								class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
+								class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500">
 						</div>
 					</div>
 				</div>
@@ -78,11 +91,11 @@
 								</svg>
 							</span>
 							<select id="room_id" name="room_id" required
-								class="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-9 text-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
+								class="w-full appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-9 text-sm text-gray-900 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
 								<option value="" data-price="0">Select Room</option>
 								@foreach ($rooms as $room)
 									{{-- Added data-price attribute here --}}
-									<option value="{{ $room->id }}" data-price="{{ $room->base_price }}">
+									<option value="{{ $room->id }}" data-price="{{ $room->base_price }}" @selected(old('room_id') == $room->id)>
 										Room No.: {{ $room->room_no }} - Php. {{ number_format($room->base_price, 2) }}
 									</option>
 								@endforeach
@@ -130,7 +143,8 @@
 										<path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14" />
 									</svg>
 								</span>
-								<input type="date" id="check_out" name="check_out" required
+								<input type="date" id="check_out" name="check_out" min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+									value="{{ old('check_out') }}" required
 									class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-xs text-gray-700 dark:text-gray-300 dark:border-gray-800 dark:bg-white/[0.03] outline-none cursor-pointer focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
 							</div>
 						</div>
@@ -150,7 +164,7 @@
 
 								<input type="number" id="number_of_guests" name="number_of_guests" value="{{ old('number_of_guests', 1) }}"
 									min="1" required
-									class="w-full rounded-xl border border-gray-200 bg-gray-100 py-2 pl-9 pr-3 text-xs text-gray-600 outline-none">
+									class="w-full rounded-xl border border-gray-200 bg-white py-2 pl-9 pr-3 text-xs text-gray-900 outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
 							</div>
 						</div>
 					</div>
@@ -172,11 +186,11 @@
 								</svg>
 							</span>
 							<select id="ambiance" name="ambiance" required
-								class="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-10 text-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
+								class="w-full appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
 								<option value="" data-price="0">Select Ambiance</option>
 								@foreach ($ambiance as $amb => $price)
 									{{-- Added data-price attribute here --}}
-									<option value="{{ $amb }}" data-price="{{ $price }}">
+									<option value="{{ $amb }}" data-price="{{ $price }}" @selected(old('ambiance') === $amb)>
 										{{ $amb }} - Php. {{ number_format($price, 2) }}</option>
 								@endforeach
 							</select>
@@ -202,11 +216,11 @@
 								</svg>
 							</span>
 							<select id="food_package" name="food_package" required
-								class="w-full appearance-none rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-10 text-sm focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20">
+								class="w-full appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-900 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100">
 								<option value="" data-price="0">Select Package</option>
 								@foreach ($food_package as $food => $price)
 									{{-- Added data-price attribute here --}}
-									<option value="{{ $food }}" data-price="{{ $price }}">
+									<option value="{{ $food }}" data-price="{{ $price }}" @selected(old('food_package') === $food)>
 										{{ $food }} - Php. {{ number_format($price, 2) }}</option>
 								@endforeach
 							</select>
@@ -231,7 +245,7 @@
 								class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-semibold text-gray-500">₱</span>
 							<input type="number" id="room_price" name="room_price" readonly step="0.01"
 								value="{{ old('room_price', '0.00') }}"
-								class="w-full rounded-xl border border-gray-200 bg-gray-100 py-2.5 pl-8 pr-4 text-sm outline-none text-gray-600">
+								class="w-full rounded-xl border border-gray-200 bg-gray-100 py-2.5 pl-8 pr-4 text-sm text-gray-600 outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
 						</div>
 					</div>
 
@@ -244,7 +258,7 @@
 								class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-semibold text-gray-500">₱</span>
 							<input type="number" id="micro_pricing_amount" name="micro_pricing_amount" readonly step="0.01"
 								value="0.00"
-								class="w-full rounded-xl border border-gray-200 bg-gray-100 py-2.5 pl-8 pr-4 text-sm outline-none text-gray-600">
+								class="w-full rounded-xl border border-gray-200 bg-gray-100 py-2.5 pl-8 pr-4 text-sm text-gray-600 outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
 						</div>
 					</div>
 
@@ -256,7 +270,7 @@
 							<span
 								class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm font-semibold text-yellow-600">₱</span>
 							<input type="number" id="total_price" name="total_price" readonly step="0.01" value="0.00"
-								class="w-full rounded-xl border-2 border-yellow-300 bg-yellow-50 py-2.5 pl-8 pr-4 text-sm font-bold text-yellow-700 outline-none">
+								class="w-full rounded-xl border-2 border-yellow-300 bg-yellow-50 py-2.5 pl-8 pr-4 text-sm font-bold text-yellow-700 outline-none dark:border-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-300">
 						</div>
 					</div>
 
@@ -274,8 +288,8 @@
 									d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
 							</svg>
 						</span>
-						<textarea id="remarks" name="remarks" rows="3" placeholder="Add custom notes..."
-						 class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-800 dark:bg-white/[0.03] outline-none transition resize-none"></textarea>
+						<textarea id="remarks" name="remarks" rows="3" maxlength="500" placeholder="Add custom notes..."
+						 class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-500 outline-none transition resize-none">{{ old('remarks') }}</textarea>
 					</div>
 				</div>
 
@@ -292,14 +306,15 @@
 						</svg>
 						Cancel
 					</a>
-					<button type="submit"
-						class="inline-flex items-center justify-center gap-2 rounded-xl bg-yellow-400 px-6 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 active:scale-95 dark:focus:ring-offset-gray-900">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-							stroke="currentColor" stroke-width="2">
+					<button id="walk-in-submit-btn" type="submit"
+						class="inline-flex items-center justify-center gap-2 rounded-xl bg-yellow-400 px-6 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-offset-gray-900">
+						<i class="fas fa-spinner fa-spin hidden" id="walk-in-submit-spinner" aria-hidden="true"></i>
+						<svg id="walk-in-submit-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+							viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
 							<path stroke-linecap="round" stroke-linejoin="round"
 								d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
 						</svg>
-						Create Booking
+						<span id="walk-in-submit-label">Create Booking</span>
 					</button>
 				</div>
 			</form>
@@ -308,6 +323,22 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
+			let isSubmitting = false;
+			const bookingForm = document.getElementById('walk-in-booking-form');
+			bookingForm.addEventListener('submit', function(event) {
+				if (isSubmitting) {
+					event.preventDefault();
+					return;
+				}
+
+				isSubmitting = true;
+				const submitButton = document.getElementById('walk-in-submit-btn');
+				submitButton.disabled = true;
+				document.getElementById('walk-in-submit-icon').classList.add('hidden');
+				document.getElementById('walk-in-submit-spinner').classList.remove('hidden');
+				document.getElementById('walk-in-submit-label').textContent = 'Booking…';
+			});
+
 			// Selection Inputs
 			const roomSelect = document.getElementById('room_id');
 			const ambianceSelect = document.getElementById('ambiance');
@@ -345,9 +376,12 @@
 				const checkInDate = new Date(checkInInput.value);
 				const checkOutDate = new Date(checkOutInput.value);
 
-				// Ensure check-out minimum boundary is reactive to check-in selection
+				// Require checkout to be at least one day after check-in.
 				if (checkInInput.value) {
-					checkOutInput.min = checkInInput.value;
+					const [year, month, day] = checkInInput.value.split('-').map(Number);
+					checkOutInput.min = new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+				} else {
+					checkOutInput.min = '{{ date('Y-m-d', strtotime('+1 day')) }}';
 				}
 
 				// Run calculation if both dates are valid code entries
@@ -399,6 +433,7 @@
 			foodPackageSelect.addEventListener('change', calculatePrices);
 			checkInInput.addEventListener('change', calculatePrices);
 			checkOutInput.addEventListener('change', calculatePrices);
+			calculatePrices();
 		});
 	</script>
 @endsection
