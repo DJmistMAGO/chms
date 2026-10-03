@@ -408,13 +408,27 @@ class MicroPricingController extends Controller
             ], 401);
         }
 
+        $catalog = $this->roomCatalog();
+        $request->validate([
+            'room_type_slug' => ['required', 'string', \Illuminate\Validation\Rule::in(array_keys($catalog))],
+        ]);
+        $room = $catalog[$request->input('room_type_slug')];
+
         $request->validate(array_merge($this->bookingFieldRules(), [
             'room_type_slug' => ['required', 'string'],
+            'number_of_guests' => ['required', 'integer', 'min:1', 'max:' . $room['capacity']],
+            'floor_level' => ['required', 'string', 'in:Floor 1,Floor 2,Floor 4'],
+            'ambiance' => ['required', 'string', \Illuminate\Validation\Rule::in(array_keys($this->ambiancePrices()))],
+            'food_package' => ['required', 'string', \Illuminate\Validation\Rule::in(array_keys($this->foodPrices()))],
         ]));
 
         $validated = $this->validateBookingFields(
             $request->only($this->bookingDataKeys())
         );
+
+        $validated['nights'] = Carbon::parse($validated['check_in'])
+            ->startOfDay()
+            ->diffInDays(Carbon::parse($validated['check_out'])->startOfDay());
 
         $validated = $this->repriceBooking($validated, $request->input('room_type_slug'));
 
