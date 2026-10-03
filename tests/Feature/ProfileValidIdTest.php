@@ -101,6 +101,53 @@ it('updates profile columns and marks a changed password', function () {
         ->and(Hash::check('NewPassword1!', $user->password))->toBeTrue();
 });
 
+it('rejects passwords that do not meet the profile password policy', function () {
+    $user = User::factory()->create([
+        'email' => 'password-policy@example.com',
+        'password' => Hash::make('OriginalPassword1!'),
+    ]);
+
+    foreach (
+        [
+            'Ab1!xxx',
+            'abcdefg1!',
+            'ABCDEFG1!',
+            'Abcdefgh!',
+            'Abcdefg1',
+            'Abcdefg1?',
+        ] as $invalidPassword
+    ) {
+        $this->actingAs($user)
+            ->put(route('profile.update'), [
+                'name' => $user->name,
+                'email' => $user->email,
+                'password' => $invalidPassword,
+                'password_confirmation' => $invalidPassword,
+            ])
+            ->assertSessionHasErrors('password');
+    }
+
+    expect(Hash::check('OriginalPassword1!', $user->refresh()->password))->toBeTrue();
+});
+
+it('rejects a profile password when confirmation does not match', function () {
+    $user = User::factory()->create([
+        'email' => 'password-confirmation@example.com',
+        'password' => Hash::make('OriginalPassword1!'),
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'password' => 'NewPassword1!',
+            'password_confirmation' => 'DifferentPassword1!',
+        ])
+        ->assertSessionHasErrors('password');
+
+    expect(Hash::check('OriginalPassword1!', $user->refresh()->password))->toBeTrue();
+});
+
 it('accepts Philippine phone formats and rejects invalid phone numbers', function () {
     $user = User::factory()->create([
         'email' => 'phone-format@example.com',

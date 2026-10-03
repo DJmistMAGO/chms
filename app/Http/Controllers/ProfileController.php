@@ -43,9 +43,23 @@ class ProfileController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'phone' => ['nullable', 'string', 'max:13', 'regex:/^(?:09\d{9}|\+63\d{10})$/'],
             'address' => 'nullable|string|max:500',
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => [
+                'nullable',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*]/',
+                'regex:/^[A-Za-z0-9!@#$%^&*]+$/',
+                'confirmed',
+            ],
             'avatar_cropped' => ['nullable', 'string'],
             'valid_id_upload' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase and lowercase letters, a number, and one allowed symbol (!@#$%^&*).',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         if ($request->hasFile('valid_id_upload')) {

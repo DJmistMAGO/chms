@@ -275,7 +275,9 @@
 											d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 									</svg>
 								</span>
-								<input id="password" type="password" name="password" placeholder="Min. 8 characters"
+								<input id="password" type="password" name="password" placeholder="8+ characters with a symbol"
+									minlength="8" pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&amp;*]{8,}"
+									title="Use at least 8 characters with uppercase and lowercase letters, a number, and one of: ! @ # $ % ^ &amp; *"
 									class="block w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 transition focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-200/60 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-amber-600 dark:focus:ring-amber-800/30
                                     @error('password') border-red-400 focus:border-red-400 focus:ring-red-200/60 dark:border-red-600 @enderror" />
 								<button type="button"
@@ -289,6 +291,8 @@
 									</svg>
 								</button>
 							</div>
+							<p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">Use 8+ characters, uppercase and lowercase letters, a
+								number, and one of !@#$%^&amp;*.</p>
 							<div id="password-strength" class="mt-2 hidden" aria-live="polite">
 								<div class="mb-1 flex items-center justify-between text-xs">
 									<span class="text-gray-500 dark:text-gray-400">Password strength</span>
@@ -331,6 +335,7 @@
 									</svg>
 								</button>
 							</div>
+							<p id="password-confirmation-feedback" class="mt-1 hidden text-xs" aria-live="polite"></p>
 						</div>
 					</div>
 				</div>
@@ -418,6 +423,8 @@
 			});
 
 			const password = document.getElementById('password');
+			const passwordConfirmation = document.getElementById('password_confirmation');
+			const passwordConfirmationFeedback = document.getElementById('password-confirmation-feedback');
 			const strength = document.getElementById('password-strength');
 			const strengthBar = document.getElementById('password-strength-bar');
 			const strengthLabel = document.getElementById('password-strength-label');
@@ -427,8 +434,10 @@
 				let score = 0;
 				if (value.length >= 8) score++;
 				if (/[A-Z]/.test(value)) score++;
+				if (/[a-z]/.test(value)) score++;
 				if (/[0-9]/.test(value)) score++;
-				if (/[^A-Za-z0-9]/.test(value)) score++;
+				if (/[!@#$%^&*]/.test(value)) score++;
+				const hasUnsupportedCharacters = /[^A-Za-z0-9!@#$%^&*]/.test(value);
 
 				const levels = [{
 						width: '0%',
@@ -437,19 +446,25 @@
 						textColor: 'text-gray-400'
 					},
 					{
-						width: '33%',
+						width: '20%',
 						color: 'bg-red-400',
 						label: 'Weak',
 						textColor: 'text-red-400'
 					},
 					{
-						width: '66%',
+						width: '40%',
 						color: 'bg-amber-400',
 						label: 'Fair',
 						textColor: 'text-amber-500'
 					},
 					{
-						width: '85%',
+						width: '60%',
+						color: 'bg-amber-400',
+						label: 'Fair',
+						textColor: 'text-amber-500'
+					},
+					{
+						width: '80%',
 						color: 'bg-lime-500',
 						label: 'Good',
 						textColor: 'text-green-600'
@@ -464,10 +479,46 @@
 				const level = levels[score];
 
 				strength.classList.toggle('hidden', !value);
-				strengthBar.className = 'h-full rounded-full transition-all duration-300 ' + level.color;
-				strengthBar.style.width = level.width;
-				strengthLabel.className = 'font-medium ' + level.textColor;
-				strengthLabel.textContent = level.label;
+				strengthBar.className = 'h-full rounded-full transition-all duration-300 ' + (
+					hasUnsupportedCharacters ? 'bg-red-500' : level.color);
+				strengthBar.style.width = hasUnsupportedCharacters ? '100%' : level.width;
+				strengthLabel.className = 'font-medium ' + (hasUnsupportedCharacters ? 'text-red-500' : level
+					.textColor);
+				strengthLabel.textContent = hasUnsupportedCharacters ? 'Unsupported character' : level.label;
+			});
+
+			let passwordConfirmationTouched = false;
+
+			function validatePasswordConfirmation() {
+				const passwordValue = password.value;
+				const confirmationValue = passwordConfirmation.value;
+				let message = '';
+				let matches = false;
+
+				if (passwordValue && !confirmationValue) {
+					if (passwordConfirmationTouched) message = 'Please confirm your new password.';
+				} else if (!passwordValue && confirmationValue) {
+					message = 'Enter a new password first.';
+				} else if (passwordValue && confirmationValue && passwordValue !== confirmationValue) {
+					message = 'Passwords do not match.';
+				} else if (passwordValue && confirmationValue) {
+					matches = true;
+				}
+
+				passwordConfirmation.required = Boolean(passwordValue);
+				passwordConfirmation.setCustomValidity(message);
+				passwordConfirmation.setAttribute('aria-invalid', String(Boolean(message)));
+				passwordConfirmationFeedback.classList.toggle('hidden', !passwordConfirmationTouched || (!message && !
+					matches));
+				passwordConfirmationFeedback.classList.toggle('text-red-500', Boolean(message));
+				passwordConfirmationFeedback.classList.toggle('text-green-600', matches);
+				passwordConfirmationFeedback.textContent = message || (matches ? 'Passwords match.' : '');
+			}
+
+			password.addEventListener('input', validatePasswordConfirmation);
+			passwordConfirmation.addEventListener('input', function() {
+				passwordConfirmationTouched = true;
+				validatePasswordConfirmation();
 			});
 
 			fileInput.addEventListener('change', function() {
