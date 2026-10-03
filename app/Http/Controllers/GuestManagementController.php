@@ -21,7 +21,7 @@ class GuestManagementController extends Controller
         $guests = User::role('client')
             ->with([
                 'idVerification',
-                'bookings' => fn ($query) => $query->latest('created_at'),
+                'bookings' => fn($query) => $query->latest('created_at'),
             ])
             ->get()
             ->filter(function ($guest) use ($activeBookingStatuses) {
@@ -46,7 +46,7 @@ class GuestManagementController extends Controller
                     return in_array($status, $activeBookingStatuses, true);
                 });
 
-                $bookings = $visibleBookings->map(fn ($booking) => [
+                $bookings = $visibleBookings->map(fn($booking) => [
                     'id' => $booking->id,
                     'reference' => $booking->reference_number
                         ?? ('BK-' . str_pad($booking->id, 5, '0', STR_PAD_LEFT)),
@@ -90,7 +90,7 @@ class GuestManagementController extends Controller
                 ];
             })
             // sort guests so whoever has the most recently created booking is first
-            ->sortByDesc(fn ($guest) => $guest['latest_booking_at'])
+            ->sortByDesc(fn($guest) => $guest['latest_booking_at'])
             ->values();
 
         $walkInGuests = WalkInBooking::with('room')
@@ -138,7 +138,7 @@ class GuestManagementController extends Controller
 
         $guests = $guests
             ->concat($walkInGuests)
-            ->sortByDesc(fn ($guest) => $guest['latest_booking_at'])
+            ->sortByDesc(fn($guest) => $guest['latest_booking_at'])
             ->values();
 
         $perPage = 6;
@@ -154,10 +154,10 @@ class GuestManagementController extends Controller
         );
 
         $totalGuests = $guests->total();
-        $activeGuests = $guests->getCollection()->filter(fn ($guest) => strtolower((string) ($guest['status'] ?? '')) === 'active')->count();
-        $totalBookings = $guests->getCollection()->sum(fn ($guest) => (int) ($guest['bookings_count'] ?? 0));
+        $activeGuests = $guests->getCollection()->filter(fn($guest) => strtolower((string) ($guest['status'] ?? '')) === 'active')->count();
+        $totalBookings = $guests->getCollection()->sum(fn($guest) => (int) ($guest['bookings_count'] ?? 0));
         $totalRevenue = $guests->getCollection()->sum(function ($guest) {
-            return collect($guest['bookings'])->sum(fn ($booking) => (float) ($booking['total_amount'] ?? 0));
+            return collect($guest['bookings'])->sum(fn($booking) => (float) ($booking['total_amount'] ?? 0));
         });
 
         return view('pages.guest-management.guest-management', compact('guests', 'totalGuests', 'activeGuests', 'totalBookings', 'totalRevenue'));
@@ -168,7 +168,7 @@ class GuestManagementController extends Controller
         $validated = $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|unique:users,email,' . $id,
-            'phone'   => 'nullable|string|max:20',
+            'phone'   => ['nullable', 'string', 'max:13', 'regex:/^(?:09\d{9}|\+63\d{10})$/'],
             'address' => 'nullable|string|max:500',
 
         ]);

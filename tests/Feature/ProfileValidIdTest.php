@@ -101,6 +101,30 @@ it('updates profile columns and marks a changed password', function () {
         ->and(Hash::check('NewPassword1!', $user->password))->toBeTrue();
 });
 
+it('accepts Philippine phone formats and rejects invalid phone numbers', function () {
+    $user = User::factory()->create([
+        'email' => 'phone-format@example.com',
+    ]);
+
+    $this->actingAs($user)
+        ->put(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => '+639171234567',
+        ])
+        ->assertRedirect(route('profile'));
+
+    expect($user->refresh()->phone)->toBe('+639171234567');
+
+    foreach (['0917123456', '08171234567', '+63917123456', '+6391712345678'] as $invalidPhone) {
+        $this->put(route('profile.update'), [
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $invalidPhone,
+        ])->assertSessionHasErrors('phone');
+    }
+});
+
 it('prevents an admin from modifying their profile', function () {
     Role::create(['name' => 'admin']);
     $user = User::factory()->create([

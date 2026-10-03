@@ -8,7 +8,7 @@
 
 	$newReservationsCount = $newReservationsCount ?? 0;
 
-	$reservationKeywords = ['reservation', 'pending', 'my-reservations'];
+	$reservationKeywords = ['pending'];
 @endphp
 
 <aside id="sidebar"

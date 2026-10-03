@@ -387,7 +387,8 @@
 						<div>
 							<label for="editPhone" class="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
 								Phone </label>
-							<input id="editPhone" name="phone" type="text"
+							<input id="editPhone" name="phone" type="tel" pattern="(09[0-9]{9}|\+63[0-9]{10})" maxlength="13"
+								title="Enter 09 followed by 9 digits or +63 followed by 10 digits"
 								class="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
 						</div>
 

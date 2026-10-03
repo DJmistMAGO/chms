@@ -30,12 +30,12 @@ class WalkInBookingController extends Controller
         return view('pages.chms-features.booking-management.create-booking', compact('rooms', 'ambiance', 'food_package'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $data = $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'fullname' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
+            'phone_number' => ['required', 'string', 'max:13', 'regex:/^(?:09\d{9}|\+63\d{10})$/'],
             'ambiance' => 'required|string|max:255',
             'food_package' => 'required|string|max:255',
             'check_in' => 'required|date|after_or_equal:today',
@@ -59,6 +59,4 @@ class WalkInBookingController extends Controller
 
         return redirect()->route('booking.pending')->with('success', 'Walk-in booking created successfully.');
     }
-
-
 }

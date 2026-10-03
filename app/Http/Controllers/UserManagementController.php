@@ -42,7 +42,7 @@ class UserManagementController extends Controller
         $validated = $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|unique:users,email,' . $id,
-            'phone'   => 'nullable|string|max:20',
+            'phone'   => ['nullable', 'string', 'max:13', 'regex:/^(?:09\d{9}|\+63\d{10})$/'],
             'address' => 'nullable|string|max:500',
         ]);
 
@@ -101,5 +101,4 @@ class UserManagementController extends Controller
 
         return redirect()->route('user-management.index')->with('success', 'User password reset successfully.');
     }
-
 }
