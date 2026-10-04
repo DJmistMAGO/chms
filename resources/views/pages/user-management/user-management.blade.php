@@ -24,20 +24,20 @@
 		<div class="mb-5 border-b border-gray-200 dark:border-gray-800">
 			<nav class="-mb-px flex gap-6" aria-label="User types">
 				<button type="button" id="staffTab" onclick="switchUserTab('staff')"
-					class="user-tab border-b-2 border-amber-600 px-1 pb-3 text-sm font-medium text-amber-600 transition">
+					class="user-tab border-b-2 px-1 pb-3 text-sm font-medium transition {{ $activeTab === 'staff' ? 'border-amber-600 text-amber-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
 					Staff
 					<span
 						class="ml-1.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-						{{ $staffUsers->count() }}
+						{{ $staffUsers->total() }}
 					</span>
 				</button>
 
 				<button type="button" id="clientTab" onclick="switchUserTab('client')"
-					class="user-tab border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-gray-500 transition hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+					class="user-tab border-b-2 px-1 pb-3 text-sm font-medium transition {{ $activeTab === 'client' ? 'border-amber-600 text-amber-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
 					Clients
 					<span
 						class="ml-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 dark:bg-green-900/40 dark:text-green-300">
-						{{ $clientUsers->count() }}
+						{{ $clientUsers->total() }}
 					</span>
 				</button>
 			</nav>
@@ -98,7 +98,7 @@
 			</div>
 		</div>
 
-		<div id="staffTable" class="user-table">
+		<div id="staffTable" class="user-table {{ $activeTab === 'staff' ? '' : 'hidden' }}">
 			<div class="max-w-full overflow-x-auto custom-scrollbar">
 				<table class="min-w-full">
 					<thead>
@@ -206,9 +206,14 @@
 					</tbody>
 				</table>
 			</div>
+			@if ($staffUsers->hasPages())
+				<div class="mt-5">
+					{{ $staffUsers->links() }}
+				</div>
+			@endif
 		</div>
 
-		<div id="clientTable" class="user-table hidden">
+		<div id="clientTable" class="user-table {{ $activeTab === 'client' ? '' : 'hidden' }}">
 			<div class="max-w-full overflow-x-auto custom-scrollbar">
 				<table class="min-w-full">
 					<thead>
@@ -318,6 +323,11 @@
 					</tbody>
 				</table>
 			</div>
+			@if ($clientUsers->hasPages())
+				<div class="mt-5">
+					{{ $clientUsers->links() }}
+				</div>
+			@endif
 		</div>
 
 		<div id="statusModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">

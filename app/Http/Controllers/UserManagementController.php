@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $mapUser = function ($user) {
             return [
@@ -23,17 +23,22 @@ class UserManagementController extends Controller
             ];
         };
 
+        $activeTab = $request->query('user_tab') === 'client' ? 'client' : 'staff';
+
         $staffUsers = User::role('staff')
-            ->get()
-            ->map($mapUser);
+            ->paginate(10, ['*'], 'staff_page')
+            ->appends(['user_tab' => 'staff'])
+            ->through($mapUser);
 
         $clientUsers = User::role('client')
-            ->get()
-            ->map($mapUser);
+            ->paginate(10, ['*'], 'client_page')
+            ->appends(['user_tab' => 'client'])
+            ->through($mapUser);
 
         return view('pages.user-management.user-management', compact(
             'staffUsers',
-            'clientUsers'
+            'clientUsers',
+            'activeTab'
         ));
     }
 
