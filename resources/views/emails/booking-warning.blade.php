@@ -326,6 +326,9 @@
 
 
                 <p class="note">Already confirmed? You can safely ignore this message.</p>
+                <p class="note">Need to change something? Reach out to Caree Hotel guest management through our email <a
+                    class="email" href="mailto:careehotel5@gmail.com"
+                    style="font-weight: bold; color: #c58b2a;">careehotel5@gmail.com</a> and we'll take care of it.</p>
             </div>
 
             <div class="footer-perforation"></div>
