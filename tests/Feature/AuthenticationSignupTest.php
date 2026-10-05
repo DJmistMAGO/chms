@@ -21,3 +21,19 @@ it('rejects signup passwords that do not meet the password policy', function () 
 
     expect(User::count())->toBe(0);
 });
+
+it('rejects signup email addresses with invalid syntax or a non-resolving domain', function () {
+    foreach ([
+        'not-an-email',
+        'jane@nonexistent.invalid',
+    ] as $invalidEmail) {
+        $this->post(route('signup.post'), [
+            'name' => 'Jane Doe',
+            'email' => $invalidEmail,
+            'password' => 'StrongPass1!',
+            'password_confirmation' => 'StrongPass1!',
+        ])->assertSessionHasErrors('email');
+    }
+
+    expect(User::count())->toBe(0);
+});

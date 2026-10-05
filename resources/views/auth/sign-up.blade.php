@@ -109,6 +109,8 @@
                         placeholder="you@example.com"
                         value="{{ old('email') }}"
                         required
+                        pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                        title="Enter an email address with a valid domain, such as you@example.com."
                         class="input-field w-full px-4 py-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-800 placeholder-stone-300 text-sm"
                     >
                     @error('email')
