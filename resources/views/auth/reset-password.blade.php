@@ -26,6 +26,7 @@
             box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.12);
             outline: none;
         }
+        .strength-bar { transition: width 0.3s, background 0.3s; }
 
         .btn-primary {
             background: linear-gradient(135deg, #c9960c 0%, #e8b11c 100%);
@@ -118,8 +119,12 @@
                             type="password"
                             name="password"
                             id="password"
-                            placeholder="••••••••"
+                            placeholder="8+ characters with a symbol"
                             required
+                            minlength="8"
+                            pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&amp;*])[A-Za-z0-9!@#$%^&amp;*]{8,}"
+                            title="Use at least 8 characters with uppercase and lowercase letters, a number, and one of: ! @ # $ % ^ &amp; *"
+                            oninput="checkStrength(this.value)"
                             class="input-field w-full px-4 py-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-800 placeholder-stone-300 text-sm pr-11"
                         >
                         <button type="button"
@@ -131,6 +136,11 @@
                             </svg>
                         </button>
                     </div>
+                    <div class="h-1 w-full bg-stone-100 rounded-full overflow-hidden">
+                        <div id="strength-bar" class="strength-bar h-full w-0 rounded-full bg-stone-300"></div>
+                    </div>
+                    <p id="strength-label" class="text-xs text-stone-400"></p>
+                    <p class="text-xs text-stone-400">Use 8+ characters, uppercase and lowercase letters, a number, and one of !@#$%^&amp;*.</p>
                     @error('password')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -175,6 +185,31 @@
 
     {{-- Script for Toggling Password Field Visibility --}}
     <script>
+        function checkStrength(val) {
+            const bar = document.getElementById('strength-bar');
+            const label = document.getElementById('strength-label');
+            let score = 0;
+            if (val.length >= 8) score++;
+            if (/[A-Z]/.test(val)) score++;
+            if (/[a-z]/.test(val)) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[!@#$%^&*]/.test(val) && /^[A-Za-z0-9!@#$%^&*]+$/.test(val)) score++;
+
+            const map = [
+                { w: '0%', color: 'bg-stone-200', text: '' },
+                { w: '20%', color: 'bg-red-400', text: 'Weak' },
+                { w: '40%', color: 'bg-amber-400', text: 'Fair' },
+                { w: '60%', color: 'bg-lime-500', text: 'Good' },
+                { w: '80%', color: 'bg-lime-500', text: 'Good' },
+                { w: '100%', color: 'bg-green-500', text: 'Strong' },
+            ];
+            const strength = map[score];
+            bar.className = `strength-bar h-full rounded-full ${strength.color}`;
+            bar.style.width = strength.w;
+            label.textContent = strength.text;
+            label.className = `text-xs ${score <= 1 ? 'text-red-400' : score === 2 ? 'text-amber-500' : 'text-green-600'}`;
+        }
+
         function togglePassword(id, btn) {
             const input = document.getElementById(id);
             const isHidden = input.type === 'password';

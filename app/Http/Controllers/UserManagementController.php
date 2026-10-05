@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ForgotPassword;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class UserManagementController extends Controller
 {
@@ -101,9 +106,23 @@ class UserManagementController extends Controller
     public function resetPassword(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $user->password = Hash::make('defaultpassword');
-        $user->save();
+        $token = Password::createToken($user);
 
-        return redirect()->route('user-management.index')->with('success', 'User password reset successfully.');
+        try {
+            Mail::to($user->email)->send(new ForgotPassword($token, $user->email));
+        } catch (TransportExceptionInterface $exception) {
+            Log::warning('Unable to deliver admin password reset email.', [
+                'user_id' => $user->id,
+                'exception' => $exception::class,
+            ]);
+
+            return back()->withErrors([
+                'email' => 'Could not send the password reset email. Verify the address and try again.',
+            ]);
+        }
+
+        return redirect()
+            ->back()
+            ->with('success', "Password reset link sent to {$user->email}.");
     }
 }

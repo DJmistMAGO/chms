@@ -67,10 +67,21 @@ class ForgotPasswordController extends Controller
         $request->validate([
             'token'    => ['required'],
             'email'    => ['required', 'email'],
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*]/',
+                'regex:/^[A-Za-z0-9!@#$%^&*]+$/',
+                'confirmed',
+            ],
         ], [
             'password.confirmed' => 'The password confirmation does not match.',
             'password.min'       => 'Password must be at least 8 characters.',
+            'password.regex'     => 'Password must include uppercase and lowercase letters, a number, and one allowed symbol (!@#$%^&*).',
         ]);
 
         // Validate and update password using Laravel's Broker
