@@ -71,6 +71,11 @@
     edit_status: 'Available',
     editFormAction: '',
     roomTypes: @js($roomTypes),
+    add_room_no: @js(old('room_no', '')),
+    add_floor: @js(old('floor', '')),
+    selectedRoom: @js(old('room_type', '')),
+    price: @js(old('base_price', '')),
+    add_status: @js(old('status', 'Available')),
 
     /* delete modal state */
     deleteRoomNo: '',
@@ -112,9 +117,19 @@
 
     closeAllModals() {
         this.statusModalOpen = false;
+        if (this.addRoomModalOpen) this.resetAddRoomForm();
         this.addRoomModalOpen = false;
         this.editRoomModalOpen = false;
         this.deleteRoomModalOpen = false;
+    },
+
+    resetAddRoomForm() {
+        this.add_room_no = '';
+        this.add_floor = '';
+        this.selectedRoom = '';
+        this.price = '';
+        this.add_status = 'Available';
+        this.addRoomModalOpen = false;
     },
 
     /* filtering */
@@ -206,7 +221,7 @@
 		{{-- ADD ROOM MODAL --}}
 
 		<div x-show="addRoomModalOpen" x-init="{{ $errors->hasAny(['room_no', 'floor', 'room_type', 'base_price', 'status']) ? 'addRoomModalOpen = true' : '' }}" x-cloak x-transition.opacity
-			@click.self="addRoomModalOpen = false"
+			@click.self="resetAddRoomForm()"
 			class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" role="dialog"
 			aria-modal="true">
 			<div
@@ -224,7 +239,7 @@
 						</p>
 					</div>
 
-					<button type="button" @click="addRoomModalOpen = false"
+					<button type="button" @click="resetAddRoomForm()"
 						class="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
 						aria-label="Close">
 						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,37 +251,31 @@
 				<form method="POST" action="{{ route('room.store') }}" data-confirm-leave class="p-6">
 					@csrf
 
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2" x-data="{
-	    roomTypes: < ? = htmlspecialchars(json_encode($roomTypes), ENT_QUOTES, 'UTF-8') ? > ,
-	    selectedRoom: @js(old('room_type', '')),
-	    price: @js(old('base_price', ''))
-	}">
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
-						<!-- Room Number -->
 						<div>
 							<label for="add_room_no" class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
 								Room Number
 							</label>
 
-							<input type="text" id="add_room_no" name="room_no" value="{{ old('room_no') }}" required placeholder="e.g. 101"
+							<input type="text" id="add_room_no" name="room_no" x-model="add_room_no" required placeholder="e.g. 101"
 								class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30">
 							@error('room_no')
 								<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
 							@enderror
 						</div>
 
-						<!-- Floor -->
 						<div>
 							<label for="add_floor" class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
 								Floor
 							</label>
 
-							<select id="add_floor" name="floor" required
+							<select id="add_floor" name="floor" x-model="add_floor" required
 								class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30">
-								<option value="" @selected(old('floor', '') === '')>Select Floor</option>
+								<option value="">Select Floor</option>
 
 								@foreach ($floorLabels as $floor => $label)
-									<option value="{{ $floor }}" @selected(old('floor') == $floor)>
+									<option value="{{ $floor }}">
 										{{ $label }}
 									</option>
 								@endforeach
@@ -276,7 +285,6 @@
 							@enderror
 						</div>
 
-						<!-- Room Type -->
 						<div>
 							<label for="add_room_type" class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
 								Room Type
@@ -285,12 +293,12 @@
 							<select id="add_room_type" name="room_type" x-model="selectedRoom"
 								@change="price = roomTypes[selectedRoom] ? parseFloat(roomTypes[selectedRoom]).toFixed(2) : ''" required
 								class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30">
-								<option value="" disabled @selected(old('room_type', '') === '')>
+								<option value="" disabled>
 									Select a room type
 								</option>
 
 								@foreach ($roomTypes as $roomName => $roomPrice)
-									<option value="{{ $roomName }}" @selected(old('room_type') === $roomName)>
+									<option value="{{ $roomName }}">
 										{{ $roomName }}
 									</option>
 								@endforeach
@@ -300,7 +308,6 @@
 							@enderror
 						</div>
 
-						<!-- Base Price -->
 						<div>
 							<label for="add_base_price" class="mb-1.5 block text-xs font-medium text-gray-500 dark:text-gray-400">
 								Base Price
@@ -311,7 +318,7 @@
 									₱
 								</span>
 
-								<input type="number" id="add_base_price" name="base_price" x-model="price" value="{{ old('base_price') }}"
+								<input type="number" id="add_base_price" name="base_price" x-model="price"
 									min="0" step="0.01" required placeholder="0.00"
 									class="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-8 pr-3 text-sm font-medium text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30">
 							</div>
@@ -326,21 +333,21 @@
 								Status
 							</label>
 
-							<select id="add_status" name="status" required
+							<select id="add_status" name="status" x-model="add_status" required
 								class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm font-medium text-gray-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:ring-indigo-500/30">
-								<option value="Available" @selected(old('status', 'Available') === 'Available')>
+								<option value="Available">
 									Available
 								</option>
 
-								<option value="Occupied" @selected(old('status') === 'Occupied')>
+								<option value="Occupied">
 									Occupied
 								</option>
 
-								<option value="Maintenance" @selected(old('status') === 'Maintenance')>
+								<option value="Maintenance">
 									Under Maintenance
 								</option>
 
-								<option value="Reserved" @selected(old('status') === 'Reserved')>
+								<option value="Reserved">
 									Reserved
 								</option>
 							</select>
@@ -353,7 +360,7 @@
 
 					<!-- Actions -->
 					<div class="mt-6 flex gap-3 border-t border-gray-100 pt-5 dark:border-gray-800">
-						<button type="button" @click="addRoomModalOpen = false"
+						<button type="button" @click="resetAddRoomForm()"
 							class="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
 							Cancel
 						</button>
