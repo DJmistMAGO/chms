@@ -6,6 +6,7 @@ use App\Mail\StatusEmail;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\User;
+use App\Models\WalkInBooking;
 use App\Traits\HandlesBookingCreation;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -111,36 +112,7 @@ class MicroPricingController extends Controller
         $room = (object) $rooms[$roomType];
         $roomName = $room->name;
         $price = $room->price;
-        $totalRooms = $room->total_rooms;
-
-        $bookings = Booking::where('room_type', $roomName)
-            ->whereIn('status', ['Pending', 'Confirmed'])
-            ->get();
-
-        $dateCounts = [];
-
-        foreach ($bookings as $booking) {
-            $start = Carbon::parse($booking->check_in)->startOfDay();
-            $end = Carbon::parse($booking->check_out)->startOfDay()->subDay();
-
-            if ($end->lt($start)) {
-                continue;
-            }
-
-            $period = CarbonPeriod::create($start, $end);
-
-            foreach ($period as $date) {
-                $formatted = $date->format('Y-m-d');
-                $dateCounts[$formatted] = ($dateCounts[$formatted] ?? 0) + 1;
-            }
-        }
-
-        $disabledDates = [];
-        foreach ($dateCounts as $date => $count) {
-            if ($count >= $totalRooms) {
-                $disabledDates[] = $date;
-            }
-        }
+        $disabledDates = $this->disabledRoomDates($roomName);
 
         return view('micro-pricing', compact(
             'room',
@@ -223,6 +195,8 @@ class MicroPricingController extends Controller
         DB::beginTransaction();
 
         try {
+            $this->ensureRoomAvailability($validated, $request->input('room_type_slug'));
+
             if ($useExistingAccount) {
                 $user = $existingUser;
 
@@ -355,34 +329,7 @@ class MicroPricingController extends Controller
         $room       = (object) $rooms[$roomType];
         $roomName   = $room->name;
         $price      = $room->price;
-        $totalRooms = $room->total_rooms;
-
-        $bookings = Booking::where('room_type', $roomName)
-            ->whereIn('status', ['pending', 'confirmed'])
-            ->get();
-
-        $dateCounts = [];
-
-        foreach ($bookings as $booking) {
-            $start = Carbon::parse($booking->check_in)->startOfDay();
-            $end = Carbon::parse($booking->check_out)->startOfDay()->subDay();
-
-            if ($end->lt($start)) {
-                continue;
-            }
-
-            foreach (CarbonPeriod::create($start, $end) as $date) {
-                $formatted = $date->format('Y-m-d');
-                $dateCounts[$formatted] = ($dateCounts[$formatted] ?? 0) + 1;
-            }
-        }
-
-        $disabledDates = [];
-        foreach ($dateCounts as $date => $count) {
-            if ($count >= $totalRooms) {
-                $disabledDates[] = $date;
-            }
-        }
+        $disabledDates = $this->disabledRoomDates($roomName);
 
         $user = Auth::user();
         $hasValidId = ! empty($user->valid_id);
@@ -435,6 +382,8 @@ class MicroPricingController extends Controller
         DB::beginTransaction();
 
         try {
+            $this->ensureRoomAvailability($validated, $request->input('room_type_slug'));
+
             $booking = $this->persistBooking($validated, $user->id, $request->file('valid_id_path'), $user);
 
             DB::commit();
@@ -486,7 +435,7 @@ class MicroPricingController extends Controller
         $roomName = $room->name;
         $price = $room->price;
 
-        $disabledDates = [];
+        $disabledDates = $this->disabledRoomDates($roomName);
 
         return view('booking.new-wizard', compact(
             'user',
@@ -521,6 +470,8 @@ class MicroPricingController extends Controller
         DB::beginTransaction();
 
         try {
+            $this->ensureRoomAvailability($validated, $request->input('room_type_slug'));
+
             $booking = $this->persistBooking(
                 $validated,
                 $user->id,
@@ -559,5 +510,111 @@ class MicroPricingController extends Controller
                 'success',
                 'Booking submitted! We will verify your ID and confirm shortly.'
             );
+    }
+
+    protected function roomInventoryCount(string $roomName, bool $lock = false): int
+    {
+        $rooms = Room::where('room_type', $roomName)
+            ->whereNotIn('status', ['Maintenance', 'Reserved']);
+
+        if ($lock) {
+            return $rooms->lockForUpdate()->get(['id'])->count();
+        }
+
+        return $rooms->count();
+    }
+
+    protected function roomOccupancyByDate(
+        string $roomName,
+        ?Carbon $rangeStart = null,
+        ?Carbon $rangeEnd = null
+    ): array {
+        $overlapping = function ($query) use ($rangeStart, $rangeEnd) {
+            if ($rangeEnd) {
+                $query->whereDate('check_in', '<', $rangeEnd->format('Y-m-d'));
+            }
+            if ($rangeStart) {
+                $query->whereDate('check_out', '>', $rangeStart->format('Y-m-d'));
+            }
+        };
+
+        $dateCounts = [];
+        $addStay = function ($checkIn, $checkOut) use (&$dateCounts, $rangeStart, $rangeEnd) {
+            $start = Carbon::parse($checkIn)->startOfDay();
+            $end = Carbon::parse($checkOut)->startOfDay()->subDay();
+
+            if ($rangeStart && $start->lt($rangeStart)) {
+                $start = $rangeStart->copy();
+            }
+            if ($rangeEnd && $end->gte($rangeEnd)) {
+                $end = $rangeEnd->copy()->subDay();
+            }
+            if ($end->lt($start)) {
+                return;
+            }
+
+            foreach (CarbonPeriod::create($start, $end) as $date) {
+                $formatted = $date->format('Y-m-d');
+                $dateCounts[$formatted] = ($dateCounts[$formatted] ?? 0) + 1;
+            }
+        };
+
+        $bookings = Booking::where('room_type', $roomName)
+            ->whereIn('status', ['Pending', 'Confirmed', 'Checked In', 'pending', 'confirmed', 'checked in']);
+        $overlapping($bookings);
+        foreach ($bookings->get(['check_in', 'check_out']) as $booking) {
+            $addStay($booking->check_in, $booking->check_out);
+        }
+
+        $walkIns = WalkInBooking::whereIn('status', ['Confirmed', 'Checked In', 'confirmed', 'checked in'])
+            ->whereHas('room', function ($query) use ($roomName) {
+                $query->where('room_type', $roomName);
+            });
+        $overlapping($walkIns);
+        foreach ($walkIns->get(['check_in', 'check_out']) as $walkIn) {
+            $addStay($walkIn->check_in, $walkIn->check_out);
+        }
+
+        return $dateCounts;
+    }
+
+    protected function disabledRoomDates(string $roomName): array
+    {
+        $roomCount = $this->roomInventoryCount($roomName);
+        if ($roomCount === 0) {
+            return [];
+        }
+
+        $disabledDates = [];
+        foreach ($this->roomOccupancyByDate($roomName, Carbon::today()) as $date => $occupiedCount) {
+            if ($occupiedCount >= $roomCount) {
+                $disabledDates[] = $date;
+            }
+        }
+
+        return $disabledDates;
+    }
+
+    protected function ensureRoomAvailability(array $validated, string $roomTypeSlug): void
+    {
+        $room = $this->roomCatalog()[$roomTypeSlug] ?? null;
+        if (! $room) {
+            throw ValidationException::withMessages([
+                'room_type' => ['Selected room is no longer available.'],
+            ]);
+        }
+
+        $checkIn = Carbon::parse($validated['check_in'])->startOfDay();
+        $checkOut = Carbon::parse($validated['check_out'])->startOfDay();
+        $roomCount = $this->roomInventoryCount($room['name'], true);
+
+        $dateCounts = $this->roomOccupancyByDate($room['name'], $checkIn, $checkOut);
+        foreach (CarbonPeriod::create($checkIn, $checkOut->copy()->subDay()) as $date) {
+            if ($roomCount === 0 || ($dateCounts[$date->format('Y-m-d')] ?? 0) >= $roomCount) {
+                throw ValidationException::withMessages([
+                    'check_in' => ['All rooms of this type are occupied for the selected dates. Please choose different dates.'],
+                ]);
+            }
+        }
     }
 }
