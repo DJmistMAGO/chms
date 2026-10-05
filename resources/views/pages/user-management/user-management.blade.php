@@ -23,6 +23,15 @@
 
 		<div class="mb-5 border-b border-gray-200 dark:border-gray-800">
 			<nav class="-mb-px flex gap-6" aria-label="User types">
+				<button type="button" id="allTab" onclick="switchUserTab('all')"
+					class="user-tab border-b-2 px-1 pb-3 text-sm font-medium transition {{ $activeTab === 'all' ? 'border-amber-600 text-amber-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
+					All users
+					<span
+						class="ml-1.5 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+						{{ $allUsers->total() }}
+					</span>
+				</button>
+
 				<button type="button" id="staffTab" onclick="switchUserTab('staff')"
 					class="user-tab border-b-2 px-1 pb-3 text-sm font-medium transition {{ $activeTab === 'staff' ? 'border-amber-600 text-amber-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' }}">
 					Staff
@@ -96,6 +105,93 @@
 					</div>
 				</form>
 			</div>
+		</div>
+
+		<div id="allTable" class="user-table {{ $activeTab === 'all' ? '' : 'hidden' }}">
+			<div class="max-w-full overflow-x-auto custom-scrollbar">
+				<table class="min-w-full">
+					<thead>
+						<tr class="border-y border-gray-100 dark:border-gray-800">
+							<th class="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Name</th>
+							<th class="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Email</th>
+							<th class="py-3 pr-4 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">User type</th>
+							<th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Phone</th>
+							<th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Address</th>
+							<th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</th>
+							<th class="py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Actions</th>
+						</tr>
+					</thead>
+
+					<tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+						@forelse ($allUsers as $user)
+							<tr class="user-row transition hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+								data-search="{{ strtolower($user['name']) }} {{ strtolower($user['email']) }} {{ strtolower($user['phone'] ?? '') }} {{ strtolower($user['address'] ?? '') }} {{ strtolower(implode(' ', $user['roles'])) }}">
+								<td class="py-3 pr-4">
+									<div class="flex items-center gap-3">
+										@if ($user['avatar'])
+											<img src="{{ asset('storage/' . $user['avatar']) }}" alt="{{ $user['name'] }}'s Avatar"
+												class="h-9 w-9 rounded-full object-cover">
+										@else
+											<div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+												{{ strtoupper(substr($user['name'], 0, 2)) }}
+											</div>
+										@endif
+										<span class="font-medium text-gray-800 dark:text-white/90">{{ $user['name'] }}</span>
+									</div>
+								</td>
+								<td class="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{{ $user['email'] }}</td>
+								<td class="py-3 pr-4 text-sm text-gray-500 dark:text-gray-400">{{ implode(', ', $user['roles']) ?: 'No role' }}</td>
+								<td class="py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user['phone'] ?? 'N/A' }}</td>
+								<td class="py-3 text-sm text-gray-500 dark:text-gray-400">{{ $user['address'] ?? 'N/A' }}</td>
+								<td class="py-3">
+									@if ($user['status'] === 'active')
+										<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">Active</span>
+									@else
+										<span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-300">Inactive</span>
+									@endif
+								</td>
+								<td class="py-3 text-sm">
+									<div class="inline-flex flex-wrap items-center gap-2">
+										<button type="button"
+											onclick='openEditModal({{ json_encode($user['id']) }}, {{ json_encode($user['name'] ?? '') }}, {{ json_encode($user['email'] ?? '') }}, {{ json_encode($user['phone'] ?? '') }}, {{ json_encode($user['address'] ?? '') }})'
+											class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-700 active:bg-blue-800">
+											Edit
+										</button>
+										@if ($user['status'] === 'active')
+											<button type="button" onclick="openStatusModal('{{ $user['id'] }}', 'deactivate')"
+												class="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-red-700 active:bg-red-800">Deactivate</button>
+										@else
+											<button type="button" onclick="openStatusModal('{{ $user['id'] }}', 'activate')"
+												class="inline-flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-green-700 active:bg-green-800">Activate</button>
+										@endif
+										<form action="{{ route('user-management.reset-password', $user['id']) }}" method="POST"
+											class="inline-flex js-reset-password-form">
+											@csrf
+											<button type="submit"
+												class="inline-flex items-center gap-1 rounded-lg bg-yellow-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-yellow-700 active:bg-yellow-800 disabled:cursor-not-allowed disabled:opacity-60">
+												<svg class="reset-password-spinner hidden h-3.5 w-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+													<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+													<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+												</svg>
+												<span class="reset-password-label">Reset Password</span>
+											</button>
+										</form>
+									</div>
+								</td>
+							</tr>
+						@empty
+							<tr>
+								<td colspan="7" class="py-10 text-center text-sm text-gray-500 dark:text-gray-400">No users found.</td>
+							</tr>
+						@endforelse
+					</tbody>
+				</table>
+			</div>
+			@if ($allUsers->hasPages())
+				<div class="mt-5">
+					{{ $allUsers->links() }}
+				</div>
+			@endif
 		</div>
 
 		<div id="staffTable" class="user-table {{ $activeTab === 'staff' ? '' : 'hidden' }}">
@@ -578,11 +674,17 @@
 
 
 		function switchUserTab(type) {
+			const allTable =
+				document.getElementById('allTable');
+
 			const staffTable =
 				document.getElementById('staffTable');
 
 			const clientTable =
 				document.getElementById('clientTable');
+
+			const allTab =
+				document.getElementById('allTab');
 
 			const staffTab =
 				document.getElementById('staffTab');
@@ -602,25 +704,26 @@
 			];
 
 
-			if (type === 'staff') {
-				staffTable.classList.remove('hidden');
-				clientTable.classList.add('hidden');
+			const tables = {
+				all: allTable,
+				staff: staffTable,
+				client: clientTable
+			};
 
-				staffTab.classList.add(...activeClasses);
-				staffTab.classList.remove(...inactiveClasses);
+			const tabs = {
+				all: allTab,
+				staff: staffTab,
+				client: clientTab
+			};
 
-				clientTab.classList.remove(...activeClasses);
-				clientTab.classList.add(...inactiveClasses);
-			} else {
-				staffTable.classList.add('hidden');
-				clientTable.classList.remove('hidden');
-
-				clientTab.classList.add(...activeClasses);
-				clientTab.classList.remove(...inactiveClasses);
-
-				staffTab.classList.remove(...activeClasses);
-				staffTab.classList.add(...inactiveClasses);
-			}
+			Object.entries(tables).forEach(([tabType, table]) => {
+				const isActive = tabType === type;
+				table.classList.toggle('hidden', !isActive);
+				tabs[tabType].classList.toggle('border-amber-600', isActive);
+				tabs[tabType].classList.toggle('text-amber-600', isActive);
+				tabs[tabType].classList.toggle('border-transparent', !isActive);
+				tabs[tabType].classList.toggle('text-gray-500', !isActive);
+			});
 
 			document.getElementById('search-input').value = '';
 			filterTable();

@@ -28,7 +28,17 @@ class UserManagementController extends Controller
             ];
         };
 
-        $activeTab = $request->query('user_tab') === 'client' ? 'client' : 'staff';
+        $activeTab = in_array($request->query('user_tab'), ['all', 'client'], true)
+            ? $request->query('user_tab')
+            : 'staff';
+
+        $allUsers = User::query()
+            ->whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'admin');
+            })
+            ->paginate(10, ['*'], 'all_page')
+            ->appends(['user_tab' => 'all'])
+            ->through($mapUser);
 
         $staffUsers = User::role('staff')
             ->paginate(10, ['*'], 'staff_page')
@@ -41,6 +51,7 @@ class UserManagementController extends Controller
             ->through($mapUser);
 
         return view('pages.user-management.user-management', compact(
+            'allUsers',
             'staffUsers',
             'clientUsers',
             'activeTab'

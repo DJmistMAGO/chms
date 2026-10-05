@@ -30,7 +30,7 @@
 		<div class="grid grid-cols-12 gap-6">
 			<div class="col-span-12">
 				<x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms"
-					:bookingsToday="$bookingsToday" />
+					:bookingsToday="$bookingsToday" :cancelledBookings="$cancelledBookings" />
 			</div>
 
 			<div class="col-span-12">

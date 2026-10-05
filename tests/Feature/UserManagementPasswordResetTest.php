@@ -45,7 +45,15 @@ it('emails an admin-triggered password reset link without changing the user pass
         ->assertSee('Sending...', false)
         ->assertSee('disabled:cursor-not-allowed disabled:opacity-60', false);
 
-    expect(substr_count($managementPage->getContent(), 'reset-password-spinner hidden'))->toBe(2);
+    expect(substr_count($managementPage->getContent(), 'reset-password-spinner hidden'))->toBe(5);
+
+    $allUsersPage = $this->get(route('user-management.index', [
+        'user_tab' => 'all',
+        'all_page' => 1,
+    ]));
+    $allUsersPage->assertOk()
+        ->assertSee('User type')
+        ->assertSee($admin->email);
 
     $user->refresh();
     expect($user->password)->toBe($originalPassword);

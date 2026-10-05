@@ -36,6 +36,8 @@ class DashboardController extends Controller
             ->orderBy('room_no')
             ->paginate(7);
         $allBookings = Booking::all();
+        $cancelledBookings = Booking::where('status', 'Cancelled')->count()
+            + WalkInBooking::where('status', 'Cancelled')->count();
         $recentBookings = Booking::with('user')
             ->whereIn('status', ['Confirmed', 'Checked In', 'Completed'])
             ->latest('created_at')
@@ -60,6 +62,7 @@ class DashboardController extends Controller
             'bookingHistory' => $bookingHistory,
             'rooms' => $rooms,
             'allBookings' => $allBookings,
+            'cancelledBookings' => $cancelledBookings,
             'recentBookings' => $recentBookings,
             'bookingsToday' => $bookingsToday,
             'pendingBookings' => $pendingBookings,
