@@ -31,7 +31,21 @@ class AuthenticationController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*]/',
+                'regex:/^[A-Za-z0-9!@#$%^&*]+$/',
+                'confirmed',
+            ],
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must include uppercase and lowercase letters, a number, and one allowed symbol (!@#$%^&*).',
+            'password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         $user = User::create([
