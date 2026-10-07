@@ -27,7 +27,14 @@ Route::controller(MicroPricingController::class)
         Route::post('/account/check', 'checkExistingAccount')->name('customize.account.check');
         Route::post('/login-with-booking', 'loginOrRegisterWithBooking')->name('customize.login.with.booking');
         Route::post('/booking/google/store', 'storeGoogleBookingSession')->name('booking.google.store');
+        
     });
+
+
+// Placed outside the 'customize' prefix
+Route::get('/booking/check-floors/{roomType}', [MicroPricingController::class, 'checkFloorAvailability'])
+    ->name('booking.check-floors');
+
 
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy.policy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms.of.service');
@@ -80,6 +87,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/booking/new/{roomType}', [MicroPricingController::class, 'newAuthenticatedBookingWizard'])->name('booking.new.wizard');
     Route::post('/booking/new', [MicroPricingController::class, 'storeNewBooking'])->name('booking.new.store');
+
+
 
 
     Route::controller(BookingController::class)
