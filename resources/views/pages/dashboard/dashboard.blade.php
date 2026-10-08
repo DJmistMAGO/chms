@@ -28,10 +28,18 @@
 
 	@unlessrole('client')
 		<div class="grid grid-cols-12 gap-6">
-			<div class="col-span-12">
-				<x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms"
-					:bookingsToday="$bookingsToday" :cancelledBookings="$cancelledBookings" />
-			</div>
+			@role('admin')
+				<div class="col-span-12">
+					<x-dashboard.admin-summary :stats="$adminUserStats" />
+				</div>
+			@endrole
+
+			@unlessrole('admin')
+				<div class="col-span-12">
+					<x-dashboard.staff-summary :rooms="$rooms" :allBookings="$allBookings" :totalRooms="$totalRooms" :availableRooms="$availableRooms"
+						:bookingsToday="$bookingsToday" :cancelledBookings="$cancelledBookings" />
+				</div>
+			@endunlessrole
 
 			<div class="col-span-12">
 				<x-dashboard.room-overview :rooms="$rooms" :totalRooms="$totalRooms" />
