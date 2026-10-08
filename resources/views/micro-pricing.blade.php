@@ -583,8 +583,9 @@
                                             hours before check-in</p>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="wizard-step hidden" data-step="2">
+                            <div class="wizard-step hidden" data-step="2">
                                     <div class="section-label mb-3">
                                         <span class="text-xs font-medium tracking-widest uppercase text-charcoal"
                                             id="step2-heading">Step 2: Your
@@ -613,10 +614,11 @@
                                         <div>
                                             <label class="block text-xs font-medium tracking-widest uppercase mb-1.5"
                                                 style="color:#7A6E68;">Name</label>
-                                            <input type="text" name="name" required id="wizard-name"
+                                            <input type="text" name="name" id="wizard-name"
                                                 value="{{ old('name') }}" placeholder="Your full name"
                                                 class="w-full rounded-xl border px-4 py-3 text-sm text-warm"
                                                 style="border-color:#FFE566; background:#FFF8D6;">
+                                            <p class="field-error hidden" id="wizard-name-error"></p>
                                             @error('name')
                                                 <p class="field-error"><i
                                                         class="fas fa-circle-exclamation"></i><span>{{ $message }}</span>
@@ -695,7 +697,7 @@
                                             <label class="block text-xs font-medium tracking-widest uppercase mb-1.5"
                                                 style="color:#7A6E68;">Email
                                                 Address</label>
-                                            <input type="email" id="wizard-email-existing"
+                                            <input type="email" name="email" id="wizard-email-existing"
                                                 placeholder="you@email.com"
                                                 class="w-full rounded-xl border px-4 py-3 text-sm text-warm"
                                                 style="border-color:#FFE566; background:#FFF8D6;">
@@ -704,7 +706,7 @@
                                         <div>
                                             <label class="block text-xs font-medium tracking-widest uppercase mb-1.5"
                                                 style="color:#7A6E68;">Password</label>
-                                            <input type="password" id="wizard-password-existing"
+                                            <input type="password" name="password" id="wizard-password-existing"
                                                 placeholder="••••••••"
                                                 class="w-full rounded-xl border px-4 py-3 text-sm text-warm"
                                                 style="border-color:#FFE566; background:#FFF8D6;">
@@ -757,9 +759,9 @@
                                             <i class="fas fa-spinner fa-spin hidden" id="step2-spinner"></i>
                                         </button>
                                     </div>
-                                </div>
+                            </div>
 
-                                <div class="wizard-step hidden" data-step="3">
+                            <div class="wizard-step hidden" data-step="3">
                                     <div class="section-label mb-3"><span
                                             class="text-xs font-medium tracking-widest uppercase text-charcoal">Step
                                             3: Upload a valid ID</span></div>
@@ -844,9 +846,9 @@
                                             class="py-3.5 px-6 rounded-2xl font-medium text-sm transition-all active:scale-95"
                                             style="background:#FFD000; color:#1C1C1E;">Continue to review</button>
                                     </div>
-                                </div>
+                            </div>
 
-                                <div class="wizard-step hidden" data-step="4">
+                            <div class="wizard-step hidden" data-step="4">
                                     <div class="section-label mb-3"><span
                                             class="text-xs font-medium tracking-widest uppercase text-charcoal">Step
                                             4: Review & confirm</span></div>
@@ -905,7 +907,6 @@
                                             <span id="final-submit-label">Confirm booking</span>
                                         </button>
                                     </div>
-                                </div>
                             </div>
                         </div>
                 </form>
@@ -1130,8 +1131,16 @@
             currentGuestMode = mode;
             const isNew = mode === 'new';
 
-            document.getElementById('panel-new-guest').classList.toggle('hidden', !isNew);
-            document.getElementById('panel-existing-guest').classList.toggle('hidden', isNew);
+            const newPanel = document.getElementById('panel-new-guest');
+            const existingPanel = document.getElementById('panel-existing-guest');
+            newPanel.classList.toggle('hidden', !isNew);
+            existingPanel.classList.toggle('hidden', isNew);
+            newPanel.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = !isNew;
+            });
+            existingPanel.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = isNew;
+            });
             document.getElementById('use-existing-account').value = isNew ? '0' : '1';
 
             document.getElementById('toggle-new-guest').style.cssText = isNew ?
@@ -1221,25 +1230,21 @@
             label.className = `text-xs ${score <= 1 ? 'text-red-400' : score === 2 ? 'text-amber-500' : 'text-green-600'}`;
         }
 
-        function finalizeStep2Fields(mode) {
-            if (mode === 'existing') {
-                document.getElementById('wizard-email-new').value = document.getElementById('wizard-email-existing').value
-                    .trim();
-                document.getElementById('wizard-password-new').value = document.getElementById('wizard-password-existing')
-                    .value;
-            }
-        }
-
         async function handleStep2Continue() {
             document.querySelectorAll('#panel-new-guest .field-error, #panel-existing-guest .field-error')
                 .forEach(el => el.classList.add('hidden'));
 
             if (currentGuestMode === 'new') {
+                const name = document.getElementById('wizard-name');
                 const email = document.getElementById('wizard-email-new');
                 const password = document.getElementById('wizard-password-new');
                 const confirm = document.getElementById('wizard-password-confirmation');
                 let hasError = false;
 
+                if (!name.value.trim()) {
+                    showFieldError('wizard-name-error', 'Enter your full name.');
+                    hasError = true;
+                }
                 if (!email.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
                     showFieldError('wizard-email-new-error', 'Enter a valid email address.');
                     hasError = true;
@@ -1326,7 +1331,6 @@
                         return;
                     }
 
-                    finalizeStep2Fields('existing');
                     syncBookingToHiddenFields();
 
                     if (data.requires_id_upload) {
