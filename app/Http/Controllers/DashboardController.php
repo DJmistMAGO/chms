@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\User;
 use App\Models\WalkInBooking;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,6 +49,19 @@ class DashboardController extends Controller
         $pendingBookings = Booking::where('status', 'Pending')->get();
         $totalRooms = Room::count();
         $availableRooms = Room::where('status', 'Available')->count();
+        $managedUsers = User::query()->whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'admin');
+        });
+        $adminUserStats = [
+            'totalUsers' => (clone $managedUsers)->count(),
+            'clients' => User::role('client')->count(),
+            'staff' => User::role('staff')->count(),
+            'activeUsers' => (clone $managedUsers)->where('status', 'active')->count(),
+            'newUsersThisMonth' => (clone $managedUsers)
+                ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+                ->count(),
+            'totalBookings' => Booking::count() + WalkInBooking::count(),
+        ];
 
         $bookingStats = [
             'Active' => $bookings->whereIn('status', ['Confirmed', 'Verified'])->count(),
@@ -69,6 +83,7 @@ class DashboardController extends Controller
             'totalRooms' => $totalRooms,
             'bookingStats' => $bookingStats,
             'availableRooms' => $availableRooms,
+            'adminUserStats' => $adminUserStats,
         ]);
     }
 }
