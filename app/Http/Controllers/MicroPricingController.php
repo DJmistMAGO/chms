@@ -94,8 +94,12 @@ class MicroPricingController extends Controller
         $roomName = $room->name;
         $price = $room->price;
         $disabledDates = $this->disabledRoomDates($roomName);
+        $floorAvailability = $this->floorAvailability($roomName);
+        $firstAvailableFloor = collect($floorAvailability)
+            ->search(fn ($availability) => $availability['available']);
+        $defaultFloor = $firstAvailableFloor === false ? '' : $firstAvailableFloor;
 
-        return view('micro-pricing', compact('room', 'roomName', 'roomType', 'price', 'disabledDates'));
+        return view('micro-pricing', compact('room', 'roomName', 'roomType', 'price', 'disabledDates', 'floorAvailability', 'defaultFloor'));
     }
 
     public function checkExistingAccount(Request $request)
@@ -305,11 +309,24 @@ class MicroPricingController extends Controller
         $roomName = $room->name;
         $price = $room->price;
         $disabledDates = $this->disabledRoomDates($roomName);
+        $floorAvailability = $this->floorAvailability($roomName);
+        $firstAvailableFloor = collect($floorAvailability)
+            ->search(fn ($availability) => $availability['available']);
+        $defaultFloor = $firstAvailableFloor === false ? '' : $firstAvailableFloor;
 
         $user = Auth::user();
         $hasValidId = !empty($user->valid_id);
 
-        return view('components.common.booking-wizard-authenticated', compact('room', 'roomName', 'roomType', 'price', 'disabledDates', 'hasValidId'));
+        return view('components.common.booking-wizard-authenticated', compact(
+            'room',
+            'roomName',
+            'roomType',
+            'price',
+            'disabledDates',
+            'floorAvailability',
+            'defaultFloor',
+            'hasValidId'
+        ));
     }
 
     public function storeAuthenticatedBooking(Request $request)
@@ -410,8 +427,12 @@ class MicroPricingController extends Controller
         $price = $room->price;
 
         $disabledDates = $this->disabledRoomDates($roomName);
+        $floorAvailability = $this->floorAvailability($roomName);
+        $firstAvailableFloor = collect($floorAvailability)
+            ->search(fn ($availability) => $availability['available']);
+        $defaultFloor = $firstAvailableFloor === false ? '' : $firstAvailableFloor;
 
-        return view('booking.new-wizard', compact('user', 'room', 'roomType', 'roomName', 'price', 'disabledDates'));
+        return view('booking.new-wizard', compact('user', 'room', 'roomType', 'roomName', 'price', 'disabledDates', 'floorAvailability', 'defaultFloor'));
     }
 
     public function storeNewBooking(Request $request)
@@ -468,34 +489,47 @@ class MicroPricingController extends Controller
 
     protected function roomInventoryCount(string $roomName, ?string $floorLevel = null, bool $lock = false): int
     {
-        // 1. First check total rooms defined in room catalog for this room name
         $catalogRoom = collect($this->roomCatalog())->firstWhere('name', $roomName);
         $totalCatalogCapacity = $catalogRoom['total_rooms'] ?? 0;
 
-        // 2. Query database for physical room inventory
-        $query = Room::where('room_type', $roomName)->whereNotIn('status', ['Maintenance', 'Out of Order', 'Reserved']);
+        $inventory = Room::where('room_type', $roomName);
+        $hasPhysicalInventory = (clone $inventory)->exists();
+        $query = (clone $inventory)->whereNotIn(DB::raw('LOWER(status)'), ['maintenance', 'out of order', 'reserved']);
 
         if ($floorLevel) {
-            $query->where('floor', $floorLevel);
+            $floorNumber = $this->floorNumber($floorLevel);
+            if ($floorNumber === null) {
+                return 0;
+            }
+
+            $query->where('floor', $floorNumber);
         }
 
         if ($lock) {
-            $dbCount = $query
+            $inventoryCount = $query
                 ->lockForUpdate()
                 ->get(['id'])
                 ->count();
         } else {
-            $dbCount = $query->count();
+            $inventoryCount = $query->count();
         }
 
-        // Return DB count if room rows exist, otherwise fall back to catalog total_rooms
-        return $dbCount > 0 ? $dbCount : ($totalCapacityCatalogFallback = $totalCatalogCapacity);
+        if ($hasPhysicalInventory) {
+            return $inventoryCount;
+        }
+
+        return $floorLevel ? 0 : $totalCatalogCapacity;
     }
 
     protected function roomOccupancyByDate(string $roomName, ?Carbon $rangeStart = null, ?Carbon $rangeEnd = null, ?string $floorLevel = null): array
 {
     $rangeStart = $rangeStart ? $rangeStart->copy()->startOfDay() : Carbon::today();
     $rangeEnd = $rangeEnd ? $rangeEnd->copy()->startOfDay() : null;
+    $floorNumber = $floorLevel ? $this->floorNumber($floorLevel) : null;
+
+    if ($floorLevel && $floorNumber === null) {
+        return [];
+    }
 
     $dateCounts = [];
 
@@ -528,12 +562,17 @@ class MicroPricingController extends Controller
             'checked in',
             'checked-in'
         ])
-        ->whereHas('room', function ($query) use ($floorLevel, $roomName) {
-            $query->where('room_type', $roomName);
-
-            if ($floorLevel) {
-                $query->where('floor', $floorLevel);
-            }
+        ->when($floorLevel, function ($query) use ($floorLevel, $floorNumber, $roomName) {
+            $query->where(function ($query) use ($floorLevel, $floorNumber, $roomName) {
+                $query->whereHas('room', function ($roomQuery) use ($floorNumber, $roomName) {
+                    $roomQuery->where('room_type', $roomName)
+                        ->where('floor', $floorNumber);
+                })->orWhere(function ($unassignedQuery) use ($floorLevel, $roomName) {
+                    $unassignedQuery->whereNull('room_id')
+                        ->where('room_type', $roomName)
+                        ->where('floor_level', $floorLevel);
+                });
+            });
         })
         ->whereDate('check_in', '<', $rangeEnd ? $rangeEnd->format('Y-m-d') : '9999-12-31')
         ->whereDate('check_out', '>', $rangeStart->format('Y-m-d'))
@@ -548,11 +587,11 @@ class MicroPricingController extends Controller
         'checked in',
         'checked-in'
     ])
-        ->whereHas('room', function ($query) use ($roomName, $floorLevel) {
+        ->whereHas('room', function ($query) use ($roomName, $floorLevel, $floorNumber) {
             $query->where('room_type', $roomName);
 
             if ($floorLevel) {
-                $query->where('floor', $floorLevel);
+                $query->where('floor', $floorNumber);
             }
         })
         ->whereDate('check_in', '<', $rangeEnd ? $rangeEnd->format('Y-m-d') : '9999-12-31')
@@ -617,50 +656,71 @@ class MicroPricingController extends Controller
         }
     }
 
-    protected function getDisabledFloors(string $roomType, string $checkIn, string $checkOut): array
+    protected function floorNumber(string $floorLevel): ?int
     {
-        $floors = ['Floor 1', 'Floor 2', 'Floor 4'];
-        $disabledFloors = [];
-
-        foreach ($floors as $floor) {
-            $floorNum = (int) filter_var($floor, FILTER_SANITIZE_NUMBER_INT);
-            $capacity = $this->roomInventoryCount($roomType, $floor);
-
-            // Standard check using existing occupancy logic
-            $occupancy = $this->roomOccupancyByDate($roomType, Carbon::parse($checkIn), Carbon::parse($checkOut), $floor);
-
-            // If any date in the stay is at capacity for this floor, disable the floor
-            foreach ($occupancy as $date => $count) {
-                if ($capacity === 0 || $count >= $capacity) {
-                    $disabledFloors[] = $floor;
-                    break;
-                }
-            }
+        if (preg_match('/^(?:Floor\s*)?([1-9]\d*)$/i', trim($floorLevel), $matches) !== 1) {
+            return null;
         }
 
-        return $disabledFloors;
+        return (int) $matches[1];
     }
 
-    public function checkFloorAvailability(Request $request,$roomType)
-{
-    $checkIn =$request->query('check_in');
-    $checkOut =$request->query('check_out');
+    protected function floorAvailability(string $roomName, ?string $checkIn = null, ?string $checkOut = null): array
+    {
+        $availability = [];
 
-    // Fetch all active bookings overlapping with the selected dates
-    $bookings = Booking::where('status', '!=', 'cancelled')
-        ->where(function ($query) use ($checkIn,$checkOut) {
-            $query->where('check_in', '<',$checkOut)
-                  ->where('check_out', '>', $checkIn);
-        })
-        ->get();
+        foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $floor) {
+            $capacity = $this->roomInventoryCount($roomName, $floor);
+            $fullyBooked = false;
 
-    return response()->json([
-        'status'   => 'success',
-        'check_in' => $checkIn,
-        'check_out'=> $checkOut,
-        'bookings' => $bookings
-    ]);
-}
+            if ($capacity > 0 && $checkIn && $checkOut) {
+                $occupancy = $this->roomOccupancyByDate(
+                    $roomName,
+                    Carbon::parse($checkIn),
+                    Carbon::parse($checkOut),
+                    $floor
+                );
+
+                foreach ($occupancy as $count) {
+                    if ($count >= $capacity) {
+                        $fullyBooked = true;
+                        break;
+                    }
+                }
+            }
+
+            $availability[$floor] = [
+                'capacity' => $capacity,
+                'unavailable' => $capacity === 0,
+                'fully_booked' => $fullyBooked,
+                'available' => $capacity > 0 && !$fullyBooked,
+            ];
+        }
+
+        return $availability;
+    }
+
+    public function checkFloorAvailability(Request $request, $roomType)
+    {
+        $rooms = $this->roomCatalog();
+        abort_unless(isset($rooms[$roomType]), 404);
+
+        $dates = $request->validate([
+            'check_in' => ['required', 'date'],
+            'check_out' => ['required', 'date', 'after:check_in'],
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'check_in' => $dates['check_in'],
+            'check_out' => $dates['check_out'],
+            'floors' => $this->floorAvailability(
+                $rooms[$roomType]['name'],
+                $dates['check_in'],
+                $dates['check_out']
+            ),
+        ]);
+    }
 
 //    public function checkFloorAvailability(Request $request, $roomType)
 // {

@@ -11,6 +11,12 @@
 		</div>
 	@endif
 
+	@php
+		$selectedFloor = old('floor_level', $defaultFloor ?? 'Floor 1');
+		if (!($floorAvailability[$selectedFloor]['available'] ?? false)) {
+			$selectedFloor = $defaultFloor;
+		}
+	@endphp
 	<form id="auth-wizard-form" enctype="multipart/form-data">
 		@csrf
 		<input type="hidden" name="room_type" value="{{ $roomName }}">
@@ -19,7 +25,7 @@
 		<input type="hidden" name="check_out" id="aw-check_out" value="">
 		<input type="hidden" name="number_of_guests" id="aw-input-guests" value="1">
 		<input type="hidden" name="nights" id="aw-input-nights" value="0">
-		<input type="hidden" name="floor_level" id="aw-input-floor" value="Floor 1">
+		<input type="hidden" name="floor_level" id="aw-input-floor" value="{{ $selectedFloor }}">
 		<input type="hidden" name="ambiance" id="aw-input-ambiance" value="Regular Room">
 		<input type="hidden" name="food_package" id="aw-input-food" value="No Food">
 		<input type="hidden" name="room_price" value="{{ $price }}">
@@ -81,12 +87,21 @@
 						<i class="fas fa-layer-group text-[10px]"></i> Floor Level
 					</label>
 					<div class="grid grid-cols-3 gap-2">
-						@foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $i => $floor)
+						@foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $floor)
+							@php
+								$floorState = $floorAvailability[$floor] ?? ['available' => false, 'unavailable' => true];
+								$isDisabled = !$floorState['available'];
+								$isSelected = $selectedFloor === $floor && !$isDisabled;
+							@endphp
 							<div
-								class="aw-option-row aw-chip border border-amber-400 dark:border-white/10 {{ $i === 0 ? 'aw-selected' : '' }}"
-								data-group="floor_level" data-price="0" data-label="{{ $floor }}">
+								class="aw-option-row aw-chip border border-amber-400 dark:border-white/10 {{ $isSelected ? 'aw-selected' : '' }} {{ $isDisabled ? 'aw-unavailable' : '' }}"
+								data-group="floor_level" data-price="0" data-label="{{ $floor }}"
+								data-available="{{ $floorState['available'] ? 'true' : 'false' }}"
+								data-unavailable="{{ $floorState['unavailable'] ? 'true' : 'false' }}">
 								<span class="aw-chip-label dark:text-white text-gray-800">{{ $floor }}</span>
-								<span class="aw-badge text-gray-800 dark:text-white">Free</span>
+								<span class="aw-badge text-gray-800 dark:text-white">
+									{{ $isDisabled ? ($floorState['unavailable'] ? 'Unavailable for this room type' : 'Fully booked') : 'Free' }}
+								</span>
 							</div>
 						@endforeach
 					</div>
@@ -194,6 +209,7 @@
 	(function() {
 		const BASE_PRICE = {{ $price }};
 		const disabledDates = @json($disabledDates);
+		const baseFloorAvailability = @json($floorAvailability);
 
 		const groupAddons = {
 			ambiance: 0,
@@ -208,6 +224,57 @@
 
 		function q(id) {
 			return document.getElementById(id);
+		}
+
+		function applyFloorAvailability(availability) {
+			const rows = [...document.querySelectorAll('.aw-option-row[data-group="floor_level"]')];
+			const selectedFloor = q('aw-input-floor').value;
+
+			rows.forEach(row => {
+				const state = availability[row.dataset.label] || {
+					available: false,
+					unavailable: true,
+					fully_booked: false
+				};
+				const isDisabled = !state.available;
+				const badge = row.querySelector('.aw-badge');
+
+				row.dataset.available = state.available ? 'true' : 'false';
+				row.dataset.unavailable = state.unavailable ? 'true' : 'false';
+				row.classList.toggle('aw-unavailable', isDisabled);
+				if (badge) {
+					badge.textContent = isDisabled
+						? (state.unavailable ? 'Unavailable for this room type' : 'Fully booked')
+						: 'Free';
+				}
+			});
+
+			const selectedRow = rows.find(row =>
+				row.dataset.label === selectedFloor && row.dataset.available === 'true'
+			);
+			const nextFloor = selectedRow || rows.find(row => row.dataset.available === 'true');
+			rows.forEach(row => row.classList.toggle('aw-selected', row === nextFloor));
+			q('aw-input-floor').value = nextFloor ? nextFloor.dataset.label : '';
+		}
+
+		async function updateFloorAvailability(checkIn, checkOut) {
+			const baseUrl = "{{ route('booking.check-floors', ['roomType' => ':roomType']) }}"
+				.replace(':roomType', encodeURIComponent('{{ $roomType }}'));
+			const params = new URLSearchParams({ check_in: checkIn, check_out: checkOut });
+
+			try {
+				const response = await fetch(`${baseUrl}?${params}`, {
+					headers: { Accept: 'application/json' }
+				});
+				if (!response.ok) {
+					throw new Error(`Floor availability request failed (${response.status}).`);
+				}
+
+				const data = await response.json();
+				applyFloorAvailability(data.floors);
+			} catch (error) {
+				console.error('Unable to update floor availability:', error);
+			}
 		}
 
 		function recalcTotal() {
@@ -227,14 +294,17 @@
 			Object.entries(selectionFields).forEach(([group, fieldId]) => {
 				const value = q(fieldId).value;
 				document.querySelectorAll(`.aw-option-row[data-group="${group}"]`).forEach(row => {
-					const selected = row.dataset.label === value;
+					const selected = row.dataset.label === value &&
+						(group !== 'floor_level' || row.dataset.available === 'true');
 					row.classList.toggle('aw-selected', selected);
 
 					const badge = row.querySelector('.aw-badge');
 					const price = parseInt(row.dataset.price) || 0;
 					badge.className = selected ? 'aw-badge aw-badge-active' : 'aw-badge';
-					badge.textContent = group === 'floor_level' ? 'Free' :
-						(price === 0 ? (group === 'ambiance' ? 'Base' : 'Free') : '+₱' + price
+					badge.textContent = group === 'floor_level'
+						? (row.dataset.available === 'true' ? 'Free' :
+							(row.dataset.unavailable === 'true' ? 'Unavailable for this room type' : 'Fully booked'))
+						: (price === 0 ? (group === 'ambiance' ? 'Base' : 'Free') : '+₱' + price
 							.toLocaleString());
 
 					if (group === 'ambiance' && selected) groupAddons.ambiance = price;
@@ -282,6 +352,10 @@
 
 			q('aw-input-nights').value = nights;
 			selectedNights = nights;
+			if (!q('aw-input-floor').value) {
+				showOptionsError('No floors have rooms of this type available for the selected dates.');
+				return false;
+			}
 			showOptionsError('');
 			return true;
 		}
@@ -396,6 +470,8 @@
 		document.querySelectorAll('.aw-option-row').forEach(row => {
 			row.addEventListener('click', function() {
 				const group = this.dataset.group;
+				if (group === 'floor_level' && this.dataset.available !== 'true') return;
+
 				const price = parseInt(this.dataset.price) || 0;
 				const label = this.dataset.label;
 
@@ -404,8 +480,10 @@
 					const badge = r.querySelector('.aw-badge');
 					const p = parseInt(r.dataset.price) || 0;
 					badge.className = 'aw-badge';
-					badge.textContent = group === 'floor_level' ? 'Free' :
-						(p === 0 ? (group === 'ambiance' ? 'Base' : 'Free') : '+₱' + p
+					badge.textContent = group === 'floor_level'
+						? (r.dataset.available === 'true' ? 'Free' :
+							(r.dataset.unavailable === 'true' ? 'Unavailable for this room type' : 'Fully booked'))
+						: (p === 0 ? (group === 'ambiance' ? 'Base' : 'Free') : '+₱' + p
 							.toLocaleString());
 				});
 
@@ -441,7 +519,16 @@
 			onSelectRange() {
 				const value = q('aw-booking_range').value.trim();
 				const parts = value.split(' - ');
-				if (parts.length !== 2) return;
+				if (parts.length !== 2) {
+					q('aw-check_in').value = '';
+					q('aw-check_out').value = '';
+					q('aw-input-nights').value = 0;
+					q('aw-nights-label').classList.add('hidden');
+					selectedNights = 0;
+					applyFloorAvailability(baseFloorAvailability);
+					recalcTotal();
+					return;
+				}
 
 				const start = fecha.parse(parts[0], 'MMM D, YYYY');
 				const end = fecha.parse(parts[1], 'MMM D, YYYY');
@@ -459,9 +546,11 @@
 				q('aw-nights-label').classList.remove('hidden');
 
 				recalcTotal();
+				updateFloorAvailability(q('aw-check_in').value, q('aw-check_out').value);
 			}
 		});
 
+		applyFloorAvailability(baseFloorAvailability);
 		recalcTotal();
 		restoreOptionSelections();
 	})();
@@ -484,6 +573,12 @@
 
 	#auth-wizard-root .aw-chip:hover {
 		background: rgba(255, 255, 255, 0.05);
+	}
+
+	#auth-wizard-root .aw-chip.aw-unavailable {
+		cursor: not-allowed;
+		opacity: 0.5;
+		pointer-events: none;
 	}
 
 	#auth-wizard-root .aw-chip-label {
