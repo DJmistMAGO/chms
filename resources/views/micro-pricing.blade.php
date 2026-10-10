@@ -314,6 +314,12 @@
                     </div>
                 @endif
 
+                @php
+                    $selectedFloor = old('floor_level', $defaultFloor ?? 'Floor 1');
+                    if (!($floorAvailability[$selectedFloor]['available'] ?? false)) {
+                        $selectedFloor = $defaultFloor;
+                    }
+                @endphp
                 <form method="POST" action="{{ route('customize.login.with.booking') }}" id="booking-wizard-form"
                     class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:1px solid #FFE566;"
                     enctype="multipart/form-data" data-confirm-leave>
@@ -326,7 +332,7 @@
                         value="{{ old('number_of_guests', 1) }}">
                     <input type="hidden" name="nights" id="input-nights" value="{{ old('nights', 0) }}">
                     <input type="hidden" name="floor_level" id="input-floor"
-                        value="{{ old('floor_level', 'Floor 1') }}">
+                        value="{{ $selectedFloor }}">
                     <input type="hidden" name="ambiance" id="input-ambiance"
                         value="{{ old('ambiance', 'Regular Room') }}">
                     <input type="hidden" name="food_package" id="input-food"
@@ -457,18 +463,16 @@
                                                 Level</span>
                                         </div>
                                         <div class="space-y-2">
-                                            @php
-                                                $selectedFloor = old('floor_level', 'Floor 1');
-                                                $disabledFloors = $disabledFloors ?? [];
-                                            @endphp
                                             @foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $floor)
                                                 @php
-                                                    $isDisabled = in_array($floor, $disabledFloors);
+                                                    $floorState = $floorAvailability[$floor] ?? ['available' => false, 'unavailable' => true];
+                                                    $isDisabled = !$floorState['available'];
                                                     $isSelected = $selectedFloor === $floor && !$isDisabled;
                                                 @endphp
                                                 <div class="option-row {{ $isSelected ? 'selected' : '' }} {{ $isDisabled ? 'opacity-50 cursor-not-allowed bg-gray-100 pointer-events-none' : 'cursor-pointer' }} flex items-center justify-between border rounded-xl px-4 py-3"
                                                     style="border-color: {{ $isDisabled ? '#E5E7EB' : ($isSelected ? '#D4A800' : '#FFE566') }};"
                                                     data-group="floor_level" data-value="{{ $floor }}"
+                                                    data-available="{{ $floorState['available'] ? 'true' : 'false' }}"
                                                     data-price="0">
                                                     <div class="flex items-center gap-3">
                                                         <span class="dot w-2 h-2 rounded-full flex-shrink-0"
@@ -482,7 +486,7 @@
                                                         @if ($isDisabled)
                                                             <span
                                                                 class="fully-booked-badge text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                                                                Fully Booked
+                                                                {{ $floorState['unavailable'] ? 'Unavailable for this room type' : 'Fully Booked' }}
                                                             </span>
                                                         @endif
                                                     </div>
@@ -942,6 +946,7 @@
     <script>
         const BASE_PRICE = {{ $price }};
         const disabledDates = @json($disabledDates);
+        const baseFloorAvailability = @json($floorAvailability);
         const accountCheckUrl = '{{ route('customize.account.check') }}';
 
         const groupAddons = {
@@ -958,71 +963,79 @@
             return Number(String(text).replace(/[₱,\s]/g, '')) || 0;
         }
 
-        // Function to update floor UI based on selected dates
-  async function updateFloorAvailability(checkIn, checkOut) {
-    const roomType = '{{ $roomType }}';
-    const baseUrl = "{{ route('booking.check-floors', ['roomType' => ':roomType']) }}".replace(':roomType', roomType);
-    const url = `${baseUrl}?check_in=${checkIn}&check_out=${checkOut}`;
+        function applyFloorAvailability(availability) {
+            const rows = [...document.querySelectorAll('[data-group="floor_level"]')];
+            const selectedFloor = document.getElementById('input-floor').value;
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+            rows.forEach(row => {
+                const floor = row.dataset.value;
+                const state = availability[floor] || {
+                    available: false,
+                    unavailable: true,
+                    fully_booked: false
+                };
+                const isDisabled = !state.available;
+                const dot = row.querySelector('.dot');
+                const label = row.querySelector('.floor-name');
+                const status = row.querySelector('.floor-status');
 
-        console.log('📦 All Bookings for selected dates:', data.bookings);
+                row.dataset.available = state.available ? 'true' : 'false';
+                row.classList.toggle('opacity-50', isDisabled);
+                row.classList.toggle('cursor-not-allowed', isDisabled);
+                row.classList.toggle('bg-gray-100', isDisabled);
+                row.classList.toggle('pointer-events-none', isDisabled);
+                row.classList.toggle('cursor-pointer', !isDisabled);
+                if (isDisabled) row.classList.remove('selected');
+                row.style.borderColor = isDisabled ? '#E5E7EB' : (row.classList.contains('selected') ? '#D4A800' : '#FFE566');
 
-        // Extract list of booked floor levels from the returned records
-        const bookedFloors = data.bookings.map(b => b.floor_level);
-
-        document.querySelectorAll('[data-group="floor_level"]').forEach(row => {
-            const floorValue = row.dataset.value || row.getAttribute('data-value');
-            const isBooked = bookedFloors.includes(floorValue);
-
-            const radioInput = row.querySelector('input[type="radio"]');
-            const dot = row.querySelector('.dot');
-            const labelText = row.querySelector('.text-sm');
-
-            if (isBooked) {
-                // Apply disabled styling and disable interactions
-                row.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'pointer-events-none');
-                row.classList.remove('cursor-pointer', 'selected');
-                row.style.borderColor = '#E5E7EB';
-
-                if (radioInput) radioInput.disabled = true;
-                if (dot) dot.style.background = '#9CA3AF';
-                if (labelText) {
-                    labelText.classList.remove('text-warm', 'font-medium');
-                    labelText.classList.add('text-gray-400');
+                if (dot) dot.style.background = isDisabled ? '#9CA3AF' : '#D4A800';
+                if (label) {
+                    label.classList.toggle('text-gray-400', isDisabled);
+                    label.classList.toggle('text-warm', !isDisabled);
+                    label.classList.toggle('font-medium', !isDisabled && row.classList.contains('selected'));
                 }
 
-                // Append Fully Booked Badge UI
-                if (!row.querySelector('.fully-booked-badge')) {
-                    const badge = document.createElement('span');
-                    badge.className = 'fully-booked-badge text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-200 ml-auto';
-                    badge.innerText = 'Fully Booked';
-                    row.appendChild(badge);
+                if (status) {
+                    status.replaceChildren();
+                    if (isDisabled) {
+                        const badge = document.createElement('span');
+                        badge.className = 'fully-booked-badge text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-200';
+                        badge.textContent = state.unavailable ? 'Unavailable for this room type' : 'Fully Booked';
+                        status.appendChild(badge);
+                    }
                 }
-            } else {
-                // Re-enable floor option styling and interactions
-                row.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-100', 'pointer-events-none');
-                row.classList.add('cursor-pointer');
-                row.style.borderColor = row.classList.contains('selected') ? '#D4A800' : '#FFE566';
+            });
 
-                if (radioInput) radioInput.disabled = false;
-                if (dot) dot.style.background = '#D4A800';
-                if (labelText) {
-                    labelText.classList.remove('text-gray-400');
-                    labelText.classList.add('text-warm');
+            const selectedRow = rows.find(row => row.dataset.value === selectedFloor && row.dataset.available === 'true');
+            const nextFloor = selectedRow || rows.find(row => row.dataset.available === 'true');
+            rows.forEach(row => {
+                const isSelected = row === nextFloor;
+                row.classList.toggle('selected', isSelected);
+                row.style.borderColor = row.dataset.available !== 'true' ? '#E5E7EB' : (isSelected ? '#D4A800' : '#FFE566');
+                row.querySelector('.floor-name')?.classList.toggle('font-medium', isSelected);
+            });
+            document.getElementById('input-floor').value = nextFloor ? nextFloor.dataset.value : '';
+        }
+
+        async function updateFloorAvailability(checkIn, checkOut) {
+            const baseUrl = "{{ route('booking.check-floors', ['roomType' => ':roomType']) }}"
+                .replace(':roomType', encodeURIComponent('{{ $roomType }}'));
+            const params = new URLSearchParams({ check_in: checkIn, check_out: checkOut });
+
+            try {
+                const response = await fetch(`${baseUrl}?${params}`, {
+                    headers: { Accept: 'application/json' }
+                });
+                if (!response.ok) {
+                    throw new Error(`Floor availability request failed (${response.status}).`);
                 }
 
-                // Remove Fully Booked Badge UI if previously added
-                const existingBadge = row.querySelector('.fully-booked-badge');
-                if (existingBadge) existingBadge.remove();
+                const data = await response.json();
+                applyFloorAvailability(data.floors);
+            } catch (error) {
+                console.error('Unable to update floor availability:', error);
             }
-        });
-    } catch (error) {
-        console.error('Error fetching bookings:', error);
-    }
-}
+        }
 
         function recalcTotal() {
             const addonPerNight = (groupAddons.ambiance || 0) + (groupAddons.food_package || 0);
@@ -1438,15 +1451,7 @@
                     document.getElementById('nights-badge').classList.add('hidden');
                     syncBookingToHiddenFields();
                     recalcTotal();
-
-                    // Clear fully booked states on floor options if range is cleared
-                    document.querySelectorAll('[data-group="floor_level"]').forEach(row => {
-                        row.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-gray-100',
-                            'pointer-events-none');
-                        row.classList.add('cursor-pointer');
-                        const badge = row.querySelector('.fully-booked-badge');
-                        if (badge) badge.remove();
-                    });
+                    applyFloorAvailability(baseFloorAvailability);
                     return;
                 }
 
@@ -1512,6 +1517,9 @@
                 document.getElementById('nights-label').textContent =
                     selectedNights + ' night' + (selectedNights !== 1 ? 's' : '');
                 document.getElementById('nights-badge').classList.remove('hidden');
+                updateFloorAvailability(oldCheckIn, oldCheckOut);
+            } else {
+                applyFloorAvailability(baseFloorAvailability);
             }
 
             syncBookingToHiddenFields();
@@ -1521,6 +1529,8 @@
         // option row selection
         document.querySelectorAll('.option-row').forEach(row => {
             row.addEventListener('click', function() {
+                if (this.dataset.group === 'floor_level' && this.dataset.available !== 'true') return;
+
                 const group = this.dataset.group;
                 const price = parseInt(this.dataset.price) || 0;
 

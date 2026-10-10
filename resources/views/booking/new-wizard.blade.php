@@ -346,6 +346,12 @@
 					</div>
 				@endif
 
+				@php
+					$selectedFloor = old('floor_level', $defaultFloor ?? 'Floor 1');
+					if (!($floorAvailability[$selectedFloor]['available'] ?? false)) {
+						$selectedFloor = $defaultFloor;
+					}
+				@endphp
 				<form method="POST" action="{{ route('booking.new.store') }}" id="booking-wizard-form"
 					class="bg-white rounded-2xl shadow-sm overflow-hidden" style="border:1px solid #FFE566;" data-confirm-leave>
 					@csrf
@@ -355,7 +361,7 @@
 					<input type="hidden" name="check_out" id="check_out" value="{{ old('check_out') }}">
 					<input type="hidden" name="number_of_guests" id="input-guests" value="{{ old('number_of_guests', 1) }}">
 					<input type="hidden" name="nights" id="input-nights" value="{{ old('nights', 0) }}">
-					<input type="hidden" name="floor_level" id="input-floor" value="{{ old('floor_level', 'Floor 1') }}">
+					<input type="hidden" name="floor_level" id="input-floor" value="{{ $selectedFloor }}">
 					<input type="hidden" name="ambiance" id="input-ambiance" value="{{ old('ambiance', 'Regular Room') }}">
 					<input type="hidden" name="food_package" id="input-food" value="{{ old('food_package', 'No Food') }}">
 					<input type="hidden" name="room_price" value="{{ $price }}">
@@ -451,16 +457,26 @@
 										<div class="section-label mb-3"><span
 												class="text-xs font-medium tracking-widest uppercase text-charcoal">Floor Level</span></div>
 										<div class="space-y-2">
-											@php $selectedFloor = old('floor_level', 'Floor 1'); @endphp
 											@foreach (['Floor 1', 'Floor 2', 'Floor 4'] as $floor)
+												@php
+													$floorState = $floorAvailability[$floor] ?? ['available' => false, 'unavailable' => true];
+													$isDisabled = !$floorState['available'];
+												@endphp
 												<div
-													class="option-row {{ $selectedFloor === $floor ? 'selected' : '' }} flex items-center border rounded-xl px-4 py-3"
-													style="border-color:{{ $selectedFloor === $floor ? '#D4A800' : '#FFE566' }};" data-group="floor_level"
-													data-price="0">
+													class="option-row {{ $selectedFloor === $floor ? 'selected' : '' }} {{ $isDisabled ? 'opacity-50 cursor-not-allowed bg-gray-100 pointer-events-none' : 'cursor-pointer' }} flex items-center justify-between border rounded-xl px-4 py-3"
+													style="border-color:{{ $isDisabled ? '#E5E7EB' : ($selectedFloor === $floor ? '#D4A800' : '#FFE566') }};" data-group="floor_level"
+													data-value="{{ $floor }}" data-available="{{ $floorState['available'] ? 'true' : 'false' }}" data-price="0">
 													<div class="flex items-center gap-3">
-														<span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:#D4A800;"></span>
+														<span class="dot w-2 h-2 rounded-full flex-shrink-0" style="background:{{ $isDisabled ? '#9CA3AF' : '#D4A800' }};"></span>
 														<span
-															class="text-sm {{ $selectedFloor === $floor ? 'font-medium' : '' }} text-warm">{{ $floor }}</span>
+															class="floor-name text-sm {{ $selectedFloor === $floor ? 'font-medium' : '' }} {{ $isDisabled ? 'text-gray-400' : 'text-warm' }}">{{ $floor }}</span>
+													</div>
+													<div class="floor-status">
+														@if ($isDisabled)
+															<span class="fully-booked-badge text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-200">
+																{{ $floorState['unavailable'] ? 'Unavailable for this room type' : 'Fully Booked' }}
+															</span>
+														@endif
 													</div>
 												</div>
 											@endforeach
@@ -623,6 +639,7 @@
 	<script>
 		const BASE_PRICE = {{ $price }};
 		const disabledDates = @json($disabledDates ?? []);
+		const baseFloorAvailability = @json($floorAvailability);
 
 		const groupAddons = {
 			ambiance: 0,
@@ -632,6 +649,80 @@
 		let selectedNights = 0;
 		let maxStepReached = 1;
 		let isFinalSubmitting = false;
+
+		function applyFloorAvailability(availability) {
+			const rows = [...document.querySelectorAll('[data-group="floor_level"]')];
+			const selectedFloor = document.getElementById('input-floor').value;
+
+			rows.forEach(row => {
+				const floor = row.dataset.value;
+				const state = availability[floor] || {
+					available: false,
+					unavailable: true,
+					fully_booked: false
+				};
+				const isDisabled = !state.available;
+				const dot = row.querySelector('.dot');
+				const label = row.querySelector('.floor-name');
+				const status = row.querySelector('.floor-status');
+
+				row.dataset.available = state.available ? 'true' : 'false';
+				row.classList.toggle('opacity-50', isDisabled);
+				row.classList.toggle('cursor-not-allowed', isDisabled);
+				row.classList.toggle('bg-gray-100', isDisabled);
+				row.classList.toggle('pointer-events-none', isDisabled);
+				row.classList.toggle('cursor-pointer', !isDisabled);
+				if (isDisabled) row.classList.remove('selected');
+				row.style.borderColor = isDisabled ? '#E5E7EB' : (row.classList.contains('selected') ? '#D4A800' : '#FFE566');
+
+				if (dot) dot.style.background = isDisabled ? '#9CA3AF' : '#D4A800';
+				if (label) {
+					label.classList.toggle('text-gray-400', isDisabled);
+					label.classList.toggle('text-warm', !isDisabled);
+					label.classList.toggle('font-medium', !isDisabled && row.classList.contains('selected'));
+				}
+
+				if (status) {
+					status.replaceChildren();
+					if (isDisabled) {
+						const badge = document.createElement('span');
+						badge.className = 'fully-booked-badge text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded border border-red-200';
+						badge.textContent = state.unavailable ? 'Unavailable for this room type' : 'Fully Booked';
+						status.appendChild(badge);
+					}
+				}
+			});
+
+			const selectedRow = rows.find(row => row.dataset.value === selectedFloor && row.dataset.available === 'true');
+			const nextFloor = selectedRow || rows.find(row => row.dataset.available === 'true');
+			rows.forEach(row => {
+				const isSelected = row === nextFloor;
+				row.classList.toggle('selected', isSelected);
+				row.style.borderColor = row.dataset.available !== 'true' ? '#E5E7EB' : (isSelected ? '#D4A800' : '#FFE566');
+				row.querySelector('.floor-name')?.classList.toggle('font-medium', isSelected);
+			});
+			document.getElementById('input-floor').value = nextFloor ? nextFloor.dataset.value : '';
+		}
+
+		async function updateFloorAvailability(checkIn, checkOut) {
+			const baseUrl = "{{ route('booking.check-floors', ['roomType' => ':roomType']) }}"
+				.replace(':roomType', encodeURIComponent('{{ $roomType }}'));
+			const params = new URLSearchParams({ check_in: checkIn, check_out: checkOut });
+
+			try {
+				const response = await fetch(`${baseUrl}?${params}`, {
+					headers: { Accept: 'application/json' }
+				});
+				if (!response.ok) {
+					throw new Error(`Floor availability request failed (${response.status}).`);
+				}
+
+				const data = await response.json();
+				applyFloorAvailability(data.floors);
+			} catch (error) {
+				console.error('Unable to update floor availability:', error);
+			}
+		}
 
 		function recalcTotal() {
 			const addonPerNight = (groupAddons.ambiance || 0) + (groupAddons.food_package || 0);
@@ -791,6 +882,7 @@
 					document.getElementById('nights-badge').classList.add('hidden');
 					syncBookingToHiddenFields();
 					recalcTotal();
+					applyFloorAvailability(baseFloorAvailability);
 					return;
 				}
 
@@ -811,6 +903,7 @@
 
 				syncBookingToHiddenFields();
 				recalcTotal();
+				updateFloorAvailability(checkInStr, checkOutStr);
 			}
 		});
 
@@ -843,6 +936,9 @@
 				document.getElementById('nights-label').textContent =
 					selectedNights + ' night' + (selectedNights !== 1 ? 's' : '');
 				document.getElementById('nights-badge').classList.remove('hidden');
+				updateFloorAvailability(oldCheckIn, oldCheckOut);
+			} else {
+				applyFloorAvailability(baseFloorAvailability);
 			}
 
 			syncBookingToHiddenFields();
@@ -852,6 +948,8 @@
 		// option row selection
 		document.querySelectorAll('.option-row').forEach(row => {
 			row.addEventListener('click', function() {
+				if (this.dataset.group === 'floor_level' && this.dataset.available !== 'true') return;
+
 				const group = this.dataset.group;
 				const price = parseInt(this.dataset.price) || 0;
 
